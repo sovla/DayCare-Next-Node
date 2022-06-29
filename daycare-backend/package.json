@@ -1,0 +1,16 @@
+{
+    "name": "daycare-backend",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "license": "MIT",
+    "dependencies": {},
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.30.0",
+        "@typescript-eslint/parser": "^5.30.0",
+        "eslint": "^8.0.1",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-n": "^15.0.0",
+        "eslint-plugin-promise": "^6.0.0"
+    }
+}
