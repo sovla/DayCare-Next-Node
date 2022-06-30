@@ -5,5 +5,5 @@ daycare-backend/node_modules/*
 
 # 프론트엔드
 
-daycare-front/node_modules
+daycare-front/node_modules/*
 
