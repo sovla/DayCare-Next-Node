@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+import { Injectable, HttpException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/domain/user.entity';
+import { Repository } from 'typeorm';
+import { LoginDTO } from './dto/login.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SessionService {
-  create(createSessionDto: CreateSessionDto) {
-    return 'This action adds a new session';
-  }
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+  async login(loginDto: LoginDTO) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        email: loginDto.email,
+      },
+    });
+    if (!findUser) {
+      throw new HttpException('아이디와 비밀번호를 확인해주세요.', 401);
+    }
+    const validatePassword = await bcrypt.compare(
+      loginDto.password,
+      findUser.password,
+    );
 
-  findAll() {
-    return `This action returns all session`;
-  }
+    if (!validatePassword) {
+      throw new HttpException('비밀번호가 틀립니다.', 401);
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} session`;
+    return findUser;
   }
-
-  update(id: number, updateSessionDto: UpdateSessionDto) {
-    return `This action updates a #${id} session`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} session`;
+  async logout(id: number) {
+    return true;
   }
 }

@@ -1,34 +1,85 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+  HttpException,
+  Res,
+} from '@nestjs/common';
 import { SessionService } from './session.service';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+import { LoginDTO } from './dto/login.dto';
+import { JWTGuard } from 'src/user/guard/jwt.guard';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Controller('session')
 export class SessionController {
-  constructor(private readonly sessionService: SessionService) {}
+  constructor(
+    private readonly sessionService: SessionService,
+    private jwtService: JwtService,
+  ) {}
 
   @Post()
-  create(@Body() createSessionDto: CreateSessionDto) {
-    return this.sessionService.create(createSessionDto);
+  async login(@Body() loginDto: LoginDTO, @Res() res: Response) {
+    const findUser = await this.sessionService.login(loginDto);
+    if (findUser) {
+      const result = {
+        accessToken: this.jwtService.sign({
+          id: findUser.id,
+          name: findUser.name,
+          email: findUser.email,
+        }),
+      };
+      res.statusCode = 200;
+      res.cookie('jwt', result.accessToken, {
+        httpOnly: true,
+        maxAge: 1 * 60 * 60 * 1000, // 1hours
+      });
+      return res.send({
+        statusCode: res.statusCode,
+        message: `${findUser.name}님 로그인 성공하셨습니다.`,
+        user: {
+          id: findUser.id,
+          name: findUser.name,
+          email: findUser.email,
+        },
+      });
+    }
+    return;
   }
 
-  @Get()
-  findAll() {
-    return this.sessionService.findAll();
-  }
+  @Delete()
+  @UseGuards(JWTGuard)
+  async logout(
+    @Body(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: (error) => {
+          throw new HttpException('올바른 id 값을 입력해주세요', 400);
+        },
+      }),
+    )
+    id: number,
+    @Res() res: Response,
+  ) {
+    const result = await this.sessionService.logout(id);
+    if (result) {
+      res.cookie('jwt', '', {
+        maxAge: 0,
+      });
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sessionService.findOne(+id);
-  }
+      res.statusCode = 200;
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSessionDto: UpdateSessionDto) {
-    return this.sessionService.update(+id, updateSessionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sessionService.remove(+id);
+      return res.send({
+        statusCode: 200,
+        message: '로그아웃 성공하셨습니다',
+      });
+    }
+    return;
   }
 }
