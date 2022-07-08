@@ -26,10 +26,10 @@ export class User {
   @Column({
     type: 'varchar',
   })
-  age: string;
+  image: string;
 
   @Column({
     type: 'varchar',
   })
-  image: string;
+  refresh_token: string;
 }
