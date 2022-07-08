@@ -12,6 +12,7 @@ import {
   ValidationPipe,
   Res,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { jwtUserDTO } from './dto/jwt-user.dto';
+import { JWTGuard } from './guard/jwt.guard';
 
 @Controller('user')
 export class UserController {
@@ -74,22 +76,12 @@ export class UserController {
   }
 
   @Delete()
+  @UseGuards(JWTGuard)
   async removeUser(
     @Req() req: Request,
     @Res() res: Response,
     @Body('id') id: number,
   ) {
-    if (req.cookies['jwt'] == null) {
-      throw new HttpException('올바르지 않은 접근입니다.', 401);
-    }
-    const jwtUser = await this.jwtService.verifyAsync<jwtUserDTO>(
-      req.cookies['jwt'],
-    );
-
-    if (+id !== +jwtUser.id) {
-      throw new HttpException('올바르지 않은 접근입니다.', 403);
-    }
-
     const result = await this.userService.removeUser(id);
     if (result) {
       res.statusCode = 200;
@@ -112,12 +104,14 @@ export class UserController {
   }
 
   @Patch()
+  @UseGuards(JWTGuard)
   updateUser(
     @Req() req: Request,
     @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
   ) {
     // 유저 업데이트
+
     return this.userService.updateUser(req, updateUserDto);
   }
 }
