@@ -2,7 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 function ormConfig(): TypeOrmModuleOptions {
   const commonConf = {
-    SYNCRONIZE: false, // 운영시 사용 금지
+    SYNCRONIZE: true, // 운영시 사용 금지
     ENTITIES: [__dirname + '/domain/*.entity{.ts,.js}'],
     MIGRATIONS: [__dirname + '/migrations/**/*{.ts,.js}'],
     CLI: {
@@ -20,7 +20,7 @@ function ormConfig(): TypeOrmModuleOptions {
     database: 'daycare',
     entities: commonConf.ENTITIES, // entity 추가후 넣어주기
     synchronize: commonConf.SYNCRONIZE,
-    logging: true,
+    logging: false,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
   };

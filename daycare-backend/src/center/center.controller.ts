@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  Req,
+  UploadedFiles,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 import { CenterService } from './center.service';
-import { CreateCenterDto } from './dto/create-center.dto';
-import { UpdateCenterDto } from './dto/update-center.dto';
+import { FindFilterDTO } from './dto/findFilter-center.dto';
 
 @Controller('center')
 export class CenterController {
   constructor(private readonly centerService: CenterService) {}
 
-  @Post()
-  create(@Body() createCenterDto: CreateCenterDto) {
-    return this.centerService.create(createCenterDto);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.centerService.findOne(id);
   }
 
   @Get()
-  findAll() {
-    return this.centerService.findAll();
+  findFilter(@Query() findFilterDto: FindFilterDTO) {
+    return this.centerService.findFilter(findFilterDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.centerService.findOne(+id);
+  @Post('/basicInfo')
+  @UseInterceptors(FilesInterceptor('files'))
+  createBasicInfo(@UploadedFiles() files: Array<Express.Multer.File>) {
+    return this.centerService.createCenterToExcel(files);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCenterDto: UpdateCenterDto) {
-    return this.centerService.update(+id, updateCenterDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.centerService.remove(+id);
+  @Put('/detailInfo')
+  @UseInterceptors(FilesInterceptor('files'))
+  updateDetailInfo(@UploadedFiles() files: Array<Express.Multer.File>) {
+    return this.centerService.createCenterToExcelDetail(files);
   }
 }
