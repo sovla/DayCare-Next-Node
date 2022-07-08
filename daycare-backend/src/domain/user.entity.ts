@@ -34,4 +34,10 @@ export class User {
     default: '',
   })
   refresh_token: string;
+
+  @Column({
+    type: 'tinyint',
+    default: 0,
+  })
+  delete_account: number;
 }

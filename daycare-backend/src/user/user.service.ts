@@ -16,6 +16,8 @@ import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 import { Request } from 'express';
 import { Cache } from 'cache-manager';
+import { find } from 'rxjs';
+import { jwtUserDTO } from './dto/jwt-user.dto';
 
 @Injectable()
 export class UserService {
@@ -56,7 +58,7 @@ export class UserService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const insertData = await this.userRepository.insert({
+    const insertData = await this.userRepository.save({
       email: privateUser.email,
       name: privateUser.name,
       password: privateUser.password,
@@ -118,7 +120,27 @@ export class UserService {
     return `This action updates a `;
   }
 
-  removeUser(req: Request) {
-    return `This action removes a # user`;
+  async removeUser(id: number) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (findUser.delete_account === 0) {
+      await this.userRepository.save({ ...findUser, delete_account: 1 });
+      return true;
+    } else if (findUser.delete_account === 1) {
+      throw new HttpException('이미 탈퇴처리된 회원입니다.', 400);
+    } else {
+      throw new HttpException('존재하지 않는 회원입니다.', 400);
+    }
+  }
+
+  async tokenValidateUser(payload: jwtUserDTO) {
+    const userFind = await this.userRepository.find({
+      where: { id: payload.id },
+    });
+    return userFind;
   }
 }

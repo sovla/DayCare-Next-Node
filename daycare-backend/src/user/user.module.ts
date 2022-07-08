@@ -4,20 +4,23 @@ import { UserController } from './user.controller';
 import { User } from 'src/domain/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './security/passport.jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     CacheModule.register(),
     JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,
+      secret: `${process.env.JWT_SECRET_KEY}`,
       signOptions: {
         expiresIn: '300s',
       },
     }),
+    PassportModule,
   ],
   exports: [TypeOrmModule],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, JwtStrategy],
 })
 export class UserModule {}
