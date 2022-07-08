@@ -25,11 +25,13 @@ export class User {
 
   @Column({
     type: 'varchar',
+    default: '',
   })
   image: string;
 
   @Column({
     type: 'varchar',
+    default: '',
   })
   refresh_token: string;
 }

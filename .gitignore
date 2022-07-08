@@ -2,6 +2,8 @@
 
 daycare-backend/node_modules/*
 
+daycare-backend/.env
+
 
 # 프론트엔드
 
