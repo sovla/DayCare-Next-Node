@@ -1,3 +1,4 @@
+import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import {
   Controller,
   Get,
@@ -16,7 +17,7 @@ import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Response } from 'express';
-import { JWTGuard } from 'src/user/guard/jwt.guard';
+import { JWTGuard } from './guard/jwt.guard';
 
 @Controller('review')
 export class ReviewController {
@@ -58,19 +59,35 @@ export class ReviewController {
     }
   }
 
-  @Patch(':id')
+  @Patch()
   @UseGuards(JWTGuard)
   @UsePipes(ValidationPipe)
-  updateReview(
-    @Param('id') id: string,
+  async updateReview(
     @Body() updateReviewDto: UpdateReviewDto,
+    @Res() res: Response,
   ) {
-    return this.reviewService.updateReview(+id, updateReviewDto);
+    const saveReview = await this.reviewService.updateReview(updateReviewDto);
+
+    res.statusCode = 200;
+
+    return res.send({
+      statusCode: res.statusCode,
+      message: '리뷰 변경 완료',
+      review: saveReview,
+    });
   }
 
   @Delete()
   @UseGuards(JWTGuard)
-  removeReview(@Body() id: string) {
-    return this.reviewService.removeReview(+id);
+  async removeReview(
+    @Body() deleteReviewDto: DeleteReviewDTO,
+    @Res() res: Response,
+  ) {
+    await this.reviewService.removeReview(deleteReviewDto);
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '리뷰 삭제 완료',
+    });
   }
 }

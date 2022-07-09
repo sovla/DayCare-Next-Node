@@ -6,6 +6,7 @@ import { Center } from 'src/domain/center.entity';
 import { Review } from 'src/domain/review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
@@ -94,11 +95,42 @@ export class ReviewService {
     }
   }
 
-  updateReview(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async updateReview(updateReviewDto: UpdateReviewDto) {
+    const findReview = await this.reviewRepository.findOne({
+      where: {
+        id: updateReviewDto.review_id,
+      },
+    });
+    if (!findReview) {
+      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    }
+
+    const saveReview = await this.reviewRepository.save({
+      ...findReview,
+      title: updateReviewDto.title,
+      content: updateReviewDto.content,
+    });
+
+    return saveReview;
   }
 
-  removeReview(id: number) {
-    return `This action removes a #${id} review`;
+  async removeReview(deleteReviewDto: DeleteReviewDTO) {
+    const findReview = await this.reviewRepository.findOne({
+      where: {
+        user_id: deleteReviewDto.id,
+        id: deleteReviewDto.review_id,
+      },
+    });
+
+    if (!findReview) {
+      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    }
+
+    const saveReview = this.reviewRepository.save({
+      ...findReview,
+      delete_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    return saveReview;
   }
 }
