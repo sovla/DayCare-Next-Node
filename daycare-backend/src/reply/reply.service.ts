@@ -65,7 +65,7 @@ export class ReplyService {
   async findOne(id: number) {
     const findReview = await this.reviewRepository.findOne({
       where: {
-        id: id,
+        id: +id,
       },
     });
 
@@ -73,11 +73,12 @@ export class ReplyService {
       throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
     }
 
-    const findReplys = await this.replyRepository.find({
-      where: {
-        review: findReview,
-      },
-    });
+    const findReplys = await this.replyRepository
+      .createQueryBuilder('reply')
+      .where(`review_id=${findReview.id}`)
+      .leftJoin('reply.likes', 'likes')
+      .loadRelationCountAndMap('reply.like_count', 'reply.likes')
+      .getMany();
 
     return findReplys;
   }
@@ -122,5 +123,42 @@ export class ReplyService {
     return !!saveReply;
   }
 
-  async likeReply(Reply_id: number, user_id: number) {}
+  async likeReply(reply_id: number, user_id: number) {
+    const findReply = await this.replyRepository.findOne({
+      where: {
+        id: reply_id,
+      },
+    });
+
+    if (!findReply || findReply.delete_date != null) {
+      throw new HttpException('존재하지 않는 댓글 입니다.', 400);
+    }
+
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user_id,
+      },
+    });
+
+    if (!findUser || findUser.delete_account) {
+      throw new HttpException('존재하지 않는 이용자 입니다.', 400);
+    }
+    const findReplyLike = await this.replyLikeRepository.findOne({
+      where: {
+        reply: findReply,
+        user: findUser,
+      },
+    });
+
+    if (findReplyLike) {
+      await this.replyLikeRepository.delete(findReplyLike);
+      return false;
+    } else {
+      await this.replyLikeRepository.save({
+        reply: findReply,
+        user: findUser,
+      });
+      return true;
+    }
+  }
 }

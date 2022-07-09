@@ -24,22 +24,22 @@ import { Response } from 'express';
 export class ReplyController {
   constructor(private readonly replyService: ReplyService) {}
 
-  // @Get('/like/:Reply_id')
-  // async likeReply(
-  //   @Param('Reply_id') Reply_id: number,
-  //   @Query('id') id: number,
-  //   @Res() res: Response,
-  // ) {
-  //   const result = await this.replyService.likeReply(+Reply_id, +id);
+  @Get('/like/:reply_id')
+  async likeReply(
+    @Param('reply_id') reply_id: number,
+    @Query('id') id: number,
+    @Res() res: Response,
+  ) {
+    const result = await this.replyService.likeReply(+reply_id, +id);
 
-  //   res.statusCode = 200;
+    res.statusCode = 200;
 
-  //   return res.send({
-  //     message: '좋아요 완료',
-  //     statusCode: res.statusCode,
-  //     like: result,
-  //   });
-  // }
+    return res.send({
+      message: '좋아요 완료',
+      statusCode: res.statusCode,
+      like: result,
+    });
+  }
 
   @Post()
   @UsePipes(ValidationPipe)
