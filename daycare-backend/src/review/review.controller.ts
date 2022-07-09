@@ -12,6 +12,7 @@ import {
   Res,
   UseGuards,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -22,6 +23,23 @@ import { JWTGuard } from './guard/jwt.guard';
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
+
+  @Get('/like/:review_id')
+  async likeReview(
+    @Param('review_id') review_id: number,
+    @Query('id') id: number,
+    @Res() res: Response,
+  ) {
+    const result = await this.reviewService.likeReview(review_id, id);
+
+    res.statusCode = 200;
+
+    return res.send({
+      message: '좋아요 완료',
+      statusCode: res.statusCode,
+      like: result,
+    });
+  }
 
   @Post()
   @UsePipes(ValidationPipe)
