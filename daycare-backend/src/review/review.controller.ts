@@ -30,7 +30,7 @@ export class ReviewController {
     @Query('id') id: number,
     @Res() res: Response,
   ) {
-    const result = await this.reviewService.likeReview(review_id, id);
+    const result = await this.reviewService.likeReview(+review_id, +id);
 
     res.statusCode = 200;
 

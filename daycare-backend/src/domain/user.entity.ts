@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ReviewLike } from './reviewlike.entity';
 
 @Entity()
 export class User {
@@ -40,4 +41,9 @@ export class User {
     default: 0,
   })
   delete_account: number;
+
+  @OneToMany(() => ReviewLike, (reviewLike) => reviewLike.user, {
+    eager: false,
+  })
+  likes: ReviewLike[];
 }

@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ReviewLike } from './reviewlike.entity';
 
 @Entity()
 export class Review {
@@ -72,12 +79,6 @@ export class Review {
     type: 'int',
     default: 0,
   })
-  like_count: number;
-
-  @Column({
-    type: 'int',
-    default: 0,
-  })
   view_count: number;
 
   @Column({
@@ -91,4 +92,9 @@ export class Review {
     nullable: true,
   })
   category_id: number;
+
+  @OneToMany(() => ReviewLike, (reviewLike) => reviewLike.review, {
+    eager: true,
+  })
+  likes: ReviewLike[];
 }

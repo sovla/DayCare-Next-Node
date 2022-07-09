@@ -1,4 +1,4 @@
-import { ReviewLike } from './../domain/revielike.entity';
+import { ReviewLike } from '../domain/reviewlike.entity';
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment-timezone';
@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { User } from 'src/domain/user.entity';
 
 @Injectable()
 export class ReviewService {
@@ -24,6 +25,9 @@ export class ReviewService {
 
     @InjectRepository(ReviewLike)
     private reviewLikeRepository: Repository<ReviewLike>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async writeReview(createReviewDto: CreateReviewDto) {
@@ -69,24 +73,13 @@ export class ReviewService {
         throw new HttpException('존재하지 않는 어린이집입니다.', 400);
       }
 
-      const findReview = await this.reviewRepository.findOne({
-        where: {
-          center_id: center_id,
-        },
-      });
-      const { length } = await this.reviewLikeRepository.find({
-        where: { review_id: findReview.id },
-      });
-      await this.reviewRepository.save({
-        ...findReview,
-        like_count: length,
-      });
+      const findReviews = await this.reviewRepository
+        .createQueryBuilder('review')
+        .where(`center_id=${center_id}`)
+        .leftJoin('review.likes', 'likes')
+        .loadRelationCountAndMap('review.like_count', 'review.likes')
+        .getMany();
 
-      const findReviews = await this.reviewRepository.find({
-        where: {
-          center_id: center_id,
-        },
-      });
       return findReviews;
     }
 
@@ -101,24 +94,12 @@ export class ReviewService {
         throw new HttpException('존재하지 않는 어린이집입니다.', 400);
       }
 
-      const findReview = await this.reviewRepository.findOne({
-        where: {
-          category_id: category_id,
-        },
-      });
-      const { length } = await this.reviewLikeRepository.find({
-        where: { review_id: findReview.id },
-      });
-      await this.reviewRepository.save({
-        ...findReview,
-        like_count: length,
-      });
-
-      const findReviews = await this.reviewRepository.find({
-        where: {
-          category_id: category_id,
-        },
-      });
+      const findReviews = await this.reviewRepository
+        .createQueryBuilder('review')
+        .where(`category_id=${category_id}`)
+        .leftJoin('review.likes', 'likes')
+        .loadRelationCountAndMap('review.like_count', 'review.likes')
+        .getMany();
 
       return findReviews;
     }
@@ -170,14 +151,20 @@ export class ReviewService {
       },
     });
 
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user_id,
+      },
+    });
+
     if (!findReview) {
       throw new HttpException('존재하지 않는 리뷰입니다.', 400);
     }
 
     const findLike = await this.reviewLikeRepository.findOne({
       where: {
-        review_id: review_id,
-        user_id: user_id,
+        review: findReview,
+        user: findUser,
       },
     });
 
@@ -186,8 +173,8 @@ export class ReviewService {
       return false;
     } else {
       await this.reviewLikeRepository.save({
-        review_id: review_id,
-        user_id: user_id,
+        user: findUser,
+        review: findReview,
       });
       return true;
     }
