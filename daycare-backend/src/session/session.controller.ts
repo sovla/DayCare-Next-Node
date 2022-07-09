@@ -38,7 +38,7 @@ export class SessionController {
       res.statusCode = 200;
       res.cookie('jwt', result.accessToken, {
         httpOnly: true,
-        maxAge: 1 * 60 * 60 * 1000, // 1hours
+        maxAge: 24 * 60 * 60 * 1000, // 1hours
       });
       return res.send({
         statusCode: res.statusCode,

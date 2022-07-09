@@ -40,25 +40,25 @@ export class ReplyController {
   //   });
   // }
 
-  // @Post()
-  // @UsePipes(ValidationPipe)
-  // @UseGuards(JWTGuard)
-  // async writeReply(
-  //   @Body() createReplyDto: CreateReplyDto,
-  //   @Res() res: Response,
-  // ) {
-  //   const saveReply = await this.replyService.writeReply(createReplyDto);
-  //   if (!saveReply) {
-  //     throw new HttpException('댓글 작성 실패', 401);
-  //   }
+  @Post()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JWTGuard)
+  async writeReply(
+    @Body() createReplyDto: CreateReplyDto,
+    @Res() res: Response,
+  ) {
+    const saveReply = await this.replyService.writeReply(createReplyDto);
+    if (!saveReply) {
+      throw new HttpException('댓글 작성 실패', 401);
+    }
 
-  //   res.statusCode = 200;
-  //   return res.send({
-  //     message: '댓글 작성 완료',
-  //     statusCode: res.statusCode,
-  //     reply: saveReply,
-  //   });
-  // }
+    res.statusCode = 200;
+    return res.send({
+      message: '댓글 작성 완료',
+      statusCode: res.statusCode,
+      reply: saveReply,
+    });
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {

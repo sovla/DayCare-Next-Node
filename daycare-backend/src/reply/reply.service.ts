@@ -27,7 +27,39 @@ export class ReplyService {
     private userRepository: Repository<User>,
   ) {}
 
-  async writeReply(createReplyDto: CreateReplyDto) {}
+  async writeReply(
+    createReplyDto: CreateReplyDto,
+  ): Promise<Omit<Reply, 'review' | 'user' | 'likes'>> {
+    const findUser = await this.userRepository.findOne({
+      where: { id: +createReplyDto.id },
+    });
+
+    if (!findUser || findUser.delete_account) {
+      throw new HttpException('존재하지 않는 유저 입니다.', 400);
+    }
+
+    const findReview = await this.reviewRepository.findOne({
+      where: { id: createReplyDto.review_id },
+    });
+
+    if (!findReview || findReview.delete_date != null) {
+      throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
+    }
+
+    const saveReply = await this.replyRepository.save({
+      content: createReplyDto.content,
+      user: findUser,
+      review: findReview,
+    });
+
+    return {
+      content: saveReply.content,
+      id: saveReply.id,
+      delete_date: saveReply.delete_date,
+      update_date: saveReply.update_date,
+      write_date: saveReply.write_date,
+    };
+  }
 
   async findOne(id: number) {
     const findReview = await this.reviewRepository.findOne({
@@ -37,7 +69,7 @@ export class ReplyService {
     });
 
     if (!findReview || findReview.delete_date != null) {
-      throw new HttpException('존재하지 않는 리뷰 입니다.', 401);
+      throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
     }
 
     const findReplys = await this.replyRepository.find({

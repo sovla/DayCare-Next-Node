@@ -46,16 +46,19 @@ export class User {
 
   @OneToMany(() => ReviewLike, (reviewLike) => reviewLike.user, {
     eager: false,
+    lazy: true,
   })
   likes: ReviewLike[];
 
   @OneToMany(() => Reply, (reply) => reply.user, {
     eager: false,
+    lazy: true,
   })
   reply: Reply[];
 
   @OneToMany(() => ReplyLike, (replyLike) => replyLike.user, {
     eager: false,
+    lazy: true,
   })
   reply_likes: ReplyLike[];
 }
