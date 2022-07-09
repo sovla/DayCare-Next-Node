@@ -79,4 +79,14 @@ export class Review {
     type: 'int',
   })
   view_count: number;
+
+  @Column({
+    type: 'int',
+  })
+  center_id: number;
+
+  @Column({
+    type: 'int',
+  })
+  category_id: number;
 }
