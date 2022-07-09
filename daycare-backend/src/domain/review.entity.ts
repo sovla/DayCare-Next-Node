@@ -1,3 +1,4 @@
+import { Reply } from './reply.entity';
 import {
   Column,
   Entity,
@@ -97,4 +98,9 @@ export class Review {
     eager: true,
   })
   likes: ReviewLike[];
+
+  @OneToMany(() => Reply, (reply) => reply.review, {
+    eager: true,
+  })
+  reply: Reply[];
 }

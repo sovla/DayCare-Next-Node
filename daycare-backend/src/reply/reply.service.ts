@@ -1,14 +1,15 @@
 import { UpdateReplyDto } from './dto/update-reply.dto';
 import { CreateReplyDto } from './dto/create-reply.dto';
 import { Injectable, HttpException } from '@nestjs/common';
-import { ReviewLike } from '../domain/reviewlike.entity';
+import { ReplyLike } from '../domain/Replylike.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment-timezone';
 import { Category } from 'src/domain/category.entity';
 import { Center } from 'src/domain/center.entity';
-import { Review } from 'src/domain/review.entity';
+import { Reply } from 'src/domain/Reply.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/domain/user.entity';
+import { Review } from 'src/domain/review.entity';
 
 @Injectable()
 export class ReplyService {
@@ -16,60 +17,41 @@ export class ReplyService {
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
 
-    @InjectRepository(Center)
-    private centerRepository: Repository<Center>,
+    @InjectRepository(Reply)
+    private replyRepository: Repository<Reply>,
 
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
-
-    @InjectRepository(ReviewLike)
-    private reviewLikeRepository: Repository<ReviewLike>,
+    @InjectRepository(ReplyLike)
+    private replyLikeRepository: Repository<ReplyLike>,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
-  async writeReply(createReviewDto: CreateReplyDto) {}
+  async writeReply(createReplyDto: CreateReplyDto) {}
 
-  async findOne(id: number) {}
-
-  async updateReview(updateReviewDto: UpdateReplyDto) {}
-
-  async removeReview(deleteReviewDto: UpdateReplyDto): boolean {}
-
-  async likeReview(review_id: number, user_id: number) {
+  async findOne(id: number) {
     const findReview = await this.reviewRepository.findOne({
       where: {
-        id: review_id,
+        id: id,
       },
     });
 
-    const findUser = await this.userRepository.findOne({
-      where: {
-        id: user_id,
-      },
-    });
-
-    if (!findReview) {
-      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    if (!findReview || findReview.delete_date != null) {
+      throw new HttpException('존재하지 않는 리뷰 입니다.', 401);
     }
 
-    const findLike = await this.reviewLikeRepository.findOne({
+    const findReplys = await this.replyRepository.find({
       where: {
         review: findReview,
-        user: findUser,
       },
     });
 
-    if (findLike) {
-      await this.reviewLikeRepository.delete(findLike);
-      return false;
-    } else {
-      await this.reviewLikeRepository.save({
-        user: findUser,
-        review: findReview,
-      });
-      return true;
-    }
+    return findReplys;
   }
+
+  async updateReply(updateReplyDto: UpdateReplyDto) {}
+
+  async removeReply(deleteReplyDto: UpdateReplyDto) {}
+
+  async likeReply(Reply_id: number, user_id: number) {}
 }

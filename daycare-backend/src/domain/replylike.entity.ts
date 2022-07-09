@@ -1,4 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/domain/user.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Reply } from './reply.entity';
 
 @Entity()
 export class ReplyLike {
@@ -7,13 +16,11 @@ export class ReplyLike {
   })
   id: number;
 
-  @Column({
-    type: 'int',
-  })
-  reply_id: number;
+  @ManyToOne(() => Reply, (reply) => reply.likes)
+  @JoinColumn({ name: 'reply_id' })
+  reply: Reply;
 
-  @Column({
-    type: 'int',
-  })
-  user_id: number;
+  @ManyToOne(() => User, (user) => user.reply)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
