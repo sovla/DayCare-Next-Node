@@ -1,3 +1,4 @@
+import { DeleteReplyDTO } from './dto/delete-reply.dto';
 import {
   Controller,
   Get,
@@ -72,38 +73,39 @@ export class ReplyController {
     });
   }
 
-  // @Patch()
-  // @UseGuards(JWTGuard)
-  // @UsePipes(ValidationPipe)
-  // async updateReply(
-  //   @Body() updateReplyDto: UpdateReplyDto,
-  //   @Res() res: Response,
-  // ) {
-  //   const saveReply = await this.replyService.updateReply(updateReplyDto);
+  @Patch()
+  @UseGuards(JWTGuard)
+  @UsePipes(ValidationPipe)
+  async updateReply(
+    @Body() updateReplyDto: UpdateReplyDto,
+    @Res() res: Response,
+  ) {
+    const saveReply = await this.replyService.updateReply(updateReplyDto);
 
-  //   res.statusCode = 200;
+    res.statusCode = 200;
 
-  //   return res.send({
-  //     statusCode: res.statusCode,
-  //     message: '댓글 변경 완료',
-  //     Reply: saveReply,
-  //   });
-  // }
+    return res.send({
+      statusCode: res.statusCode,
+      message: '댓글 변경 완료',
+      Reply: saveReply,
+    });
+  }
 
-  // @Delete()
-  // @UseGuards(JWTGuard)
-  // async removeReply(
-  //   @Body() deleteReplyDto: UpdateReplyDto,
-  //   @Res() res: Response,
-  // ) {
-  //   const result = await this.replyService.removeReply(deleteReplyDto);
-  //   if (!result) {
-  //     throw new HttpException('댓글 삭제 실패', 401);
-  //   }
-  //   res.statusCode = 200;
-  //   return res.send({
-  //     statusCode: res.statusCode,
-  //     message: '댓글 삭제 완료',
-  //   });
-  // }
+  @Delete()
+  @UsePipes(ValidationPipe)
+  @UseGuards(JWTGuard)
+  async removeReply(
+    @Body() deleteReplyDto: DeleteReplyDTO,
+    @Res() res: Response,
+  ) {
+    const result = await this.replyService.removeReply(deleteReplyDto);
+    if (!result) {
+      throw new HttpException('댓글 삭제 실패', 401);
+    }
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '댓글 삭제 완료',
+    });
+  }
 }

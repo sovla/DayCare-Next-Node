@@ -1,3 +1,4 @@
+import { DeleteReplyDTO } from './dto/delete-reply.dto';
 import { UpdateReplyDto } from './dto/update-reply.dto';
 import { CreateReplyDto } from './dto/create-reply.dto';
 import { Injectable, HttpException } from '@nestjs/common';
@@ -81,9 +82,45 @@ export class ReplyService {
     return findReplys;
   }
 
-  async updateReply(updateReplyDto: UpdateReplyDto) {}
+  async updateReply(updateReplyDto: UpdateReplyDto) {
+    const findReply = await this.replyRepository.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        user: {
+          id: +updateReplyDto.id,
+        },
+        id: +updateReplyDto.reply_id,
+      },
+      select: {
+        user: {
+          id: true,
+        },
+      },
+    });
 
-  async removeReply(deleteReplyDto: UpdateReplyDto) {}
+    if (findReply) {
+      console.log(findReply);
+    }
+  }
+
+  async removeReply(deleteReplyDto: DeleteReplyDTO) {
+    const findReply = await this.replyRepository.findOne({
+      where: {
+        id: deleteReplyDto.reply_id,
+      },
+    });
+    if (!findReply || findReply.delete_date != null) {
+      throw new HttpException('존재하지 않는 댓글 입니다.', 400);
+    }
+
+    const saveReply = await this.replyRepository.save({
+      ...findReply,
+      delete_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+    });
+    return !!saveReply;
+  }
 
   async likeReply(Reply_id: number, user_id: number) {}
 }

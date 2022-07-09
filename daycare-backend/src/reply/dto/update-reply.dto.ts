@@ -4,7 +4,7 @@ import { CreateReplyDto } from './create-reply.dto';
 
 export class UpdateReplyDto extends PartialType(CreateReplyDto) {
   @IsNotEmpty({ message: '필수값 review_id가 없습니다.' })
-  review_id: number;
+  reply_id: number;
 
   @IsNotEmpty({ message: '필수값 content가 없습니다.' })
   content: string;
