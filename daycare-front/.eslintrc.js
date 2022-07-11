@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['plugin:react/recommended', 'airbnb'],
+  extends: ['plugin:react/recommended', 'airbnb', 'next/core-web-vitals'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -42,9 +42,11 @@ module.exports = {
       },
     ],
     'linebreak-style': 0,
+    'import/no-unresolved': ['off', { caseSensitive: false }],
   },
   settings: {
     'import/resolver': {
+      typescript: {},
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
