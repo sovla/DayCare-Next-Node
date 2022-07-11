@@ -1,3 +1,9 @@
 {
-    "cSpell.words": ["jwtservice", "nestjs", "reviewlike", "tinyint"]
+    "cSpell.words": [
+        "commitlint",
+        "jwtservice",
+        "nestjs",
+        "reviewlike",
+        "tinyint"
+    ]
 }
