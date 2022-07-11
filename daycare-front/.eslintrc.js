@@ -41,6 +41,7 @@ module.exports = {
         namedComponents: 'function-declaration',
       },
     ],
+    'linebreak-style': 0,
   },
   settings: {
     'import/resolver': {
