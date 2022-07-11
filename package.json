@@ -15,7 +15,37 @@
     },
     "config": {
         "commitizen": {
-            "path": "./node_modules/cz-conventional-changelog"
+            "path": "./node_modules/cz-conventional-changelog",
+            "types": {
+                "feat": {
+                    "description": "새로운 기능의 추가",
+                    "title": "Features"
+                },
+                "fix": {
+                    "description": "버그 수정",
+                    "title": "Fixed"
+                },
+                "docs": {
+                    "description": "문서 수정",
+                    "title": "Documentation"
+                },
+                "style": {
+                    "description": "스타일 관련 기능(코드 포맷팅, 세미콜론 누락, 코드 자체의 변경이 없는 경우)",
+                    "title": "Styles"
+                },
+                "refactor": {
+                    "description": "코드 리팩토링",
+                    "title": "Code Refactoring"
+                },
+                "test": {
+                    "description": "테스트 코드, 리팩토링 코드 추가",
+                    "title": "Tests"
+                },
+                "chore": {
+                    "description": "빌드 업무 수정 및 패키지 매니저 수정",
+                    "title": "Chores"
+                }
+            }
         }
     }
 }
