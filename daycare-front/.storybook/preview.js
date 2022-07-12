@@ -1,6 +1,6 @@
-import '../styles/globals.css';
-
 import 'bootstrap/dist/css/bootstrap.css';
+
+import '../styles/globals.css';
 
 import * as NextImage from 'next/image';
 

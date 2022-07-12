@@ -43,6 +43,7 @@ module.exports = {
     'import/no-unresolved': ['off', { caseSensitive: false }],
     'comma-dangle': ['off'],
     'react/jsx-props-no-spreading': ['off'],
+    'object-curly-newline': ['off'],
   },
   settings: {
     'import/resolver': {
