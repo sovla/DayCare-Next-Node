@@ -1,11 +1,14 @@
 {
     "cSpell.words": [
         "commitlint",
+        "Docgen",
         "jwtservice",
         "linebreak",
         "nestjs",
+        "opentype",
         "reduxjs",
         "reviewlike",
-        "tinyint"
+        "tinyint",
+        "unoptimized"
     ]
 }

@@ -1,5 +1,7 @@
 import '../styles/globals.css';
 
+import 'bootstrap/dist/css/bootstrap.css';
+
 import * as NextImage from 'next/image';
 
 const OriginalNextImage = NextImage.default;

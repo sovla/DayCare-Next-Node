@@ -5,6 +5,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import InputTextComponents from '@src/Components/Atom/Input/InputText';
 import SearchComponent from '@src/Components/Atom/Input/Search';
+import SelectComponent from '@src/Components/Atom/Input/Select';
 
 export default {
   title: 'Atom/Input',
@@ -18,6 +19,9 @@ const SearchTemplate: ComponentStory<typeof SearchComponent> = (args) => (
   <SearchComponent {...args} />
 );
 
+const SelectTemplate: ComponentStory<typeof SelectComponent> = (args) => (
+  <SelectComponent {...args} />
+);
 export const InputText = InputTextTemplate.bind({});
 
 InputText.argTypes = {
@@ -83,6 +87,18 @@ Search.argTypes = {
     defaultValue: () => console.log('액션'),
     control: {
       type: 'function',
+    },
+  },
+};
+
+export const SelectCategory = SelectTemplate.bind({});
+
+SelectCategory.argTypes = {
+  menuList: {
+    description: '메뉴 리스트',
+    defaultValue: ['전체', '어린이집 추천', '어린이집 꿀팁'],
+    control: {
+      type: 'array',
     },
   },
 };
