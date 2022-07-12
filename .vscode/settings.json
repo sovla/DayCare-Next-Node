@@ -4,6 +4,7 @@
         "jwtservice",
         "linebreak",
         "nestjs",
+        "reduxjs",
         "reviewlike",
         "tinyint"
     ]
