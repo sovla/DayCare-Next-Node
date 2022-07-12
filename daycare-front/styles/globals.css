@@ -145,7 +145,8 @@ p,
 small,
 li,
 a,
-span {
+span,
+input {
   font-family: CookieRun Regular;
 }
 
