@@ -3,19 +3,24 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import Categories from '@src/Components/Template/Board/Categories';
+import CategoriesComponent from '@src/Components/Template/Board/Categories';
+import PaginationComponent from '@src/Components/Template/Board/Pagination';
 
 export default {
   title: 'Template/Board',
-} as ComponentMeta<typeof Categories>;
+} as ComponentMeta<typeof CategoriesComponent>;
 
-const Template: ComponentStory<typeof Categories> = (args) => (
-  <Categories {...args} />
-);
+const CategoriesTemplate: ComponentStory<typeof CategoriesComponent> = (
+  args
+) => <CategoriesComponent {...args} />;
 
-export const BoardRow = Template.bind({});
+const PaginationTemplate: ComponentStory<typeof PaginationComponent> = (
+  args
+) => <PaginationComponent {...args} />;
 
-BoardRow.argTypes = {
+export const Categories = CategoriesTemplate.bind({});
+
+Categories.argTypes = {
   categoryList: {
     description: '카테고리 리스트',
     defaultValue: [
@@ -28,5 +33,28 @@ BoardRow.argTypes = {
     control: {
       type: 'array',
     },
+  },
+};
+
+export const Pagination = PaginationTemplate.bind({});
+
+Pagination.argTypes = {
+  selectPage: {
+    defaultValue: 1,
+    description: '선택한 번호',
+    control: {
+      type: 'number',
+    },
+  },
+  maxPage: {
+    defaultValue: 20,
+    description: '마지막 번호',
+    control: {
+      type: 'number',
+    },
+  },
+  onClickPage: {
+    defaultValue: (page: number) => console.log(page),
+    description: '선택한 페이지 액션',
   },
 };
