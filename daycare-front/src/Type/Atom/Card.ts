@@ -1,6 +1,6 @@
 import { StaticImageData } from 'next/image';
 
-export type NextImageProps =
+export type NextImageSrc =
   | string
   | {
       default: StaticImageData;
@@ -10,5 +10,5 @@ export type NextImageProps =
 export interface CardProps {
   title: string;
   content: string;
-  image: NextImageProps;
+  image: NextImageSrc;
 }

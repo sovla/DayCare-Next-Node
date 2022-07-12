@@ -4,6 +4,8 @@ const Theme = {
     orange_FF: '#FF9500',
     gray_C1: '#C1C1C1',
     blue_00: '#0068C3',
+    blue_25: '#2599FF',
+    blue_007: '#0085FF70',
   },
 };
 
