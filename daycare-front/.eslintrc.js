@@ -41,6 +41,7 @@ module.exports = {
     ],
     'linebreak-style': 0,
     'import/no-unresolved': ['off', { caseSensitive: false }],
+    'comma-dangle': ['off'],
   },
   settings: {
     'import/resolver': {
