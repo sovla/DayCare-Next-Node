@@ -8,7 +8,7 @@ import CardComponents from '@src/Components/Atom/Card/Card';
 import Dummy from '@src/assets/image/dummy1.png';
 
 export default {
-  title: 'Atom/Card',
+  title: 'Atom/Cards',
 } as ComponentMeta<typeof CardComponents>;
 
 const Template: ComponentStory<typeof CardComponents> = (args) => (

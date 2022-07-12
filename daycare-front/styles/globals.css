@@ -150,7 +150,8 @@ input {
   font-family: CookieRun Regular;
 }
 
-div {
+div,
+input {
   box-sizing: border-box;
 }
 
