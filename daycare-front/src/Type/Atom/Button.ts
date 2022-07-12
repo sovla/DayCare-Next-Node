@@ -6,7 +6,7 @@ export interface CategoryButtonProps
   content: string;
 }
 
-export interface DetailMenuTextProps {
+export interface DetailMenuButtonProps {
   buttonProps: StyledComponentProps<'button', any, {}, never>;
   menu: string;
   image: NextImageProps;
