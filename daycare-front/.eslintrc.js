@@ -37,9 +37,7 @@ module.exports = {
     ],
     'react/function-component-definition': [
       2,
-      {
-        namedComponents: 'function-declaration',
-      },
+      { namedComponents: 'arrow-function' },
     ],
     'linebreak-style': 0,
     'import/no-unresolved': ['off', { caseSensitive: false }],
