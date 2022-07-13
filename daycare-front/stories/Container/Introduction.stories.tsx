@@ -9,6 +9,7 @@ export default {
   title: 'Container/Introduction',
   component: IntroductionComponent,
   argTypes: {},
+  parameters: { layout: 'fullscreen' },
 } as ComponentMeta<typeof IntroductionComponent>;
 
 const Template: ComponentStory<typeof IntroductionComponent> = (args) => (

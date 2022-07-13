@@ -22,6 +22,9 @@ const SearchDiv = styled.div<Pick<SearchProps, 'height' | 'width'>>`
     width: 100%;
     border: 0px;
     padding: 10px 0px;
+    &:focus {
+      outline: none;
+    }
   }
   & > button {
     padding-left: 5px;

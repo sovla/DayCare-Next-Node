@@ -25,7 +25,7 @@ const ContainerDiv = styled.div`
     }
   }
 
-  .menu {
+  .nav-menu {
     position: fixed;
     top: 0;
     right: 30px;
@@ -56,7 +56,7 @@ const Introduction: React.FC = () => (
         <p>는 간편하게 찾을수 있어요</p>
       </div>
     </div>
-    <div className="menu">
+    <div className="nav-menu">
       <Menu />
     </div>
 

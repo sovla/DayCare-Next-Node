@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const CenterListDiv = styled.div`
+  padding: 20px 20px 0px;
   & > div {
     margin-bottom: 20px;
   }

@@ -10,10 +10,11 @@ import Theme from '@src/assets/global/Theme';
 
 const CenterAside = styled.aside`
   width: 440px;
+  min-width: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 1080px;
+  min-height: 100vh;
   .menu {
     display: flex;
     width: 100%;
@@ -53,6 +54,7 @@ const CenterAside = styled.aside`
     border: 1px solid ${Theme.color.gray_D9};
     width: 190px;
     text-align: center;
+    padding: 10px 0px;
   }
   .detail {
     margin-top: 20px;
