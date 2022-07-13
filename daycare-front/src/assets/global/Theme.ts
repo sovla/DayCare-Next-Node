@@ -10,6 +10,7 @@ const Theme = {
     yellow_FF: '#FFCE4F',
     darkGray_60: '#606B5D',
     grean_00: '#00CF5B',
+    gray_FA: '#FAFAFA',
   },
 };
 

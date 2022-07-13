@@ -6,7 +6,7 @@ export interface InputTextProps
   extends StyledComponentProps<'input', any, {}, never> {
   width?: string;
   height?: string;
-  type: 'text' | 'password';
+  type: 'text' | 'password' | 'email';
 }
 
 export interface SearchProps {

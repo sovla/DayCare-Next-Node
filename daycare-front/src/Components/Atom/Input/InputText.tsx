@@ -11,8 +11,11 @@ const Input = styled.input`
   color: #000000;
   border: 1px solid ${Theme.color.gray_C1};
   padding: 0px 10px;
+  background-color: ${Theme.color.gray_FA};
+  font-size: 12px;
   &::placeholder {
     color: ${Theme.color.gray_99};
+    font-size: 12px;
   }
 `;
 
