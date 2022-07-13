@@ -21,18 +21,38 @@ const CentersTemplate: ComponentStory<typeof CentersComponent> = (args) => (
 export const DetailCenter = DetailCenterTemplate.bind({});
 
 DetailCenter.argTypes = {
-  categoryList: {
-    description: '카테고리 리스트',
+  classList: {
+    description: '반 리스트',
     defaultValue: [
-      '전체',
-      '아이-자랑',
-      '어린이집 추천해요',
-      '아이-자랑',
-      '어린이집 추천해요',
+      {
+        title: '만 0세',
+        value: '0명',
+      },
     ],
     control: {
       type: 'array',
     },
+  },
+
+  center: {
+    description: '어린이집 정보',
+    defaultValue: {
+      name: '어린이집 명',
+      city: '행정 관할구역',
+      authorizationDate: '2022-07-18',
+      tel: '051-1234-1234',
+      operatingTime: '평일 09:00 ~ 17:00',
+      address: '어린이집 주소',
+      representativeName: '김무무',
+      directorName: '김원장',
+    },
+    control: {
+      type: 'object',
+    },
+  },
+  image: {
+    defaultValue: Dummy,
+    description: '어린이집 이미지',
   },
 };
 
