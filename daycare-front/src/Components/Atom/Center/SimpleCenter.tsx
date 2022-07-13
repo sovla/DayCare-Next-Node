@@ -19,10 +19,12 @@ const CenterDiv = styled.div`
     cursor: pointer;
   }
   .center {
-    padding: 4px;
+    padding: 10px;
     .introduction {
       display: flex;
       align-items: center;
+      margin-bottom: 3px;
+
       & > h5 {
         color: ${Theme.color.blue_00};
       }
@@ -32,10 +34,12 @@ const CenterDiv = styled.div`
       }
     }
     .image {
+      margin-top: 3px;
       & > span {
         padding-left: 5px;
       }
       & > a {
+        padding-left: 5px;
         text-decoration: none;
       }
       .homepage {
