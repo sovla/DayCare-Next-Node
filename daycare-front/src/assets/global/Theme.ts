@@ -8,6 +8,7 @@ const Theme = {
     blue_007: '#0085FF70',
     yellow_FF: '#FFCE4F',
     darkGray_60: '#606B5D',
+    grean_00: '#00CF5B',
   },
 };
 
