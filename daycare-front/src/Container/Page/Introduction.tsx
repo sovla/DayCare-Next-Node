@@ -11,7 +11,7 @@ import Image from 'next/image';
 const ContainerDiv = styled.div`
   position: relative;
   .subject {
-    margin-left: 100px;
+    margin-left: 200px;
     margin-top: 270px;
     p {
       font-size: 48px;

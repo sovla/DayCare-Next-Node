@@ -42,7 +42,7 @@ const Menu: React.FC = () => (
   <Nav>
     <ul>
       <li>
-        <Link href="/introduction">
+        <Link href="/">
           <a>소개</a>
         </Link>
       </li>
