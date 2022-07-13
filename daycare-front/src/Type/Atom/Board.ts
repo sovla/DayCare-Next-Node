@@ -3,7 +3,7 @@ export interface RowProps {
   title: string;
   write: string;
   writeDate: string;
-  viewCount: number;
-  likeCount: number;
-  reviewCount: number;
+  viewCount: string;
+  likeCount: string;
+  reviewCount?: number;
 }
