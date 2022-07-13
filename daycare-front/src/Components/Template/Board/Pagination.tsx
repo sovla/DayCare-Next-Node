@@ -6,6 +6,8 @@ import styled from 'styled-components';
 
 const PaginationUl = styled.ul`
   display: flex;
+  background-color: #ffffff;
+
   & > li:first-of-type > button {
     border-radius: 5px 0px 0px 5px;
   }

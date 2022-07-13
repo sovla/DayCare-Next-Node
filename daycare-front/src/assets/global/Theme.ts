@@ -11,6 +11,7 @@ const Theme = {
     darkGray_60: '#606B5D',
     grean_00: '#00CF5B',
     gray_FA: '#FAFAFA',
+    yellow_FFE: '#FFEAB4',
   },
 };
 

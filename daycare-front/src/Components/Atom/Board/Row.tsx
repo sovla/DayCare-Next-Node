@@ -8,6 +8,7 @@ const RowDiv = styled.div`
   height: 50px;
   display: flex;
   align-items: center;
+  background-color: #ffffff;
   border: 1px solid ${Theme.color.gray_99};
   & > div:not(.title) {
     width: 100px;

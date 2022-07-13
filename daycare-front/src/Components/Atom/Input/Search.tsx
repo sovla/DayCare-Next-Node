@@ -14,6 +14,7 @@ const SearchDiv = styled.div<Pick<SearchProps, 'height' | 'width'>>`
   display: flex;
   align-items: center;
   padding: 0px 10px;
+  background-color: #ffffff;
   & > input::placeholder {
     color: ${Theme.color.gray_99};
   }

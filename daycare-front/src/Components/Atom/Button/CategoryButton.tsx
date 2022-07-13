@@ -12,7 +12,7 @@ const Button = styled.button`
   text-align: center;
   border-radius: 30px;
   border: 1px solid ${Theme.color.gray_99};
-  background-color: #fff0;
+  background-color: #fff;
 `;
 
 const CategoryButton: React.FC<CategoryButtonProps> = (props) => {

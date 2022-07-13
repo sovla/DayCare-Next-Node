@@ -8,7 +8,13 @@ const Button = styled.button`
   width: 70px;
   height: 70px;
   background-color: ${Theme.color.blue_007};
+  transition: 0.3s;
   border-radius: 16px;
+  z-index: 5;
+  &:hover {
+    cursor: pointer;
+    background-color: ${Theme.color.blue_00};
+  }
 `;
 
 const IconButton: React.FC<IconButtonProps> = (props) => {

@@ -7,6 +7,7 @@ import Dummy from '@src/assets/image/dummy1.png';
 import Theme from '@src/assets/global/Theme';
 import Intro from '@src/assets/image/Intro.jpg';
 import Image from 'next/image';
+import Head from 'next/head';
 
 const ContainerDiv = styled.div`
   position: relative;
@@ -49,6 +50,11 @@ const ContainerDiv = styled.div`
 
 const Introduction: React.FC = () => (
   <ContainerDiv>
+    <Head>
+      <title>DayCare</title>
+      <meta name="description" content="DayCareIntroduction" />
+      <link rel="icon" href="/LogoIcon.png" />
+    </Head>
     <div className="subject">
       <p>그동안 좋은 어린이집 찾기 어려우셨죠?</p>
       <div>

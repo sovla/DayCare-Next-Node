@@ -18,8 +18,6 @@ const Nav = styled.nav`
     justify-content: space-around;
     & > li {
       height: 44px;
-      margin-bottom: 5px;
-
       & * {
         color: #fff;
         text-decoration: none;
@@ -32,6 +30,8 @@ const Nav = styled.nav`
       }
     }
     & > li:nth-child(-n + 3) {
+      margin-top: 10px;
+
       width: 90px;
       text-align: center;
     }
@@ -52,7 +52,7 @@ const Menu: React.FC = () => (
         </Link>
       </li>
       <li>
-        <Link href="/review">
+        <Link href="/board">
           <a>리뷰</a>
         </Link>
       </li>
