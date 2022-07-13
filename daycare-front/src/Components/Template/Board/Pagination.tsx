@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import BSRPagination from 'react-bootstrap/Pagination';
 
 //  reset css 방지
-import './Pagination.css';
+import './css/Pagination.css';
 
 const Pagination: React.FC<PaginationProps> = (props) => {
   const { maxPage, onClickPage, selectPage } = props;
