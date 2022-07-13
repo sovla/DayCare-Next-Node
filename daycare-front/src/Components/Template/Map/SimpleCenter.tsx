@@ -1,7 +1,5 @@
 import React from 'react';
 
-function SimpleCenter() {
-  return <div />;
-}
+const SimpleCenter = () => <div />;
 
 export default SimpleCenter;

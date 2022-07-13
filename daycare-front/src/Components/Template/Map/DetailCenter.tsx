@@ -1,7 +1,5 @@
 import React from 'react';
 
-function DetailCenter() {
-  return <div />;
-}
+const DetailCenter = () => <div />;
 
 export default DetailCenter;

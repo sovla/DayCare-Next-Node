@@ -1,7 +1,5 @@
 import React from 'react';
 
-function Filter() {
-  return <div />;
-}
+const Filter = () => <div />;
 
 export default Filter;

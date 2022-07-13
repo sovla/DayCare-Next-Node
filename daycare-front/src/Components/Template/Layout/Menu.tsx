@@ -1,7 +1,5 @@
 import React from 'react';
 
-function Menu() {
-  return <div />;
-}
+const Menu = () => <div />;
 
 export default Menu;

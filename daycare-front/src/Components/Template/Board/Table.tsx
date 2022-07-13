@@ -1,7 +1,5 @@
 import React from 'react';
 
-function Table() {
-  return <div />;
-}
+const Table = () => <div />;
 
 export default Table;
