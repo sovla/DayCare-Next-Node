@@ -3,6 +3,9 @@ import { PaginationProps } from '@src/Type/Template/Board';
 import React, { useMemo } from 'react';
 import BSRPagination from 'react-bootstrap/Pagination';
 
+//  reset css 방지
+import './Pagination.css';
+
 const Pagination: React.FC<PaginationProps> = (props) => {
   const { maxPage, onClickPage, selectPage } = props;
 
@@ -17,7 +20,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
   }, [selectPage]);
 
   return (
-    <BSRPagination>
+    <BSRPagination size="sm">
       <BSRPagination.First
         disabled={selectPage === 1}
         onClick={() => onClickPage(1)}

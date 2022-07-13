@@ -53,11 +53,4 @@ Pagination.argTypes = {
       type: 'number',
     },
   },
-  onClickPage: {
-    defaultValue: (page: number) => console.log(page),
-    description: '선택한 페이지 액션',
-    control: {
-      type: 'function',
-    },
-  },
 };
