@@ -11,7 +11,8 @@ import Theme from '@src/assets/global/Theme';
 const CenterDiv = styled.div`
   display: flex;
   width: 400px;
-  height: 120px;
+  max-width: 400px;
+  min-height: 80px;
   justify-content: space-between;
   border: 1px solid ${Theme.color.gray_C1};
   border-radius: 10px;
@@ -27,6 +28,10 @@ const CenterDiv = styled.div`
 
       & > h5 {
         color: ${Theme.color.blue_00};
+        width: min-content;
+        max-width: 200px;
+        word-wrap: break-word;
+        word-break: keep-all;
       }
       & > small {
         color: ${Theme.color.gray_99};
@@ -49,6 +54,11 @@ const CenterDiv = styled.div`
         }
       }
     }
+  }
+  .address {
+    max-width: 250px;
+    display: block;
+    word-break: keep-all;
   }
   div:nth-child(2) {
     display: flex;
@@ -74,17 +84,28 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
             />
           )}
         </div>
-        <span>{address}</span>
-        <div className="image">
-          <Image src={TelIcon} width={12} height={12} alt="TelIcon" />
-          <span>{tel}</span>
-        </div>
-        <div className="image">
-          <Image src={HomePageIcon} width={12} height={12} alt="HomePageIcon" />
-          <a href={homepage}>
-            <span className="homepage">{homepage}</span>
-          </a>
-        </div>
+        <span className="address">{address}</span>
+        {tel && tel.length > 0 && (
+          <div className="image">
+            <Image src={TelIcon} width={12} height={12} alt="TelIcon" />
+            <span>{tel}</span>
+          </div>
+        )}
+
+        {homepage && homepage?.length > 0 && (
+          <div className="image">
+            <Image
+              src={HomePageIcon}
+              width={12}
+              height={12}
+              alt="HomePageIcon"
+            />
+
+            <a href={homepage}>
+              <span className="homepage">{homepage}</span>
+            </a>
+          </div>
+        )}
       </div>
       <div>
         <Image

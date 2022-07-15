@@ -1,6 +1,7 @@
 import { NextImageSrc } from './Card';
 
 export interface SimpleCenterProps {
+  id: number;
   name: string;
   address: string;
   tel: string;
