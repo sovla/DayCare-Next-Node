@@ -1,10 +1,14 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import Theme from '@src/assets/global/Theme';
 import InputText from '@src/Components/Atom/Input/InputText';
-import Link from 'next/link';
-import React from 'react';
-import { BlueButton } from 'stories/Atom/Button.stories';
+import React, { useCallback, useState } from 'react';
+import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import styled from 'styled-components';
+import useApi from '@src/CustomHook/useApi';
+import { sessionLoginType } from '@src/Type/API/session';
+import { useDispatch } from 'react-redux';
+import { changeUser } from '@src/Store/userState';
+import { LoginProps } from '@src/Type/Template/Modal';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -38,32 +42,73 @@ const ContainerDiv = styled.div`
     color: ${Theme.color.blue_00};
     text-decoration: none;
   }
+  button {
+    cursor: pointer;
+  }
 `;
 
-const Login: React.FC = () => (
-  <ContainerDiv>
-    <h3>로그인</h3>
-    <InputText type="text" placeholder="사용자 이름" />
+const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-    <InputText type="password" placeholder="비밀번호" />
-    <BlueButton
-      content="로그인"
-      buttonProps={{
-        type: 'submit',
-        onClick: () => {
-          console.log('Login');
-        },
-      }}
-    />
-    <div className="line" />
-    <p>
-      계정이 없으신가요?
-      <Link href="/signUp">
-        <a>가입하기</a>
-      </Link>
-    </p>
-    <div className="line" />
-  </ContainerDiv>
-);
+  const dispatch = useDispatch();
+
+  const { api: loginApi, isLoading } = useApi<sessionLoginType>({
+    url: '/session',
+    data: {
+      email,
+      password,
+    },
+    method: 'post',
+  });
+  console.log(isLoading, '제거');
+
+  const loginApiHandle = useCallback(async () => {
+    try {
+      const response = await loginApi();
+      if (response.data.statusCode === 200) {
+        //  로그인성공
+
+        dispatch(changeUser(response.data.user));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [dispatch, loginApi]);
+
+  return (
+    <ContainerDiv>
+      <h3>로그인</h3>
+      <InputText
+        type="text"
+        placeholder="사용자 이름"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <InputText
+        type="password"
+        placeholder="비밀번호"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <BlueButton
+        content="로그인"
+        buttonProps={{
+          type: 'button',
+          onClick: loginApiHandle,
+        }}
+      />
+      <div className="line" />
+      <p>
+        계정이 없으신가요?
+        <button type="button" onClick={setIsSignUp}>
+          <a>가입하기</a>
+        </button>
+      </p>
+      <div className="line" />
+    </ContainerDiv>
+  );
+};
 
 export default Login;

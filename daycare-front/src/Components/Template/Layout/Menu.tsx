@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import AccountIcon from '@src/assets/image/AccountIcon.png';
 import BellIcon from '@src/assets/image/BellIcon.png';
 import Theme from '@src/assets/global/Theme';
+import useAuth from '@src/CustomHook/useAuth';
 
 const Nav = styled.nav`
   & > ul {
@@ -38,27 +39,36 @@ const Nav = styled.nav`
   }
 `;
 
-const Menu: React.FC = () => (
-  <Nav>
-    <ul>
-      <li>
-        <Link href="/">
-          <a>소개</a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/map">
-          <a>지도</a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/board">
-          <a>리뷰</a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/account">
-          <a>
+const Menu: React.FC = () => {
+  const { isSession, LoginModal, setIsShow } = useAuth();
+
+  return (
+    <Nav>
+      <ul>
+        <li>
+          <Link href="/">
+            <a>소개</a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/map">
+            <a>지도</a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/board">
+            <a>리뷰</a>
+          </Link>
+        </li>
+        <li>
+          <button
+            onClick={() => {
+              if (!isSession) {
+                setIsShow(true);
+              }
+            }}
+            type="button"
+          >
             <i>
               <Image
                 src={AccountIcon}
@@ -67,20 +77,21 @@ const Menu: React.FC = () => (
                 alt="AccountIcon"
               />
             </i>
-          </a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/alarm">
-          <a>
-            <i>
-              <Image src={BellIcon} width={44} height={44} alt="BellIcon" />
-            </i>
-          </a>
-        </Link>
-      </li>
-    </ul>
-  </Nav>
-);
+          </button>
+        </li>
+        <li>
+          <Link href="/alarm">
+            <a>
+              <i>
+                <Image src={BellIcon} width={44} height={44} alt="BellIcon" />
+              </i>
+            </a>
+          </Link>
+        </li>
+      </ul>
+      <LoginModal />
+    </Nav>
+  );
+};
 
 export default Menu;

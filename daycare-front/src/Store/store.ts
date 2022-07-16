@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
+import userState from './userState';
 
 const makeStore = configureStore({
   reducer: {
@@ -7,6 +8,7 @@ const makeStore = configureStore({
     // than photosStore but photosStore is clearer to me.
     // anyOtherStore: anyOtherSlice,
     // middleware: ['array of middlewares'],
+    user: userState,
   },
   devTools: true,
 });

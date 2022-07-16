@@ -1,10 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import Theme from '@src/assets/global/Theme';
 import InputText from '@src/Components/Atom/Input/InputText';
-import Link from 'next/link';
-import React from 'react';
-import { BlueButton } from 'stories/Atom/Button.stories';
+import { SignUpProps } from '@src/Type/Template/Modal';
+import React, { useCallback, useState } from 'react';
+import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import styled from 'styled-components';
+import useApi from '@src/CustomHook/useApi';
+import { userEmailVerifyType, userSignUpType } from '@src/Type/API/user';
+import RegExp from '@src/Util/RegExp';
+import { useDispatch } from 'react-redux';
+import { changeUser } from '@src/Store/userState';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -19,6 +24,10 @@ const ContainerDiv = styled.div`
 
   & > input {
     margin: 0px 0px 20px;
+  }
+  .email {
+    margin: 0px 0px 20px;
+    position: relative;
   }
   & > input:nth-of-type(1) {
     margin: 20px 0px;
@@ -39,39 +48,152 @@ const ContainerDiv = styled.div`
     text-align: center;
     line-height: 22px;
   }
+  button {
+    cursor: pointer;
+  }
 `;
 
-const SignUp: React.FC = () => (
-  <ContainerDiv>
-    <h3>회원가입</h3>
-    <p className="gray-text">
-      어린이집 리뷰 및 다양한 기능을
-      <br />
-      사용하려면 가입하세요.
-    </p>
-    <InputText type="text" placeholder="사용자 이름" />
+const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
 
-    <InputText type="password" placeholder="비밀번호" />
-    <InputText type="email" placeholder="이메일 주소" />
-    <InputText type="text" placeholder="이메일 인증코드" />
-    <BlueButton
-      content="가입"
-      buttonProps={{
-        type: 'submit',
-        onClick: () => {
-          console.log('Login');
-        },
-      }}
-    />
-    <div className="line" />
-    <p>
-      계정이 있으신가요?
-      <Link href="/login">
-        <a>로그인</a>
-      </Link>
-    </p>
-    <div className="line" />
-  </ContainerDiv>
-);
+  const { api: emailVerifyApi, isLoading } = useApi<userEmailVerifyType>({
+    url: '/user/email',
+    data: {
+      email,
+    },
+    method: 'post',
+  });
+
+  const { api: signUpApi, isLoading: isSignUpLoading } = useApi<userSignUpType>(
+    {
+      url: '/user',
+      data: {
+        email,
+        name,
+        password,
+        verificationCode,
+      },
+      method: 'post',
+    }
+  );
+
+  console.log(isLoading, isSignUpLoading, ' 로딩기능 추가예정 제거');
+
+  const dispatch = useDispatch();
+
+  const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      async (e) => {
+        //  회원가입 API 핸들러
+        e.preventDefault();
+
+        if (!RegExp.stringLength(name, 2, 20)) {
+          alert('이름은 2 ~ 20자 이내로 입력해주세요.');
+          return null;
+        }
+        if (!RegExp.stringLength(password, 6, 20)) {
+          alert('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
+          return null;
+        }
+
+        if (!RegExp.isEmail(email)) {
+          alert('이메일 형식이 아닙니다.');
+          return null;
+        }
+
+        if (verificationCode.length !== 6) {
+          alert('인증코드는 6자리입니다.');
+          return null;
+        }
+
+        const response = await signUpApi();
+        if (response.data.statusCode === 200) {
+          dispatch(changeUser(response.data.user));
+        }
+        return true;
+      },
+      [dispatch, email, name, password, signUpApi, verificationCode.length]
+    );
+
+  const onClickEmailVerifyHandle: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(async () => {
+      // 이메일 인증코드 발송 및 중복여부 확인
+      const response = await emailVerifyApi();
+      if (response.data.statusCode === 200) {
+        alert('해당 메일로 인증번호를 보냈습니다.');
+      }
+    }, [email]);
+
+  return (
+    <ContainerDiv>
+      <h3>회원가입</h3>
+      <p className="gray-text">
+        어린이집 리뷰 및 다양한 기능을
+        <br />
+        사용하려면 가입하세요.
+      </p>
+      <InputText
+        type="text"
+        placeholder="사용자 이름"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <InputText
+        type="password"
+        placeholder="비밀번호"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <div className="email">
+        <InputText
+          type="email"
+          placeholder="이메일 주소"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        {email.length > 0 && (
+          <BlueButton
+            content="인증"
+            buttonProps={{
+              onClick: onClickEmailVerifyHandle,
+              style: {
+                width: '50px',
+                position: 'absolute',
+                right: '-10px',
+                top: '50%',
+                transform: 'translate(100%,-50%)',
+              },
+            }}
+          />
+        )}
+      </div>
+      <InputText
+        type="text"
+        placeholder="이메일 인증코드"
+        value={verificationCode}
+        onChange={(e) => setVerificationCode(e.target.value)}
+      />
+      <BlueButton
+        content="가입"
+        buttonProps={{
+          type: 'submit',
+          onClick: onClickSignUpHandle,
+        }}
+      />
+      <div className="line" />
+      <p>
+        계정이 있으신가요?
+        <button type="button" onClick={setIsLogin}>
+          <a>로그인</a>
+        </button>
+      </p>
+      <div className="line" />
+    </ContainerDiv>
+  );
+};
 
 export default SignUp;
