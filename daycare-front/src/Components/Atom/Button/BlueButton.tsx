@@ -14,7 +14,7 @@ const Button = styled.button`
   }
 `;
 
-const LoginButton: React.FC<BlueButtonProps> = (props) => {
+const BlueButton: React.FC<BlueButtonProps> = (props) => {
   const { buttonProps, content } = props;
   return (
     <Button {...buttonProps}>
@@ -23,4 +23,4 @@ const LoginButton: React.FC<BlueButtonProps> = (props) => {
   );
 };
 
-export default LoginButton;
+export default BlueButton;
