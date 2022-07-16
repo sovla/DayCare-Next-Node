@@ -14,7 +14,9 @@ const CenterAside = styled.aside`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
   .menu {
     display: flex;
     width: 100%;

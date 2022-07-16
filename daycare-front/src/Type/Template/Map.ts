@@ -4,7 +4,7 @@ import { NextImageSrc } from '../Atom/Card';
 
 export interface CentersProps {
   centerList: SimpleCenterProps[];
-  onClickCenter: (id: number) => void;
+  onClickCenter: (id: number) => any;
 }
 
 export interface DetailCenterProps {
