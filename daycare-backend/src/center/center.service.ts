@@ -29,8 +29,10 @@ export class CenterService {
         `6371 * acos(cos(radians(${dto.lat})) * cos(radians(lat)) * cos(radians(lon) - radians(${dto.lon})) + sin(radians(${dto.lat})) * sin(radians(lat)))`,
         'distance',
       )
+      .where('operation_status != "폐지"')
       .having(`distance <= ${dto?.radius ?? 50}`)
       .orderBy('distance', 'ASC')
+      .limit(50)
       .getMany();
 
     return findCenterList;

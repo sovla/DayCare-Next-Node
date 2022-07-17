@@ -32,6 +32,19 @@ export class SessionService {
 
     return findUser;
   }
+
+  async silentLogin(id: number) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!findUser) {
+      throw new HttpException('존재하지 않는 회원입니다.', 401);
+    }
+
+    return findUser;
+  }
   async logout(id: number) {
     return true;
   }

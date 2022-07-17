@@ -2,19 +2,15 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   UseInterceptors,
-  UploadedFile,
-  Req,
   UploadedFiles,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Request } from 'express';
+import { Response } from 'express';
 import { CenterService } from './center.service';
 import { FindFilterDTO } from './dto/findFilter-center.dto';
 
@@ -23,12 +19,40 @@ export class CenterController {
   constructor(private readonly centerService: CenterService) {}
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.centerService.findOne(id);
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    const findCenter = await this.centerService.findOne(id);
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '정보 받아오기 완료',
+      center: findCenter,
+    });
   }
 
   @Get()
-  findFilter(@Query() findFilterDto: FindFilterDTO) {
+  async findFilter(
+    @Query() findFilterDto: FindFilterDTO,
+    @Res() res: Response,
+  ) {
+    const findCenters = await this.centerService.findFilter(findFilterDto);
+
+    res.statusCode = 200;
+    res.send({
+      statusCode: res.statusCode,
+      message: '정보 받아오기 완료',
+      center: findCenters.map((v) => ({
+        homepage: v.homepage,
+        address_detail: v.address_detail,
+        tel: v.tel,
+        name: v.name,
+        image: '일단없음',
+        lat: v.lat,
+        lng: v.lon,
+        school_vehicle: v.school_vehicle,
+        type: v.type,
+        id: v.id,
+      })),
+    });
     return this.centerService.findFilter(findFilterDto);
   }
 

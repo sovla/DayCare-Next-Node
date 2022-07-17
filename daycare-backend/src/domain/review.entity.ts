@@ -22,7 +22,7 @@ export class Review {
   title: string;
 
   @Column({
-    type: 'varchar',
+    type: 'text',
   })
   content: string;
 

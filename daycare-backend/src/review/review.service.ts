@@ -5,7 +5,7 @@ import * as moment from 'moment-timezone';
 import { Category } from 'src/domain/category.entity';
 import { Center } from 'src/domain/center.entity';
 import { Review } from 'src/domain/review.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -94,14 +94,56 @@ export class ReviewService {
         throw new HttpException('존재하지 않는 어린이집입니다.', 400);
       }
 
-      const findReviews = await this.reviewRepository
-        .createQueryBuilder('review')
-        .where(`category_id=${category_id}`)
-        .leftJoin('review.likes', 'likes')
-        .loadRelationCountAndMap('review.like_count', 'review.likes')
-        .getMany();
+      const findReviews = await this.reviewRepository.find({
+        where: {
+          category_id: category_id,
+          delete_date: IsNull(),
+        },
+      });
 
-      return findReviews;
+      return findReviews.map((v) => ({
+        ...v,
+        likes: v.likes.length,
+        reply: v.reply.length,
+      }));
+    }
+
+    if (type === 'review_id') {
+      const review_id = id;
+
+      const findReview = await this.reviewRepository.findOne({
+        where: { id: review_id },
+      });
+      const saveReview = await this.reviewRepository.save({
+        ...findReview,
+        view_count: findReview.view_count + 1,
+      });
+      if (!findReview) {
+        throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
+      }
+
+      const findUser = await this.userRepository.findOne({
+        where: {
+          id: findReview.user_id,
+        },
+      });
+
+      return {
+        ...findReview,
+        user: {
+          id: findUser.id,
+          name: findUser.name,
+          email: findUser.email,
+        },
+        reply: findReview.reply.map((v) => ({
+          ...v,
+          user: {
+            id: v.user.id,
+            name: v.user.name,
+            email: v.user.email,
+          },
+        })),
+      };
     }
   }
 
@@ -127,7 +169,6 @@ export class ReviewService {
   async removeReview(deleteReviewDto: DeleteReviewDTO) {
     const findReview = await this.reviewRepository.findOne({
       where: {
-        user_id: deleteReviewDto.id,
         id: deleteReviewDto.review_id,
       },
     });

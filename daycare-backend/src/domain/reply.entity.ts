@@ -41,8 +41,7 @@ export class Reply {
   delete_date: Date;
 
   @OneToMany(() => ReplyLike, (replyLike) => replyLike.reply, {
-    eager: false,
-    lazy: true,
+    eager: true,
   })
   likes: ReplyLike[];
 
@@ -52,7 +51,9 @@ export class Reply {
   @JoinColumn({ name: 'review_id' })
   review: Review;
 
-  @ManyToOne(() => User, (user) => user.reply, { eager: false })
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, (user) => user.reply, { eager: true })
+  @JoinColumn({
+    name: 'reply_user_id',
+  })
   user: User;
 }
