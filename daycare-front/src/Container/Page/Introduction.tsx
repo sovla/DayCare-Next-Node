@@ -13,7 +13,7 @@ const ContainerDiv = styled.div`
   position: relative;
   .subject {
     margin-left: 200px;
-    margin-top: 270px;
+    margin-top: 150px;
     p {
       font-size: 48px;
     }
