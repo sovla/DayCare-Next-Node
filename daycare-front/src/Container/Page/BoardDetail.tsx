@@ -6,14 +6,19 @@ import Menu from '@src/Components/Template/Layout/Menu';
 import useApi from '@src/CustomHook/useApi';
 import { selectUser } from '@src/Store/userState';
 import { replyWriteType } from '@src/Type/API/reply';
-import { reviewDeleteType } from '@src/Type/API/review';
+import { reviewDeleteType, reviewLikeType } from '@src/Type/API/review';
 import { BoardDetailProps } from '@src/Type/Container/Board';
 import Error from 'next/error';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import HeartIcon from '@src/assets/image/HeartIcon.png';
+import HeartEmptyIcon from '@src/assets/image/HeartEmptyIcon.png';
+import API from '@src/API';
+import { AxiosResponse } from 'axios';
 
 const StyledContainer = styled.div`
   width: 100vw;
@@ -88,12 +93,26 @@ const StyledContainer = styled.div`
       opacity: 0.7;
     }
   }
+  .heart {
+    border: 1px solid ${Theme.color.gray_C1};
+
+    border-radius: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
-  const router = useRouter();
-  const [replyComment, setReplyComment] = useState('');
   const user = useSelector(selectUser);
+  const router = useRouter();
+
+  const [replyComment, setReplyComment] = useState('');
+  const [isLike, setIsLike] = useState(
+    !!review.likes.find((v) => v.id === user.auth?.id)
+  );
 
   const { api: replyWriteApi } = useApi<replyWriteType>({
     url: '/reply',
@@ -130,13 +149,25 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
 
   const reviewDeleteApiHandle = useCallback(async () => {
     const response = await reviewDeleteApi();
-    console.log(response);
     if (response.data.statusCode === 200) {
       router.push('/board');
     }
   }, [user.auth, review]);
 
+  const onClickLike = useCallback(async () => {
+    const response = (await API.get(`review/like/${review.id}`, {
+      params: {
+        id: user.auth?.id,
+      },
+    })) as AxiosResponse<reviewLikeType['response']>;
+
+    if (response.data.statusCode === 200) {
+      setIsLike(response.data.like);
+    }
+  }, [user, review]);
+
   useEffect(() => {
+    console.log('review::::', review);
     const contentDiv = document.getElementById('content');
     if (contentDiv) {
       contentDiv.innerHTML = review.content;
@@ -163,6 +194,13 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <div id="content" />
         <hr />
         <div className="buttons">
+          <button type="button" className="heart" onClick={onClickLike}>
+            <Image
+              src={isLike ? HeartIcon : HeartEmptyIcon}
+              width={25}
+              height={25}
+            />
+          </button>
           {user.auth && review.user_id === user.auth.id && (
             <>
               <BlueButton
