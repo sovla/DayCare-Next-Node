@@ -24,7 +24,9 @@ export interface replyType {
   content: string;
   delete_date: null | string;
   id: number;
-  likes: any[];
+  likes: {
+    user_id: number;
+  }[];
   update_date: null | string;
   user: {
     id: number;
@@ -55,7 +57,7 @@ export interface reviewDetailType {
   };
   view_count: number;
   write_date: string;
-  likes: any[];
+  likes: { id: number }[];
   reply: replyType[];
 }
 

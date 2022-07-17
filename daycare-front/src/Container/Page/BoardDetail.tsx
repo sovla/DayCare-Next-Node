@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable react/jsx-one-expression-per-line */
 import Theme from '@src/assets/global/Theme';
 import BlueButton from '@src/Components/Atom/Button/BlueButton';
@@ -5,8 +6,12 @@ import InputText from '@src/Components/Atom/Input/InputText';
 import Menu from '@src/Components/Template/Layout/Menu';
 import useApi from '@src/CustomHook/useApi';
 import { selectUser } from '@src/Store/userState';
-import { replyWriteType } from '@src/Type/API/reply';
-import { reviewDeleteType, reviewLikeType } from '@src/Type/API/review';
+import { replyLikeType, replyWriteType } from '@src/Type/API/reply';
+import {
+  reviewDeleteType,
+  reviewGetType,
+  reviewLikeType,
+} from '@src/Type/API/review';
 import { BoardDetailProps } from '@src/Type/Container/Board';
 import Error from 'next/error';
 import Head from 'next/head';
@@ -63,7 +68,6 @@ const StyledContainer = styled.div`
     max-height: 800px;
     margin-left: 30px;
     border: 1px solid ${Theme.color.gray_C1};
-
     & > section {
       height: calc(100% - 150px);
       overflow-y: scroll;
@@ -99,6 +103,21 @@ const StyledContainer = styled.div`
     border-radius: 16px;
     width: 40px;
     height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const StyledReply = styled.div<{ isLike: boolean }>`
+  position: relative;
+  & > .reply-heart {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -143,7 +162,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     const response = await replyWriteApi();
     setReplyComment('');
     if (response.data.statusCode === 200) {
-      review.reply.push({ ...response.data.reply, user: user.auth });
+      review.reply.push({ ...response.data.reply, user: user.auth, likes: [] });
     }
   }, [replyComment, user.auth, review]);
 
@@ -165,6 +184,21 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
       setIsLike(response.data.like);
     }
   }, [user, review]);
+
+  const onClickReplyLike = useCallback(
+    async (id: number) => {
+      const response = (await API.get(`reply/like/${id}`, {
+        params: {
+          id: user.auth?.id,
+        },
+      })) as AxiosResponse<replyLikeType['response']>;
+
+      if (response.data.statusCode === 200) {
+        router.reload();
+      }
+    },
+    [user]
+  );
 
   useEffect(() => {
     console.log('review::::', review);
@@ -199,6 +233,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
               src={isLike ? HeartIcon : HeartEmptyIcon}
               width={25}
               height={25}
+              alt="reviewLikeIcon"
             />
           </button>
           {user.auth && review.user_id === user.auth.id && (
@@ -236,20 +271,39 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <section className="reply-section">
           {review.reply &&
             Array.isArray(review.reply) &&
-            review.reply.map((v) => (
-              <div key={`reply${v.id}`}>
-                <div className="row-center">
-                  <p>{v.user.name}</p>
-                  <small>{v.content}</small>
-                </div>
-                <small>
-                  {new Date(v?.update_date ?? v.write_date)
-                    .toISOString()
-                    .substring(0, 10)}
-                </small>
-                <hr />
-              </div>
-            ))}
+            review.reply.map((v) => {
+              const isReplyLike = !!v.likes.find(
+                (fv) => fv.user_id === user.auth?.id
+              );
+              return (
+                <StyledReply key={`reply${v.id}`} isLike={isReplyLike}>
+                  <div className="row-center">
+                    <p>{v.user.name}</p>
+                    <small>{v.content}</small>
+                  </div>
+                  <small>
+                    {new Date(v?.update_date ?? v.write_date)
+                      .toISOString()
+                      .substring(0, 10)}
+                  </small>
+                  <button
+                    type="button"
+                    className="reply-heart"
+                    onClick={() => onClickReplyLike(v.id)}
+                  >
+                    <Image
+                      src={isReplyLike ? HeartIcon : HeartEmptyIcon}
+                      width={15}
+                      height={15}
+                      alt="replyLikeIcon"
+                    />
+                    <small>{v.likes.length}</small>
+                  </button>
+
+                  <hr />
+                </StyledReply>
+              );
+            })}
         </section>
         <hr />
         <div className="reply-form">
