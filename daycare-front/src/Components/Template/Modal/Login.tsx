@@ -61,7 +61,6 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
     },
     method: 'post',
   });
-  console.log(isLoading, '제거');
 
   const loginApiHandle = useCallback(async () => {
     try {
