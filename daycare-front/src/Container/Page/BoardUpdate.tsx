@@ -144,7 +144,7 @@ const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {
         />
         <div className="write-button">
           <BlueButton
-            content="작성"
+            content="수정"
             buttonProps={{ onClick: reviewUpdateApiHandle, type: 'submit' }}
           />
           <BlueButton
