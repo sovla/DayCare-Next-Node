@@ -9,6 +9,7 @@ import { ReviewModule } from './review/review.module';
 import { ReplyModule } from './reply/reply.module';
 import { UserModule } from './user/user.module';
 import { SessionModule } from './session/session.module';
+import { CategoryModule } from './category/category.module';
 import config from './config/config';
 
 @Module({
@@ -23,6 +24,7 @@ import config from './config/config';
     ReplyModule,
     UserModule,
     SessionModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
