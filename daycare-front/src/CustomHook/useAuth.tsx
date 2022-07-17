@@ -54,26 +54,20 @@ const useAuth = () => {
   //  2.
   const user = useSelector(selectUser);
 
-  const [isSession, setIsSession] = useState<boolean>(false);
   const [isShow, setIsShow] = useState<boolean>(false);
   const [isBrowser, setIsBrowser] = useState<boolean>(false);
   const [isLogin, setIsLogin] = useState<boolean>(true);
-
   useEffect(() => {
-    setIsSession(!!user.auth);
-    if (isShow) {
-      setIsShow(user.auth == null);
+    if (isShow && user.auth != null) {
+      setIsShow(false);
     }
-  }, [user.auth]);
+  }, [user.auth, isShow]);
 
   useEffect(() => {
     setIsBrowser(true);
   }, []);
 
   const LoginModal = useCallback(() => {
-    if (isLogin) {
-      return null;
-    }
     if (isBrowser) {
       return ReactDOM.createPortal(
         <StyledModalOverlay isShow={isShow}>
@@ -99,7 +93,7 @@ const useAuth = () => {
     return null;
   }, [isBrowser, isLogin, isShow]);
 
-  return { isSession, LoginModal, setIsShow };
+  return { LoginModal, setIsShow };
 };
 
 export default useAuth;

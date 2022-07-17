@@ -1,21 +1,28 @@
+import Theme from '@src/assets/global/Theme';
 import { SelectProps } from '@src/Type/Atom/Input';
 import React from 'react';
-import Form from 'react-bootstrap/Form';
+import styled from 'styled-components';
+
+const StyledSelect = styled.select`
+  border: 1px solid ${Theme.color.gray_99};
+  border-radius: 3px;
+  padding: 3px;
+`;
 
 const Select: React.FC<SelectProps> = (props) => {
-  const { menuList, width, ...FormSelectProps } = props;
+  const { menuList, width, ...selectProps } = props;
   return (
-    <Form.Select
-      {...FormSelectProps}
+    <StyledSelect
+      {...selectProps}
       style={{
         width,
-        ...FormSelectProps.style,
+        ...selectProps.style,
       }}
     >
       {menuList.map((v) => (
         <option key={v}>{v}</option>
       ))}
-    </Form.Select>
+    </StyledSelect>
   );
 };
 

@@ -4,6 +4,7 @@ import { NextImageSrc } from './Card';
 export interface CategoryButtonProps
   extends StyledComponentProps<'button', any, {}, never> {
   content: string;
+  isSelect: boolean;
 }
 
 export interface DetailMenuButtonProps {

@@ -32,7 +32,7 @@ export const userSlice = createSlice({
     changeUser: (state, action: PayloadAction<user>) =>
       (state = {
         ...state,
-        ...action.payload,
+        auth: action.payload,
       }),
     // changeOptionalUser: (state, action: PayloadAction<Partial<userState>>) => {
     //     return (state = {

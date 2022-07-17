@@ -57,9 +57,24 @@ const Pagination: React.FC<PaginationProps> = (props) => {
       if (index > 0) {
         array.push(index);
       }
+      if (index >= maxPage) {
+        break;
+      }
     }
-    return array;
-  }, [selectPage]);
+
+    if (array.length < 9) {
+      for (let index = selectPage; array.length < 9; index -= 1) {
+        if (index > 0 && !array.includes(index)) {
+          array.push(index);
+        }
+        if (index === 0) {
+          break;
+        }
+      }
+    }
+
+    return array.sort((a, b) => a - b);
+  }, [selectPage, maxPage]);
 
   return (
     <PaginationUl>
@@ -110,7 +125,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
       <li>
         <PageButton
           type="button"
-          disabled={selectPage === maxPage}
+          disabled={selectPage >= maxPage}
           onClick={() => onClickPage(maxPage)}
         >
           »

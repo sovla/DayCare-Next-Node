@@ -15,17 +15,24 @@ const useApi = <T extends APIType>({
   //  공통적인 api를 핸들링하기 위한 훅
   const [isLoading, setIsLoading] = useState(false);
 
-  const api = useCallback(async () => {
-    setIsLoading(true);
-    const response = (await API({
-      method,
-      data: method !== 'get' ? data : null,
-      url,
-      params: method === 'get' ? data : null,
-    })) as AxiosResponse<T['response'], T['request']>;
-    setIsLoading(false);
-    return response;
-  }, [data, method, url]);
+  const api = useCallback(
+    async (optionalData?: Partial<T['request']>) => {
+      setIsLoading(true);
+      const requestData = {
+        ...data,
+        ...optionalData,
+      };
+      const response = (await API({
+        method,
+        data: method !== 'get' ? requestData : null,
+        url,
+        params: method === 'get' ? requestData : null,
+      })) as AxiosResponse<T['response'], T['request']>;
+      setIsLoading(false);
+      return response;
+    },
+    [data, method, url]
+  );
 
   return { isLoading, api };
 };

@@ -1,9 +1,21 @@
 import Row from '@src/Components/Atom/Board/Row';
 import { TableProps } from '@src/Type/Template/Board';
+import { useRouter } from 'next/router';
 import React from 'react';
+import styled from 'styled-components';
+
+const StyledRow = styled.div`
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    opacity: 0.7;
+  }
+`;
 
 const Table: React.FC<TableProps> = (props) => {
-  const { boardList } = props;
+  const { boardList, selectPage } = props;
+
+  const router = useRouter();
   return (
     <>
       <Row
@@ -14,18 +26,24 @@ const Table: React.FC<TableProps> = (props) => {
         viewCount="조회수"
         likeCount="좋아요"
       />
-      {boardList.map((v) => (
-        <Row
-          key={v.writeDate + v.write}
-          category={v.category}
-          title={v.title}
-          write={v.write}
-          writeDate={v.writeDate}
-          viewCount={v.viewCount}
-          likeCount={v.likeCount}
-          reviewCount={v.reviewCount}
-        />
-      ))}
+      {boardList.map((v, i) => {
+        if (i < (selectPage - 1) * 10 || i > selectPage * 10 - 1) {
+          return null;
+        }
+        return (
+          <StyledRow key={v.id} onClick={() => router.push(`/board/${v.id}`)}>
+            <Row
+              category={v.category}
+              title={v.title}
+              write={v.write}
+              writeDate={v.writeDate}
+              viewCount={v.viewCount}
+              likeCount={v.likeCount}
+              reviewCount={v.reviewCount}
+            />
+          </StyledRow>
+        );
+      })}
     </>
   );
 };

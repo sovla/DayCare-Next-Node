@@ -1,5 +1,4 @@
 import { MouseEventHandler } from 'react';
-import { FormSelectProps } from 'react-bootstrap';
 import { StyledComponentProps } from 'styled-components';
 
 export interface InputTextProps
@@ -16,7 +15,8 @@ export interface SearchProps {
   onClick: MouseEventHandler<HTMLElement>;
 }
 
-export interface SelectProps extends FormSelectProps {
+export interface SelectProps
+  extends StyledComponentProps<'select', any, {}, never> {
   menuList: string[];
   width: string;
 }

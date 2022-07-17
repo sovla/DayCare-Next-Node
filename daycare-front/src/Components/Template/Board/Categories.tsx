@@ -10,11 +10,16 @@ const ContainerDiv = styled.div`
 `;
 
 const Categories: React.FC<CategoriesProps> = (props) => {
-  const { categoryList } = props;
+  const { categoryList, onClickCategory, selectCategory } = props;
   return (
     <ContainerDiv>
       {categoryList.map((v) => (
-        <CategoryButton content={v} key={v} />
+        <CategoryButton
+          content={v.title}
+          key={v.join_date}
+          onClick={() => onClickCategory(v.id)}
+          isSelect={selectCategory === v.id}
+        />
       ))}
     </ContainerDiv>
   );

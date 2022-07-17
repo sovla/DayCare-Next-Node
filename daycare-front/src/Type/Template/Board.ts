@@ -1,7 +1,12 @@
+/* eslint-disable no-unused-vars */
+import React from 'react';
+import { category } from '../API/category';
 import { RowProps } from '../Atom/Board';
 
 export interface CategoriesProps {
-  categoryList: string[];
+  categoryList: category[];
+  onClickCategory: (args: number) => void;
+  selectCategory: number;
 }
 
 export interface PaginationProps {
@@ -13,4 +18,5 @@ export interface PaginationProps {
 
 export interface TableProps {
   boardList: RowProps[];
+  selectPage: number;
 }

@@ -7,6 +7,8 @@ import AccountIcon from '@src/assets/image/AccountIcon.png';
 import BellIcon from '@src/assets/image/BellIcon.png';
 import Theme from '@src/assets/global/Theme';
 import useAuth from '@src/CustomHook/useAuth';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@src/Store/userState';
 
 const Nav = styled.nav`
   & > ul {
@@ -40,7 +42,8 @@ const Nav = styled.nav`
 `;
 
 const Menu: React.FC = () => {
-  const { isSession, LoginModal, setIsShow } = useAuth();
+  const { LoginModal, setIsShow } = useAuth();
+  const user = useSelector(selectUser);
 
   return (
     <Nav>
@@ -63,9 +66,7 @@ const Menu: React.FC = () => {
         <li>
           <button
             onClick={() => {
-              if (!isSession) {
-                setIsShow(true);
-              }
+              if (!user.auth) setIsShow(true);
             }}
             type="button"
           >

@@ -6,4 +6,5 @@ export interface RowProps {
   viewCount: string;
   likeCount: string;
   reviewCount?: number;
+  id?: number;
 }

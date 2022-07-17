@@ -83,7 +83,8 @@ summary,
 time,
 mark,
 audio,
-video {
+video,
+select {
   margin: 0;
   padding: 0;
   border: 0;
@@ -198,4 +199,11 @@ button {
   background-color: #fff0;
   border: none;
   padding: 0px;
+}
+
+.nav-menu {
+  position: fixed;
+  top: 0px;
+  right: 30px;
+  z-index: 5;
 }

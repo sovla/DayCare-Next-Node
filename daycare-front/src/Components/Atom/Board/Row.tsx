@@ -43,7 +43,9 @@ const Row: React.FC<RowProps> = ({
     </div>
     <div className="title">
       <span>{title}</span>
-      {reviewCount && <span className="reviewCount">{`[${reviewCount}]`}</span>}
+      {reviewCount && reviewCount > 0 ? (
+        <span className="reviewCount">{`[${reviewCount}]`}</span>
+      ) : null}
     </div>
     <div className="write">
       <span>{write}</span>
