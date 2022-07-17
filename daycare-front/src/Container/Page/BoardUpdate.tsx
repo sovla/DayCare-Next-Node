@@ -1,24 +1,17 @@
 import Head from 'next/head';
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
-import Select from '@src/Components/Atom/Input/Select';
 
 import styled from 'styled-components';
 import Theme from '@src/assets/global/Theme';
 import Menu from '@src/Components/Template/Layout/Menu';
-import { BoardWriteProps } from '@src/Type/Container/Board';
+import { BoardUpdateProps } from '@src/Type/Container/Board';
 import InputText from '@src/Components/Atom/Input/InputText';
 import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import { useRouter } from 'next/router';
 import useApi from '@src/CustomHook/useApi';
-import { reviewWriteType } from '@src/Type/API/review';
+import { reviewUpdateType } from '@src/Type/API/review';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
 
@@ -41,7 +34,6 @@ const StyledWriteContainer = styled.div`
     margin-bottom: 20px;
     & > input {
       width: 100%;
-      margin-left: 40px;
       font-size: 16px;
       &::placeholder {
         font-size: 16px;
@@ -64,39 +56,39 @@ const StyledWriteContainer = styled.div`
   }
 `;
 
-const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
+const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {
   const editorRef = useRef<Editor>(null);
   const router = useRouter();
 
-  const [selectCategory, setSelectCategory] = useState(0);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(review.title);
 
   const user = useSelector(selectUser);
 
-  const { api: reviewWriteApi } = useApi<reviewWriteType>({
+  const { api: reviewUpdateApi } = useApi<reviewUpdateType>({
     url: '/review',
     data: {
-      category_id: selectCategory,
+      review_id: review.id,
       content: '',
       id: user.auth?.id as number,
       title,
+
       // image1,
       // image2,
       // image3,
       // image4,
       // image5,
     },
-    method: 'post',
+    method: 'patch',
   });
 
-  const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
+  const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
       e.preventDefault();
       if (!editorRef.current) {
         return null;
       }
 
-      const response = await reviewWriteApi({
+      const response = await reviewUpdateApi({
         content: editorRef.current.getInstance().getHTML(),
       });
       if (response.data.statusCode === 200) {
@@ -104,25 +96,6 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
       }
       return true;
     };
-
-  const onChangeCategory: React.ChangeEventHandler<HTMLSelectElement> =
-    useCallback((e) => {
-      const findCategory = category.find((v) => v.title === e.target.value);
-      if (findCategory) {
-        setSelectCategory(findCategory.id);
-      }
-    }, []);
-  useEffect(() => {
-    if (selectCategory === 0 && category && Array.isArray(category)) {
-      setSelectCategory(category[0].id);
-    }
-  }, [category]);
-
-  useLayoutEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.getInstance().setHTML('');
-    }
-  }, []);
 
   useEffect(() => {
     if (!user.auth) {
@@ -137,7 +110,7 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
     <StyledWriteContainer>
       <Head>
         <title>DayCare</title>
-        <meta name="description" content="DayCareBoardWrite" />
+        <meta name="description" content="DayCareBoardUpdate" />
         <link rel="icon" href="/LogoIcon.png" />
       </Head>
       <div className="nav-menu">
@@ -145,11 +118,6 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
       </div>
       <form>
         <div className="row-div">
-          <Select
-            menuList={category.map((v) => v.title)}
-            width="200px"
-            onChange={onChangeCategory}
-          />
           <InputText
             type="text"
             placeholder="제목을 입력해주세요."
@@ -172,12 +140,12 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
             ['code', 'codeblock'],
           ]}
           language="ko-kr"
-          initialValue=""
+          initialValue={review.content}
         />
         <div className="write-button">
           <BlueButton
             content="작성"
-            buttonProps={{ onClick: reviewWriteApiHandle, type: 'submit' }}
+            buttonProps={{ onClick: reviewUpdateApiHandle, type: 'submit' }}
           />
           <BlueButton
             content="취소"
@@ -196,4 +164,4 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
   );
 };
 
-export default BoardWrite;
+export default BoardUpdate;

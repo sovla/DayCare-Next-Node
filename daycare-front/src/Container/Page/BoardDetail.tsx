@@ -9,6 +9,7 @@ import { replyWriteType } from '@src/Type/API/reply';
 import { reviewDeleteType } from '@src/Type/API/review';
 import { BoardDetailProps } from '@src/Type/Container/Board';
 import Error from 'next/error';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -143,6 +144,11 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   }, []);
   return (
     <StyledContainer>
+      <Head>
+        <title>DayCare</title>
+        <meta name="description" content="DayCareBoardDetail" />
+        <link rel="icon" href="/LogoIcon.png" />
+      </Head>
       <div className="review">
         <h3>{review.title}</h3>
 

@@ -143,11 +143,11 @@ export interface reviewUpdateType extends APIType {
     review_id: number;
     title: string;
     content: string;
-    image1: File;
-    image2: File;
-    image3: File;
-    image4: File;
-    image5: File;
+    image1?: File;
+    image2?: File;
+    image3?: File;
+    image4?: File;
+    image5?: File;
     id: number;
   };
 

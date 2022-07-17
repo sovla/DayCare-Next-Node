@@ -8,3 +8,7 @@ export interface BoardWriteProps {
 export interface BoardDetailProps {
   review: reviewDetailType;
 }
+
+export interface BoardUpdateProps {
+  review: reviewDetailType;
+}
