@@ -90,6 +90,14 @@ import { APIType } from '.';
 //   };
 // }
 
+interface replyType {
+  content: string;
+  delete_date: null | string;
+  id: number;
+  update_date: null | string;
+  write_date: string;
+}
+
 export interface replyWriteType extends APIType {
   url: '/reply';
   method: 'post';
@@ -102,44 +110,22 @@ export interface replyWriteType extends APIType {
   response: {
     statusCode: 200 | 400 | 401 | 403;
     message: string;
-    reply: any;
+    reply: replyType[];
   };
 }
 
-// export interface replyDelteType extends APIType {
-//   url: '/reply';
-//   method: 'delete';
-//   request: {
-//     reply_id: number;
-//     id: number;
-//   };
-//   response: {
-//     statusCode: 200 | 400 | 401 | 403;
-//     message: string;
-//   };
-// }
-
-// export interface replyUpdateType extends APIType {
-//   url: '/reply';
-//   method: 'patch';
-//   request: {
-//     reply_id: number;
-//     title: string;
-//     content: string;
-//     image1: File;
-//     image2: File;
-//     image3: File;
-//     image4: File;
-//     image5: File;
-//     id: number;
-//   };
-
-//   response: {
-//     statusCode: 200 | 400 | 401 | 403;
-//     message: string;
-//     reply: replyListType;
-//   };
-// }
+export interface replyDeleteType extends APIType {
+  url: '/reply';
+  method: 'delete';
+  request: {
+    reply_id: number;
+    id: number;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+  };
+}
 
 export interface replyLikeType extends APIType {
   url: '/reply/like';

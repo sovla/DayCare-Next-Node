@@ -6,14 +6,13 @@ import InputText from '@src/Components/Atom/Input/InputText';
 import Menu from '@src/Components/Template/Layout/Menu';
 import useApi from '@src/CustomHook/useApi';
 import { selectUser } from '@src/Store/userState';
-import { replyLikeType, replyWriteType } from '@src/Type/API/reply';
 import {
-  reviewDeleteType,
-  reviewGetType,
-  reviewLikeType,
-} from '@src/Type/API/review';
+  replyDeleteType,
+  replyLikeType,
+  replyWriteType,
+} from '@src/Type/API/reply';
+import { reviewDeleteType, reviewLikeType } from '@src/Type/API/review';
 import { BoardDetailProps } from '@src/Type/Container/Board';
-import Error from 'next/error';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -22,6 +21,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import HeartIcon from '@src/assets/image/HeartIcon.png';
 import HeartEmptyIcon from '@src/assets/image/HeartEmptyIcon.png';
+import CloseIcon from '@src/assets/image/CloseIcon.png';
 import API from '@src/API';
 import { AxiosResponse } from 'axios';
 
@@ -111,16 +111,24 @@ const StyledContainer = styled.div`
 
 const StyledReply = styled.div<{ isLike: boolean }>`
   position: relative;
-  & > .reply-heart {
+  & > .reply-menu {
     position: absolute;
-    right: 15px;
+    right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+
     display: flex;
     justify-content: center;
     align-items: center;
+    & > .reply-heart {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 25px;
+    }
+    & > .reply-hamburger {
+      margin-left: 3px;
+    }
   }
 `;
 
@@ -152,6 +160,15 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     method: 'delete',
   });
 
+  const { api: replyDeleteApi } = useApi<replyDeleteType>({
+    method: 'delete',
+    url: '/reply',
+    data: {
+      id: user.auth?.id as number,
+      reply_id: 0,
+    },
+  });
+
   const replyWriteApiHandle = useCallback(async () => {
     if (!user.auth) {
       throw new Error({
@@ -160,6 +177,8 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
       });
     }
     const response = await replyWriteApi();
+    console.log('review::::', response);
+
     setReplyComment('');
     if (response.data.statusCode === 200) {
       review.reply.push({ ...response.data.reply, user: user.auth, likes: [] });
@@ -185,6 +204,22 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     }
   }, [user, review]);
 
+  const onClickDeleteReply = useCallback(
+    async (id: number) => {
+      const result = global.confirm('정말 삭제하시겠습니까?');
+      if (result) {
+        const response = await replyDeleteApi({
+          reply_id: id,
+        });
+        if (response.data.statusCode === 200) {
+          router.reload();
+        }
+      }
+      return null;
+    },
+    [user]
+  );
+
   const onClickReplyLike = useCallback(
     async (id: number) => {
       const response = (await API.get(`reply/like/${id}`, {
@@ -201,7 +236,6 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   );
 
   useEffect(() => {
-    console.log('review::::', review);
     const contentDiv = document.getElementById('content');
     if (contentDiv) {
       contentDiv.innerHTML = review.content;
@@ -275,6 +309,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
               const isReplyLike = !!v.likes.find(
                 (fv) => fv.user_id === user.auth?.id
               );
+              const isMyReply = v.user.id === user.auth?.id;
               return (
                 <StyledReply key={`reply${v.id}`} isLike={isReplyLike}>
                   <div className="row-center">
@@ -286,19 +321,35 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
                       .toISOString()
                       .substring(0, 10)}
                   </small>
-                  <button
-                    type="button"
-                    className="reply-heart"
-                    onClick={() => onClickReplyLike(v.id)}
-                  >
-                    <Image
-                      src={isReplyLike ? HeartIcon : HeartEmptyIcon}
-                      width={15}
-                      height={15}
-                      alt="replyLikeIcon"
-                    />
-                    <small>{v.likes.length}</small>
-                  </button>
+                  <div className="reply-menu">
+                    <button
+                      type="button"
+                      className="reply-heart"
+                      onClick={() => onClickReplyLike(v.id)}
+                    >
+                      <Image
+                        src={isReplyLike ? HeartIcon : HeartEmptyIcon}
+                        width={15}
+                        height={15}
+                        alt="replyLikeIcon"
+                      />
+                      <small>{v.likes.length}</small>
+                    </button>
+                    {isMyReply && (
+                      <button
+                        type="button"
+                        className="reply-hamburger"
+                        onClick={() => onClickDeleteReply(v.id)}
+                      >
+                        <Image
+                          src={CloseIcon}
+                          width={20}
+                          height={20}
+                          alt="CloseIcon"
+                        />
+                      </button>
+                    )}
+                  </div>
 
                   <hr />
                 </StyledReply>
