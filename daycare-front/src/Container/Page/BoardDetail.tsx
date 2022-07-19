@@ -177,7 +177,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
       });
     }
     const response = await replyWriteApi();
-    console.log('review::::', response);
+    // console.log('review::::', response);
 
     setReplyComment('');
     if (response.data.statusCode === 200) {
