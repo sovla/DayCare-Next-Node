@@ -20,9 +20,12 @@ function ormConfig(): TypeOrmModuleOptions {
     database: 'daycare',
     entities: commonConf.ENTITIES, // entity 추가후 넣어주기
     synchronize: commonConf.SYNCRONIZE,
-    logging: true,
+    logging: false,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
+    extra: {
+      connectionLimit: 120,
+    },
   };
 
   return _ormConfing;
