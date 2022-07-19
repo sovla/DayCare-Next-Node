@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { MouseEventHandler } from 'react';
 import { StyledComponentProps } from 'styled-components';
 
@@ -5,7 +6,7 @@ export interface InputTextProps
   extends StyledComponentProps<'input', any, {}, never> {
   width?: string;
   height?: string;
-  type: 'text' | 'password' | 'email';
+  type: 'text' | 'password' | 'email' | 'number';
 }
 
 export interface SearchProps {
@@ -19,4 +20,10 @@ export interface SelectProps
   extends StyledComponentProps<'select', any, {}, never> {
   menuList: string[];
   width: string;
+}
+
+export interface CheckBoxProps {
+  content: string;
+  isCheck: boolean;
+  setIsCheck: (check: boolean) => void;
 }

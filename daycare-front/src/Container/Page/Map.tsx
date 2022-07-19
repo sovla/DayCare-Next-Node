@@ -7,19 +7,27 @@ import useScript from '@src/Util/useScript';
 import Head from 'next/head';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Dummy from '@src/assets/image/dummy1.png';
+import NoImage from '@src/assets/image/NoImage.png';
 import Search from '@src/Components/Atom/Input/Search';
 import Image from 'next/image';
 import LogoIcon from '@src/assets/image/LogoIcon.png';
+import FilterIcon from '@src/assets/image/FilterIcon.png';
+import LocationIcon from '@src/assets/image/LocationIcon.png';
+
 import Menu from '@src/Components/Template/Layout/Menu';
 import API from '@src/API';
 import Theme from '@src/assets/global/Theme';
+import IconButton from '@src/Components/Atom/Button/IconButton';
+import Filter from '@src/Components/Template/Modal/Filter';
+import { filterType } from '@src/Type/Template/Modal';
+import { changeFilterData } from '@src/assets/global/Dummy';
 
 const ContainerDiv = styled.div`
   display: flex;
   position: relative;
   .search {
     padding-top: 10px;
+    width: 440px;
   }
   .row-center {
     display: flex;
@@ -82,13 +90,37 @@ const ContainerDiv = styled.div`
       transform: translate(-50%, -50%);
       z-index: 1000;
     }
+    & .map-buttons {
+      position: absolute;
+      right: 15px;
+      bottom: 50px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      & .location-button {
+        background-color: #ffffff;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 16px;
+        margin-bottom: 10px;
+        transition: 0.3s;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.7;
+        }
+      }
+    }
   }
   .main-div {
     position: relative;
   }
 `;
 
-const dummyCenter = {
+export const dummyCenter = {
   abolition_date: null,
   accreditation: '',
   address_detail: '서울특별시 서초구 청계산로11길 7-12 708동 1층',
@@ -156,7 +188,7 @@ const dummyCenter = {
   insurance_detriment: null,
   insurance_fire: null,
   lat: '37.44401897798263',
-  lng: '127.06217099875766',
+  lon: '127.06217099875766',
   name: '서초구립 포레스타7단지어린이집',
   normal_after_child_count: 0,
   normal_child_count_age0: 0,
@@ -203,8 +235,11 @@ const Map: React.FC = () => {
       process.env.NAVER_CLIENT_ID ?? 'uwfobz7x24'
     }`
   );
+  // use Script -> 스크립트 추가
+
   const [selectCenter, setSelectCenter] =
     useState<null | typeof dummyCenter>(null);
+  // 선택한 센터 정보
 
   const [centerList, setCenterList] = useState<
     {
@@ -214,86 +249,59 @@ const Map: React.FC = () => {
       name: string;
       image: string;
       lat: string;
-      lng: string;
+      lon: string;
       school_vehicle: '운영' | '미운영';
       type: string;
       id: number;
     }[]
   >([]);
+  // Side CenterList
 
   const [location, setLocation] = useState({
     lat: 37.3595704,
     lon: 127.105399,
   });
+  // 네이버 맵 가운데 위치
+
   const [naverMap, setNaverMap] = useState<null | naver.maps.Map>(null);
+  // 네이버 맵 지정
+
+  const [isFilter, setIsFilter] = useState(false);
+  // 필터 모달
+
+  const [filter, setFilter] = useState<filterType>({
+    characteristic: [],
+    city: null,
+    cityDetail: null,
+    classType: [],
+    employee: [],
+    employeeCount: null,
+    personnel: null,
+    type: [],
+  });
+
+  const formRef = useRef<any>();
+  // popup 열기 위한 폼
 
   const initMap = () => {
-    // Brewery
+    // 네이버 맵 만들기
     const mapOptions = {
       center: new naver.maps.LatLng(location.lat, location.lon),
       zoom: naverMap?.getZoom() ?? 10,
     };
+    // 관련 설정
 
     const map = new naver.maps.Map('map', mapOptions);
-    const infowindow = new naver.maps.InfoWindow({
-      content: '이게무슨정보일까?',
-    });
+
     naver.maps.Event.addListener(map, 'zoom_changed', (zoom) => {
-      console.log(zoom);
+      // console.log(zoom);
     });
-
-    // function onSuccessGeolocation(position: {
-    //   coords: {
-    //     latitude: number;
-    //     longitude: number;
-    //   };
-    // }) {
-    //   setLocation({
-    //     lat: position.coords.latitude,
-    //     lon: position.coords.longitude,
-    //   });
-    // }
-
-    // function onErrorGeolocation() {
-    //   const center = map.getCenter();
-
-    //   infowindow.setContent(
-    //     `<div style="padding:20px;">
-    //       <h5 style="margin-bottom:5px;color:#f00;">Geolocation failed!</h5>
-    //       latitude:  +${center.lat()}
-    //       <br />
-    //       longitude:${center.lng()}
-    //     </div>
-    //     `
-    //   );
-
-    //   infowindow.open(map, center);
-    // }
-    (() => {
-      if (navigator.geolocation) {
-        /**
-         * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다
-         * http://localhost 에서는 사용이 가능하며, 테스트 목적으로, Chrome 의 바로가기를 만들어서 아래와 같이 설정하면 접속은 가능합니다.
-         * chrome.exe --unsafely-treat-insecure-origin-as-secure="http://example.com"
-         */
-        // navigator.geolocation.getCurrentPosition(
-        //   onSuccessGeolocation,
-        //   onErrorGeolocation
-        // );
-      } else {
-        const center = map.getCenter();
-        infowindow.setContent(
-          '<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>'
-        );
-        infowindow.open(map, center);
-      }
-    })();
 
     return map;
   };
 
   const onClickCenter = useCallback(
-    async (id: number, map: naver.maps.Map | undefined) => {
+    async (id: number, map?: naver.maps.Map | null) => {
       API.get(`center/${id}`).then((res) => {
         setSelectCenter(res.data.center);
         if (map) {
@@ -318,13 +326,23 @@ const Map: React.FC = () => {
     if (!naverMap) {
       return null;
     }
+    // console.log(filter);
     API.get('center', {
       params: {
         lon: naverMap.getCenter().x,
         lat: naverMap.getCenter().y,
-        radius: 15,
+        type: filter?.type?.join(','),
+        city: filter?.city,
+        city_detail: filter?.cityDetail,
+        max: filter?.personnel,
+        employee: filter.employee.map(changeFilterData).join(','),
+        empty_class: filter.classType.map(changeFilterData).join(','),
+        property: filter.characteristic.map(changeFilterData).join(','),
+        employee_count: filter.employeeCount,
+        radius: 500,
       },
     }).then((res) => {
+      // console.log(res.data.center);
       setCenterList(res.data.center);
 
       const mapOptions = {
@@ -341,19 +359,30 @@ const Map: React.FC = () => {
           map,
           position: new naver.maps.LatLng(+v.lat, +v.lng),
           title: v.name,
-          icon: {
-            content: [
-              `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
-              `<span class="ico _icon">${v.name}</span>`,
-              '<span class="shd"></span>',
-              '</div>',
-            ].join(''),
-          },
+          // icon: {
+          //   content: ,
+          // },
           clickable: true,
         });
-
+        const infowindow = new naver.maps.InfoWindow({
+          content: [
+            `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
+            `<span class="ico _icon">${v.name}</span>`,
+            '<span class="shd"></span>',
+            '</div>',
+          ].join(''),
+        });
+        marker.addListener('mouseover', () => {
+          infowindow.open(map, marker);
+        });
+        marker.addListener('mouseout', () => {
+          infowindow.close();
+        });
         marker.addListener('click', () => {
-          onClickCenter(v.id, map);
+          onClickCenter(v.id);
+          if (infowindow.getMap()) {
+            infowindow.open(map, marker);
+          }
         });
 
         markers.push(marker);
@@ -364,7 +393,121 @@ const Map: React.FC = () => {
         lon: naverMap.getCenter().x,
       });
     });
-  }, [centerList, naverMap, onClickCenter]);
+  }, [centerList, naverMap, onClickCenter, filter]);
+
+  const onClickDetailInformation = useCallback(async () => {
+    let popup;
+
+    const frm = formRef.current; // = document.popfrm;
+    if (!frm || !selectCenter || !naverMap) {
+      return null;
+    }
+
+    // 정부 API - 상세 id 받아오기
+    const formData = new FormData();
+
+    formData.append('latitude', `${selectCenter.lat}`);
+    formData.append('longitude', `${selectCenter.lon}`);
+    formData.append('distance', '1000');
+
+    const response = await API.post(
+      'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+      }
+    );
+    console.log(response.data);
+    // 위도 경도 기준 찾아오기
+    let findCenter = response.data.find(
+      (v: { latitude: number; longitude: number }) =>
+        +v.latitude === +selectCenter.lat && +v.longitude === +selectCenter.lon
+    );
+    if (!findCenter) {
+      // 경도 위도 기준으로 없을경우 이름 또는 주소명 기준으로
+      findCenter = response.data.find(
+        (v: { name: string; roadAddress: string }) =>
+          v.name === selectCenter.name ||
+          v.roadAddress === selectCenter.address_detail
+      );
+    }
+    let stcode = '';
+    if (Array.isArray(response.data) && findCenter) {
+      stcode = findCenter.id;
+    }
+
+    if (stcode.length === 11) {
+      // 어린이집
+      frm.target = 'previewPop_unity';
+      popup = window.open(
+        'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp',
+        'previewPop_unity',
+        'toolbar=non, scrollbars=yes, width=810,height=680'
+      );
+      frm.action =
+        'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp';
+      frm.STCODE_POP.value = stcode;
+    } else {
+      //  (stcode.length == 10)  // 10자리 ? 유치원
+      // 보이기 전 유치원 시스템 점검여부 조회
+
+      popup = window.open(
+        'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do',
+        'previewPop_unity_kinder',
+        'toolbar=non, scrollbars=yes, width=800,height=680'
+      );
+
+      frm.target = 'previewPop_unity_kinder';
+      frm.action = 'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do';
+      frm.pPresch.value = stcode;
+    }
+
+    frm.submit();
+    popup?.focus();
+  }, [selectCenter, naverMap]);
+
+  const getLocation = useCallback(() => {
+    function onSuccessGeolocation(position: {
+      coords: {
+        latitude: number;
+        longitude: number;
+      };
+    }) {
+      setLocation({
+        lat: position.coords.latitude,
+        lon: position.coords.longitude,
+      });
+      if (naverMap) {
+        naverMap.setCenter(
+          new naver.maps.LatLng(
+            position.coords.latitude,
+            position.coords.longitude
+          )
+        );
+        onClickSearch();
+      }
+    }
+
+    function onErrorGeolocation() {
+      // console.log('error');
+    }
+    (() => {
+      if (navigator.geolocation) {
+        /**
+         * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다
+         * http://localhost 에서는 사용이 가능하며, 테스트 목적으로, Chrome 의 바로가기를 만들어서 아래와 같이 설정하면 접속은 가능합니다.
+         * chrome.exe --unsafely-treat-insecure-origin-as-secure="http://example.com"
+         */
+        navigator.geolocation.getCurrentPosition(
+          onSuccessGeolocation,
+          onErrorGeolocation
+        );
+      }
+    })();
+  }, [naverMap, onClickSearch]);
+
   useEffect(() => {
     // initMap();
     if (!loading) {
@@ -399,7 +542,7 @@ const Map: React.FC = () => {
           <Centers
             centerList={centerList.map((v) => ({
               address: v.address_detail,
-              image: Dummy,
+              image: '',
               isSchoolBus: v.school_vehicle === '운영',
               name: v.name,
               tel: v.tel,
@@ -407,13 +550,15 @@ const Map: React.FC = () => {
               homepage: v.homepage,
               id: v.id,
             }))}
-            onClickCenter={onClickCenter}
+            selectCenter={selectCenter}
+            onClickCenter={(id) => onClickCenter(id, naverMap)}
           />
         </aside>
         {selectCenter && (
           <div className="select-center">
             <DetailCenter
-              image={Dummy}
+              onClickDetailInformation={onClickDetailInformation}
+              image={NoImage}
               center={{
                 name: selectCenter.name,
                 city: selectCenter.city_dong,
@@ -478,7 +623,47 @@ const Map: React.FC = () => {
         <button id="mapReloadButton" type="button" onClick={onClickSearch}>
           <p>이 위치에서 검색</p>
         </button>
+        <div className="map-buttons">
+          <button
+            type="button"
+            className="location-button"
+            onClick={getLocation}
+          >
+            <Image
+              src={LocationIcon}
+              width={30}
+              height={30}
+              alt="LocationIcon"
+            />
+          </button>
+          <IconButton
+            image={FilterIcon}
+            buttonProps={{ onClick: () => setIsFilter(true) }}
+          />
+        </div>
       </div>
+      <form
+        id="popfrm"
+        ref={formRef}
+        name="popfrm"
+        method="post"
+        style={{ display: 'none' }}
+      >
+        <input type="hidden" id="flag" name="flag" value="YJ" />
+        <input type="hidden" id="STCODE_POP" name="STCODE_POP" value="" />
+        <input type="hidden" id="pPresch" name="pPresch" value="" />
+      </form>
+      {isFilter && (
+        <Filter
+          isShow={isFilter}
+          setIsShow={setIsFilter}
+          returnFilter={(value) => {
+            setIsFilter(false);
+            setFilter(value);
+          }}
+          filter={filter}
+        />
+      )}
     </ContainerDiv>
   );
 };

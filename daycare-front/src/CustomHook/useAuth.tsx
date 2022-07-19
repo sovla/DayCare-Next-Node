@@ -17,7 +17,7 @@ const StyledModalOverlay = styled.div<ModalProps>`
   position: fixed;
   top: 0px;
   left: 0px;
-  z-index: 1005;
+  z-index: 2000;
   width: 100vw;
   height: 100vh;
 
@@ -32,7 +32,7 @@ const StyledModalOverlay = styled.div<ModalProps>`
     position: absolute;
     right: -70px;
     top: 10px;
-    z-index: 1010;
+    z-index: 2010;
     font-size: 30px;
     font-weight: bold;
     border-radius: 16px;

@@ -80,7 +80,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
     }
   );
 
-  console.log(isLoading, isSignUpLoading, ' 로딩기능 추가예정 제거');
+  // console.log(isLoading, isSignUpLoading, ' 로딩기능 추가예정 제거');
 
   const dispatch = useDispatch();
 

@@ -108,13 +108,15 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
         )}
       </div>
       <div>
-        <Image
-          src={image}
-          width={100}
-          height={100}
-          style={{ borderRadius: '10px' }}
-          alt="DaycareCenterImage"
-        />
+        {image && (
+          <Image
+            src={image}
+            width={100}
+            height={100}
+            style={{ borderRadius: '10px' }}
+            alt="DaycareCenterImage"
+          />
+        )}
       </div>
     </CenterDiv>
   );

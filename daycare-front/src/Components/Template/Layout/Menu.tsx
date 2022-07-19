@@ -81,13 +81,16 @@ const Menu: React.FC = () => {
           </button>
         </li>
         <li>
-          <Link href="/alarm">
-            <a>
-              <i>
-                <Image src={BellIcon} width={44} height={44} alt="BellIcon" />
-              </i>
-            </a>
-          </Link>
+          <button
+            onClick={() => {
+              alert('기능 구현중 ㅠㅠ');
+            }}
+            type="button"
+          >
+            <i>
+              <Image src={BellIcon} width={44} height={44} alt="BellIcon" />
+            </i>
+          </button>
         </li>
       </ul>
       <LoginModal />

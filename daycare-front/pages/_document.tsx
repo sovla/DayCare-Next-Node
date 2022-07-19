@@ -15,6 +15,7 @@ const MainDocument = () => (
         id="modal-root"
         style={{
           position: 'fixed',
+          zIndex: 2000,
           left: '0px',
           top: '0px',
         }}

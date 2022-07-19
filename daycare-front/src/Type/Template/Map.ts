@@ -1,14 +1,17 @@
 /* eslint-disable no-unused-vars */
+import { dummyCenter } from '@src/Container/Page/Map';
 import { SimpleCenterProps } from '@src/Type/Atom/Center';
 import { NextImageSrc } from '../Atom/Card';
 
 export interface CentersProps {
   centerList: SimpleCenterProps[];
   onClickCenter: (id: number) => any;
+  selectCenter: typeof dummyCenter | null;
 }
 
 export interface DetailCenterProps {
   image: NextImageSrc;
+  onClickDetailInformation: () => void;
   center: {
     name: string;
     city: string;

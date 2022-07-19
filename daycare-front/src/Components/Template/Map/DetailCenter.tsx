@@ -15,6 +15,7 @@ const CenterAside = styled.aside`
   flex-direction: column;
   align-items: center;
   max-height: 100vh;
+  height: 100vh;
   overflow-y: scroll;
   overflow-x: hidden;
   .menu {
@@ -26,7 +27,7 @@ const CenterAside = styled.aside`
   .line {
     width: 100%;
     height: 10px;
-    background-color: ${Theme.color.gray_99};
+    background-color: ${Theme.color.gray_C1};
     margin-top: 20px;
   }
   .row-div {
@@ -79,7 +80,7 @@ const CenterAside = styled.aside`
 `;
 
 const DetailCenter: React.FC<DetailCenterProps> = (props) => {
-  const { image, center, classList } = props;
+  const { image, center, classList, onClickDetailInformation } = props;
   return (
     <CenterAside>
       <div>
@@ -91,7 +92,7 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
           objectFit="cover"
         />
       </div>
-      <div className="menu">
+      {/* <div className="menu">
         <DetailMenuButton
           image={SaveIcon}
           alt="SaveIcon"
@@ -122,8 +123,8 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
             },
           }}
         />
-      </div>
-      <div className="line" />
+      </div> */}
+      {/* <div className="line" /> */}
       <div className="information">
         <div className="row-div">
           <p>기관명</p>
@@ -171,7 +172,7 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
         ))}
       </table>
       <div className="detail">
-        <button type="button">
+        <button type="button" onClick={onClickDetailInformation}>
           <p>상세정보 보러가기</p>
         </button>
       </div>
