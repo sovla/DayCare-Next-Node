@@ -11,4 +11,6 @@ export interface CardProps {
   title: string;
   content: string;
   image: NextImageSrc;
+  objectFit?: 'cover' | 'contain';
+  onClick?: () => void;
 }

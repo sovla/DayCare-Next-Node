@@ -12,6 +12,13 @@ const Card = styled.div`
   height: 400px;
   background-color: #ffffff;
   border-radius: 24px;
+  overflow: hidden;
+
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    opacity: 0.7;
+  }
   & > .image {
     width: 300px;
     height: 300px;
@@ -36,21 +43,24 @@ const Card = styled.div`
   }
 `;
 
-const CardComponents: React.FC<CardProps> = ({ image, title, content }) => (
-  <Card>
-    <div className="image">
-      <Image
-        src={image}
-        alt="CardImage"
-        objectFit="cover"
-        layout="fixed"
-        width={300}
-        height={400}
-      />
-    </div>
-    <h5>{title}</h5>
-    <p>{content}</p>
-  </Card>
-);
+const CardComponents: React.FC<CardProps> = (props) => {
+  const { image, title, content, onClick } = props;
+  return (
+    <Card onClick={onClick}>
+      <div className="image">
+        <Image
+          src={image}
+          alt="CardImage"
+          objectFit="contain"
+          layout="intrinsic"
+          width="300px"
+          height="300px"
+        />
+      </div>
+      <h5>{title}</h5>
+      <p>{content}</p>
+    </Card>
+  );
+};
 
 export default CardComponents;
