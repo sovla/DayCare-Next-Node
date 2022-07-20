@@ -40,9 +40,7 @@ export class Reply {
   })
   delete_date: Date;
 
-  @OneToMany(() => ReplyLike, (replyLike) => replyLike.reply, {
-    eager: true,
-  })
+  @OneToMany(() => ReplyLike, (replyLike) => replyLike.reply, { eager: true })
   likes: ReplyLike[];
 
   @ManyToOne(() => Review, (review) => review.reply, {

@@ -102,7 +102,6 @@ export class ReplyService {
     });
 
     if (findReply) {
-      console.log(findReply);
     }
   }
 

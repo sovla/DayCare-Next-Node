@@ -112,7 +112,9 @@ export class ReviewService {
       const review_id = id;
 
       const findReview = await this.reviewRepository.findOne({
-        where: { id: review_id },
+        where: {
+          id: review_id,
+        },
       });
       const saveReview = await this.reviewRepository.save({
         ...findReview,
@@ -135,14 +137,17 @@ export class ReviewService {
           name: findUser.name,
           email: findUser.email,
         },
-        reply: findReview.reply.map((v) => ({
-          ...v,
-          user: {
-            id: v.user.id,
-            name: v.user.name,
-            email: v.user.email,
-          },
-        })),
+        reply: findReview.reply
+          .filter((v) => v.delete_date == null)
+          .map((v) => ({
+            ...v,
+            user: {
+              id: v.user.id,
+              name: v.user.name,
+              email: v.user.email,
+            },
+            likes: v.likes.map((v) => ({ user_id: v.user.id })),
+          })),
       };
     }
   }

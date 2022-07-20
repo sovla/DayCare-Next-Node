@@ -16,11 +16,11 @@ export class ReplyLike {
   })
   id: number;
 
-  @ManyToOne(() => Reply, (reply) => reply.likes)
-  @JoinColumn({ name: 'reply_id' })
+  @ManyToOne(() => Reply, (reply) => reply.likes, { eager: false })
+  @JoinColumn({ name: 'like_reply_id' })
   reply: Reply;
 
-  @ManyToOne(() => User, (user) => user.reply)
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, (user) => user.reply, { eager: true })
+  @JoinColumn({ name: 'like_user_id' })
   user: User;
 }
