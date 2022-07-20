@@ -494,7 +494,7 @@ export class Center {
   rest_end_date: Date;
 
   @Column({
-    type: 'timestamp',
+    type: 'date',
     default: null,
     nullable: true,
     comment: '인가일자',
