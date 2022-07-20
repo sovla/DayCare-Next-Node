@@ -40,7 +40,7 @@ const Centers: React.FC<CentersProps> = (props) => {
     <CenterListDiv ref={ref}>
       {centerList.map((v, i) => (
         <div
-          key={v.name + v.address + v.type}
+          key={v.id}
           onClick={() => onClickCenter(v.id)}
           ref={(el) => {
             if (el) {
