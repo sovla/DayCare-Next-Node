@@ -45,7 +45,6 @@ export class SessionController {
         res.statusCode = 200;
         res.setHeader('access-control-expose-headers', 'Set-Cookie');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.cookie('jwt', result.accessToken, {
           httpOnly: true,
           maxAge: 24 * 60 * 60 * 1000, // 1hours
@@ -73,11 +72,11 @@ export class SessionController {
       res.statusCode = 200;
       res.setHeader('access-control-expose-headers', 'Set-Cookie');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
-      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
       res.cookie('jwt', result.accessToken, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1hours
+        maxAge: 24 * 60 * 60 * 1000, // 24hours
       });
+      console.log('무사히 return', res);
       return res.send({
         statusCode: res.statusCode,
         message: `${findUser.name}님 로그인 성공하셨습니다.`,

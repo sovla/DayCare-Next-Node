@@ -19,6 +19,7 @@ export class SessionService {
       },
     });
     if (!findUser) {
+      console.log('아이디 비밀번호 불일치');
       throw new HttpException('아이디와 비밀번호를 확인해주세요.', 401);
     }
     const validatePassword = await bcrypt.compare(
@@ -27,9 +28,10 @@ export class SessionService {
     );
 
     if (!validatePassword) {
+      console.log(' 비밀번호 불일치');
       throw new HttpException('비밀번호가 틀립니다.', 401);
     }
-
+    console.log('무사히 return');
     return findUser;
   }
 
