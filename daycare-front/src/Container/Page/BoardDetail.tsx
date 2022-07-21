@@ -23,7 +23,8 @@ import HeartIcon from '@src/assets/image/HeartIcon.png';
 import HeartEmptyIcon from '@src/assets/image/HeartEmptyIcon.png';
 import CloseIcon from '@src/assets/image/CloseIcon.png';
 import API from '@src/API';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
+import useError from '@src/CustomHook/useError';
 
 const StyledContainer = styled.div`
   width: 100vw;
@@ -136,6 +137,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   const user = useSelector(selectUser);
   const router = useRouter();
 
+  const { ErrorModal, setErrorStatus } = useError();
   const [replyComment, setReplyComment] = useState('');
   const [isLike, setIsLike] = useState(
     !!review.likes.find((v) => v.id === user.auth?.id)
@@ -170,27 +172,37 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   });
 
   const replyWriteApiHandle = useCallback(async () => {
-    if (!user.auth) {
-      throw new Error({
-        statusCode: 400,
-        title: '로그인후 이용 가능합니다.',
-      });
-    }
-    const response = await replyWriteApi();
-    // console.log('review::::', response);
+    try {
+      if (!user.auth) {
+        throw new AxiosError('로그인 후 이용 가능합니다.', '400');
+      }
+      const response = await replyWriteApi();
+      // console.log('review::::', response);
 
-    setReplyComment('');
-    if (response.data.statusCode === 200) {
-      review.reply.push({ ...response.data.reply, user: user.auth, likes: [] });
+      setReplyComment('');
+      if (response.data.statusCode === 200) {
+        review.reply.push({
+          content: '',
+          delete_date: null,
+          id: 0,
+          update_date: null,
+          write_date: '',
+          ...response.data.reply,
+          user: user.auth,
+          likes: [],
+        });
+      }
+    } catch (error) {
+      setErrorStatus(error as any);
     }
-  }, [replyComment, user.auth, review]);
+  }, [user.auth, replyWriteApi, review.reply, setErrorStatus]);
 
   const reviewDeleteApiHandle = useCallback(async () => {
     const response = await reviewDeleteApi();
     if (response.data.statusCode === 200) {
       router.push('/board');
     }
-  }, [user.auth, review]);
+  }, [reviewDeleteApi, router]);
 
   const onClickLike = useCallback(async () => {
     const response = (await API.get(`review/like/${review.id}`, {
@@ -248,6 +260,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <meta name="description" content="DayCareBoardDetail" />
         <link rel="icon" href="/LogoIcon.png" />
       </Head>
+      <ErrorModal></ErrorModal>
       <div className="review">
         <h3>{review.title}</h3>
 

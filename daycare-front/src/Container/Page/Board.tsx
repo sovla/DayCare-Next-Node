@@ -15,6 +15,9 @@ import API from '@src/API';
 import { AxiosResponse } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import useError from '@src/CustomHook/useError';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@src/Store/userState';
 
 const ContainerDiv = styled.div`
   width: 100vw;
@@ -65,18 +68,36 @@ const Board: React.FC<{
   const [reviewList, setReviewList] = useState<reviewListType[]>([]);
   const [selectPage, setSelectPage] = useState(1);
 
+  const { ErrorModal, setErrorStatus } = useError();
+
   const router = useRouter();
+  const user = useSelector(selectUser);
 
   const getReviewListApi = useCallback(async () => {
     // category_id 기준 리뷰 받아오기
-    const response = (await API.get(
-      `/review/category_id=${selectCategory}`
-    )) as AxiosResponse<reviewWriteType['response'], any>;
+    try {
+      const response = (await API.get(
+        `/review/category_id=${selectCategory}`
+      )) as AxiosResponse<reviewWriteType['response'], any>;
 
-    if (response.data.statusCode === 200) {
-      setReviewList(response.data.review);
+      if (response.data.statusCode === 200) {
+        setReviewList(response.data.review);
+      }
+    } catch (error) {
+      setErrorStatus(error);
     }
   }, [selectCategory]);
+
+  const onClickWrite = useCallback(() => {
+    try {
+      if (!user.auth) {
+        throw new Error('로그인 후 이용 가능합니다.');
+      }
+      router.push('/board/write');
+    } catch (error) {
+      setErrorStatus(error);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectCategory) {
@@ -144,10 +165,11 @@ const Board: React.FC<{
         <IconButton
           image={WriteIcon}
           buttonProps={{
-            onClick: () => router.push('/board/write'),
+            onClick: onClickWrite,
           }}
         />
       </div>
+      <ErrorModal />
     </ContainerDiv>
   );
 };

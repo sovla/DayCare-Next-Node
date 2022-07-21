@@ -20,6 +20,15 @@ const MainDocument = () => (
           top: '0px',
         }}
       />
+      <div
+        id="error-root"
+        style={{
+          position: 'fixed',
+          zIndex: 2000,
+          left: '0px',
+          top: '0px',
+        }}
+      />
     </body>
   </Html>
 );

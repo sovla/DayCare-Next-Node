@@ -10,6 +10,8 @@ import { userEmailVerifyType, userSignUpType } from '@src/Type/API/user';
 import RegExp from '@src/Util/RegExp';
 import { useDispatch } from 'react-redux';
 import { changeUser } from '@src/Store/userState';
+import useError from '@src/CustomHook/useError';
+import { AxiosError } from 'axios';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -58,6 +60,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const { ErrorModal, setErrorStatus } = useError();
 
   const { api: emailVerifyApi, isLoading } = useApi<userEmailVerifyType>({
     url: '/user/email',
@@ -90,30 +93,29 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         //  회원가입 API 핸들러
         e.preventDefault();
 
-        if (!RegExp.stringLength(name, 2, 20)) {
-          alert('이름은 2 ~ 20자 이내로 입력해주세요.');
-          return null;
-        }
-        if (!RegExp.stringLength(password, 6, 20)) {
-          alert('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
-          return null;
-        }
+        try {
+          if (!RegExp.stringLength(name, 2, 20)) {
+            throw new AxiosError('이름은 2 ~ 20자 이내로 입력해주세요.');
+          }
+          if (!RegExp.stringLength(password, 6, 20)) {
+            throw new AxiosError('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
+          }
 
-        if (!RegExp.isEmail(email)) {
-          alert('이메일 형식이 아닙니다.');
-          return null;
-        }
+          if (!RegExp.isEmail(email)) {
+            throw new AxiosError('이메일 형식이 아닙니다.');
+          }
 
-        if (verificationCode.length !== 6) {
-          alert('인증코드는 6자리입니다.');
-          return null;
-        }
+          if (verificationCode.length !== 6) {
+            throw new AxiosError('인증코드는 6자리입니다.');
+          }
 
-        const response = await signUpApi();
-        if (response.data.statusCode === 200) {
-          dispatch(changeUser(response.data.user));
+          const response = await signUpApi();
+          if (response.data.statusCode === 200) {
+            dispatch(changeUser(response.data.user));
+          }
+        } catch (error) {
+          setErrorStatus(error);
         }
-        return true;
       },
       [dispatch, email, name, password, signUpApi, verificationCode.length]
     );
@@ -121,9 +123,13 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
   const onClickEmailVerifyHandle: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(async () => {
       // 이메일 인증코드 발송 및 중복여부 확인
-      const response = await emailVerifyApi();
-      if (response.data.statusCode === 200) {
-        alert('해당 메일로 인증번호를 보냈습니다.');
+      try {
+        const response = await emailVerifyApi();
+        if (response.data.statusCode === 200) {
+          alert('해당 메일로 인증번호를 보냈습니다.');
+        }
+      } catch (error) {
+        setErrorStatus(error);
       }
     }, [email]);
 
@@ -192,6 +198,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         </button>
       </p>
       <div className="line" />
+      <ErrorModal />
     </ContainerDiv>
   );
 };
