@@ -198,50 +198,79 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   }, [user.auth, replyWriteApi, review.reply, setErrorStatus]);
 
   const reviewDeleteApiHandle = useCallback(async () => {
-    const response = await reviewDeleteApi();
-    if (response.data.statusCode === 200) {
-      router.push('/board');
+    try {
+      if (!user.auth) {
+        throw new Error('로그인 후 이용 가능 합니다.');
+      }
+
+      const response = await reviewDeleteApi();
+      if (response.data.statusCode === 200) {
+        router.push('/board');
+      }
+    } catch (error) {
+      setErrorStatus(error);
     }
-  }, [reviewDeleteApi, router]);
+  }, [reviewDeleteApi, router, setErrorStatus, user.auth]);
 
   const onClickLike = useCallback(async () => {
-    const response = (await API.get(`review/like/${review.id}`, {
-      params: {
-        id: user.auth?.id,
-      },
-    })) as AxiosResponse<reviewLikeType['response']>;
+    try {
+      if (!user.auth) {
+        throw new Error('로그인 후 이용 가능 합니다.');
+      }
+      const response = (await API.get(`review/like/${review.id}`, {
+        params: {
+          id: user.auth?.id,
+        },
+      })) as AxiosResponse<reviewLikeType['response']>;
 
-    if (response.data.statusCode === 200) {
-      setIsLike(response.data.like);
+      if (response.data.statusCode === 200) {
+        setIsLike(response.data.like);
+      }
+    } catch (error) {
+      setErrorStatus(error);
     }
-  }, [user, review]);
+  }, [user.auth, review.id, setErrorStatus]);
 
   const onClickDeleteReply = useCallback(
     async (id: number) => {
-      const result = global.confirm('정말 삭제하시겠습니까?');
-      if (result) {
-        const response = await replyDeleteApi({
-          reply_id: id,
-        });
-        if (response.data.statusCode === 200) {
-          router.reload();
+      try {
+        if (!user.auth) {
+          throw new Error('로그인 후 이용 가능 합니다.');
         }
+
+        const result = global.confirm('정말 삭제하시겠습니까?');
+        if (result) {
+          const response = await replyDeleteApi({
+            reply_id: id,
+          });
+          if (response.data.statusCode === 200) {
+            router.reload();
+          }
+        }
+      } catch (error) {
+        setErrorStatus(error);
       }
-      return null;
     },
-    [user]
+    [replyDeleteApi, router, setErrorStatus, user.auth]
   );
 
   const onClickReplyLike = useCallback(
     async (id: number) => {
-      const response = (await API.get(`reply/like/${id}`, {
-        params: {
-          id: user.auth?.id,
-        },
-      })) as AxiosResponse<replyLikeType['response']>;
+      try {
+        if (!user.auth) {
+          throw new Error('로그인 후 이용 가능 합니다.');
+        }
+        const response = (await API.get(`reply/like/${id}`, {
+          params: {
+            id: user.auth?.id,
+          },
+        })) as AxiosResponse<replyLikeType['response']>;
 
-      if (response.data.statusCode === 200) {
-        router.reload();
+        if (response.data.statusCode === 200) {
+          router.reload();
+        }
+      } catch (error) {
+        setErrorStatus(error);
       }
     },
     [user]
@@ -260,7 +289,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <meta name="description" content="DayCareBoardDetail" />
         <link rel="icon" href="/LogoIcon.png" />
       </Head>
-      <ErrorModal></ErrorModal>
+      <ErrorModal />
       <div className="review">
         <h3>{review.title}</h3>
 
