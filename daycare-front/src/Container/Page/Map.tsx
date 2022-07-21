@@ -402,40 +402,44 @@ const Map: React.FC = () => {
     if (!frm || !selectCenter || !naverMap) {
       return null;
     }
-
-    // 정부 API - 상세 id 받아오기
-    const formData = new FormData();
-
-    formData.append('latitude', `${selectCenter.lat}`);
-    formData.append('longitude', `${selectCenter.lon}`);
-    formData.append('distance', '1000');
-
-    const response = await API.post(
-      'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-      }
-    );
-    console.log(response.data);
-    // 위도 경도 기준 찾아오기
-    let findCenter = response.data.find(
-      (v: { latitude: number; longitude: number }) =>
-        +v.latitude === +selectCenter.lat && +v.longitude === +selectCenter.lon
-    );
-    if (!findCenter) {
-      // 경도 위도 기준으로 없을경우 이름 또는 주소명 기준으로
-      findCenter = response.data.find(
-        (v: { name: string; roadAddress: string }) =>
-          v.name === selectCenter.name ||
-          v.roadAddress === selectCenter.address_detail
-      );
-    }
     let stcode = '';
-    if (Array.isArray(response.data) && findCenter) {
-      stcode = findCenter.id;
+    // 정부 API - 상세 id 받아오기
+    if (selectCenter.code.length) {
+      stcode = selectCenter.code;
+    } else {
+      const formData = new FormData();
+
+      formData.append('latitude', `${selectCenter.lat}`);
+      formData.append('longitude', `${selectCenter.lon}`);
+      formData.append('distance', '1000');
+
+      const response = await API.post(
+        'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+        }
+      );
+      // 위도 경도 기준 찾아오기
+      let findCenter = response.data.find(
+        (v: { latitude: number; longitude: number }) =>
+          +v.latitude === +selectCenter.lat &&
+          +v.longitude === +selectCenter.lon
+      );
+      if (!findCenter) {
+        // 경도 위도 기준으로 없을경우 이름 또는 주소명 기준으로
+        findCenter = response.data.find(
+          (v: { name: string; roadAddress: string }) =>
+            v.name === selectCenter.name ||
+            v.roadAddress === selectCenter.address_detail
+        );
+      }
+
+      if (Array.isArray(response.data) && findCenter) {
+        stcode = findCenter.id;
+      }
     }
 
     if (stcode.length === 11) {
