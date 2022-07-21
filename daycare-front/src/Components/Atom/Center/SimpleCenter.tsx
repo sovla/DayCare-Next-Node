@@ -1,6 +1,6 @@
 import { SimpleCenterProps } from '@src/Type/Atom/Center';
 import Image from 'next/image';
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 import SchoolBusIcon from '@src/assets/image/SchoolBusIcon.png';
@@ -69,6 +69,20 @@ const CenterDiv = styled.div`
 
 const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
   const { address, image, name, tel, homepage, isSchoolBus, type } = props;
+
+  const onClickHomepage = useCallback(() => {
+    const urlReg = /(https?:\/\/)?([\da-z\.-]+)\.([a-z]{2,6})([\/\w\.-]*)*\/?/;
+    if (!homepage) {
+      return;
+    }
+
+    if (homepage.includes('https://') || homepage.includes('http://')) {
+      window.open(homepage);
+      return;
+    }
+
+    window.open(`https://${homepage}`);
+  }, [homepage]);
   return (
     <CenterDiv>
       <div className="center">
@@ -101,7 +115,7 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
               alt="HomePageIcon"
             />
 
-            <a href={homepage}>
+            <a href="#" onClick={onClickHomepage}>
               <span className="homepage">{homepage}</span>
             </a>
           </div>
