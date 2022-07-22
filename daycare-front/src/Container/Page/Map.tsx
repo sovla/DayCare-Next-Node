@@ -13,14 +13,14 @@ import Image from 'next/image';
 import LogoIcon from '@src/assets/image/LogoIcon.png';
 import FilterIcon from '@src/assets/image/FilterIcon.png';
 import LocationIcon from '@src/assets/image/LocationIcon.png';
-
 import Menu from '@src/Components/Template/Layout/Menu';
 import API from '@src/API';
 import Theme from '@src/assets/global/Theme';
 import IconButton from '@src/Components/Atom/Button/IconButton';
 import Filter from '@src/Components/Template/Modal/Filter';
 import { filterType } from '@src/Type/Template/Modal';
-import { changeFilterData } from '@src/assets/global/Dummy';
+import { changeFilterData, dummyCenter } from '@src/assets/global/Dummy';
+import useEffectOnce from '@src/CustomHook/useEffectOnce';
 
 const ContainerDiv = styled.div`
   display: flex;
@@ -120,117 +120,8 @@ const ContainerDiv = styled.div`
   }
 `;
 
-export const dummyCenter = {
-  abolition_date: null,
-  accreditation: '',
-  address_detail: '서울특별시 서초구 청계산로11길 7-12 708동 1층',
-  address_number: '06802',
-  authorization_date: '2013-09-30T15:00:00.000Z',
-  cctv_count: 0,
-  certification: null,
-  characteristics: '',
-  child_count: 0,
-  child_count_age0: 0,
-  child_count_age1: 0,
-  child_count_age2: 0,
-  child_count_age3: 0,
-  child_count_age4: 0,
-  child_count_age5: 0,
-  child_count_age6: 0,
-  child_count_age7: 0,
-  city: '서울특별시',
-  city_detail: '서초구',
-  city_dong: '',
-  city_scale: '',
-  class_count: 0,
-  class_count0: 0,
-  class_count1: 0,
-  class_count2: 0,
-  class_count3: 0,
-  class_count4: 0,
-  class_count5: 0,
-  class_count_mix2: 0,
-  class_count_mix5: 0,
-  class_count_special: 0,
-  code: '',
-  consignment_name: '',
-  consignment_status: '',
-  consignment_type: '',
-  director_name: '',
-  employee_count: 0,
-  employee_count0: 0,
-  employee_count1: 0,
-  employee_count2: 0,
-  employee_count4: 0,
-  employee_count6: 0,
-  employee_count_cook: 0,
-  employee_count_cure: 0,
-  employee_count_director: 0,
-  employee_count_nurse: 0,
-  employee_count_nursery: 0,
-  employee_count_nursingassistant: 0,
-  employee_count_nutritionist: 0,
-  employee_count_officeworker: 0,
-  employee_count_other: 0,
-  employee_count_special: 0,
-  fax: '02-572-2030',
-  homepage: 'http://cafe.naver.com/foresta7',
-  id: 4458,
-  impaired_after_child_count: 0,
-  impaired_after_count: 0,
-  impaired_allday_child_count: 0,
-  impaired_allday_count: 0,
-  impaired_child_count: 0,
-  impaired_extension_child_count: 0,
-  impaired_holiday_child_count: 0,
-  infant_child_count: 0,
-  insurance_compensation: null,
-  insurance_detriment: null,
-  insurance_fire: null,
-  lat: '37.44401897798263',
-  lon: '127.06217099875766',
-  name: '서초구립 포레스타7단지어린이집',
-  normal_after_child_count: 0,
-  normal_child_count_age0: 0,
-  normal_child_count_age1: 0,
-  normal_child_count_age2: 0,
-  normal_child_count_age3: 0,
-  normal_child_count_age4: 0,
-  normal_child_count_mix01: 0,
-  normal_child_count_mix12: 0,
-  normal_child_count_mix23: 0,
-  normal_child_count_mix34: 0,
-  normal_holiday_child_count: 0,
-  nuri_impaired_count: 0,
-  nursery_count: '4',
-  nursery_roomarea: '197',
-  operation_status: '정상',
-  playground_count: 0,
-  property_after: '',
-  property_after_combine: '',
-  property_allday: '',
-  property_holiday: '',
-  property_impaired: '',
-  property_impaired_combine: '',
-  property_infants: '',
-  property_normal: '',
-  property_time_extension: '',
-  representative_name: '',
-  rest_end_date: null,
-  rest_start_date: null,
-  school_vehicle: '미운영',
-  server_date: '2022-07-08 10:48:35',
-  service: '',
-  student_count: 26,
-  student_max: 42,
-  support: '',
-  teaching_staff_count: 9,
-  tel: '070-7204-2030',
-  type: '국공립',
-};
-
 const Map: React.FC = () => {
-  const [loading, error] = useScript(
+  const [loading, scriptError] = useScript(
     `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${
       process.env.NAVER_CLIENT_ID ?? 'uwfobz7x24'
     }`
@@ -279,54 +170,57 @@ const Map: React.FC = () => {
     personnel: null,
     type: [],
   });
+  // 필터 오브젝트
 
   const formRef = useRef<any>();
   // popup 열기 위한 폼
 
   const initMap = () => {
     // 네이버 맵 만들기
-    const mapOptions = {
+    const map = new naver.maps.Map('map', {
       center: new naver.maps.LatLng(location.lat, location.lon),
       zoom: naverMap?.getZoom() ?? 10,
-    };
-    // 관련 설정
-
-    const map = new naver.maps.Map('map', mapOptions);
-
-    naver.maps.Event.addListener(map, 'zoom_changed', (zoom) => {
-      // console.log(zoom);
     });
+
+    // naver.maps.Event.addListener(map, 'zoom_changed', (zoom) => {
+    //   // console.log(zoom);
+    //       });
 
     return map;
   };
 
   const onClickCenter = useCallback(
     async (id: number, map?: naver.maps.Map | null) => {
+      // 지도위에서 센터를 선택하거나 왼쪽 센터리스트에서 선택한 경우
+
       API.get(`center/${id}`).then((res) => {
         setSelectCenter(res.data.center);
-        if (map) {
-          map?.setCenter(
-            new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
-          );
-          map?.setZoom(map?.getZoom() > 15 ? map?.getZoom() : 15);
-        } else {
-          naverMap?.setCenter(
-            new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
-          );
-          naverMap?.setZoom(
-            naverMap?.getZoom() > 15 ? naverMap?.getZoom() : 15
-          );
+
+        const currentMap = map ?? naverMap;
+        // 파라미터로 맵을 받거나 현재 맵인 경우 센터 가운데로 지정
+
+        if (!currentMap) {
+          return null;
         }
+
+        currentMap.setCenter(
+          new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
+        );
+        currentMap.setZoom(
+          currentMap.getZoom() > 15 ? currentMap.getZoom() : 15
+        );
       });
     },
     [naverMap]
   );
 
   const onClickSearch = useCallback(() => {
+    // 지도에서 이 위치에서 검색 버튼을 눌럿을때
+
     if (!naverMap) {
       return null;
     }
-    // console.log(filter);
+
     API.get('center', {
       params: {
         lon: naverMap.getCenter().x,
@@ -342,28 +236,28 @@ const Map: React.FC = () => {
         radius: 500,
       },
     }).then((res) => {
-      // console.log(res.data.center);
+      // 성공시
+      // 1. 센터리스트 넣어주기
+      // 2. 새로운 네이버 맵에 마커 찍어서 넣어주기
+      // 3. 그 마커에 이벤트 걸어주기
+
       setCenterList(res.data.center);
 
-      const mapOptions = {
+      const map = new naver.maps.Map('map', {
         center: naverMap.getCenter(),
         zoom: naverMap?.getZoom() ?? 10,
-      };
+      });
 
-      const map = new naver.maps.Map('map', mapOptions);
-
-      const markers = [];
       for (let index = 0; index < res.data.center.length; index += 1) {
         const v = res.data.center[index];
+
         const marker = new naver.maps.Marker({
           map,
           position: new naver.maps.LatLng(+v.lat, +v.lng),
           title: v.name,
-          // icon: {
-          //   content: ,
-          // },
           clickable: true,
         });
+
         const infowindow = new naver.maps.InfoWindow({
           content: [
             `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
@@ -372,6 +266,7 @@ const Map: React.FC = () => {
             '</div>',
           ].join(''),
         });
+
         marker.addListener('mouseover', () => {
           infowindow.open(map, marker);
         });
@@ -384,8 +279,6 @@ const Map: React.FC = () => {
             infowindow.open(map, marker);
           }
         });
-
-        markers.push(marker);
       }
       setNaverMap(map);
       setLocation({
@@ -393,83 +286,51 @@ const Map: React.FC = () => {
         lon: naverMap.getCenter().x,
       });
     });
-  }, [centerList, naverMap, onClickCenter, filter]);
+  }, [naverMap, onClickCenter, filter]);
 
   const onClickDetailInformation = useCallback(async () => {
-    let popup;
+    try {
+      let popup;
 
-    const frm = formRef.current; // = document.popfrm;
-    if (!frm || !selectCenter || !naverMap) {
-      return null;
-    }
-    let stcode = '';
-    // 정부 API - 상세 id 받아오기
-    if (selectCenter.code.length) {
-      stcode = selectCenter.code;
-    } else {
-      const formData = new FormData();
+      const frm = formRef.current; // = document.popfrm;
+      if (!frm || !selectCenter || !naverMap) {
+        return null;
+      }
 
-      formData.append('latitude', `${selectCenter.lat}`);
-      formData.append('longitude', `${selectCenter.lon}`);
-      formData.append('distance', '1000');
+      if (selectCenter.code.length === 0) {
+        throw new Error('해당 어린이집은 상세보기가 지원되지 않습니다.');
+      }
 
-      const response = await API.post(
-        'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          },
-        }
-      );
-      // 위도 경도 기준 찾아오기
-      let findCenter = response.data.find(
-        (v: { latitude: number; longitude: number }) =>
-          +v.latitude === +selectCenter.lat &&
-          +v.longitude === +selectCenter.lon
-      );
-      if (!findCenter) {
-        // 경도 위도 기준으로 없을경우 이름 또는 주소명 기준으로
-        findCenter = response.data.find(
-          (v: { name: string; roadAddress: string }) =>
-            v.name === selectCenter.name ||
-            v.roadAddress === selectCenter.address_detail
+      if (selectCenter.code.length === 11) {
+        // 어린이집
+        frm.target = 'previewPop_unity';
+        popup = window.open(
+          'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp',
+          'previewPop_unity',
+          'toolbar=non, scrollbars=yes, width=810,height=680'
         );
+        frm.action =
+          'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp';
+        frm.STCODE_POP.value = selectCenter.code;
+      } else {
+        //  (stcode.length == 10)  // 10자리 ? 유치원
+        //   보이기 전 유치원 시스템 점검여부 조회
+
+        popup = window.open(
+          'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do',
+          'previewPop_unity_kinder',
+          'toolbar=non, scrollbars=yes, width=800,height=680'
+        );
+
+        frm.target = 'previewPop_unity_kinder';
+        frm.action =
+          'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do';
+        frm.pPresch.value = selectCenter.code;
       }
 
-      if (Array.isArray(response.data) && findCenter) {
-        stcode = findCenter.id;
-      }
-    }
-
-    if (stcode.length === 11) {
-      // 어린이집
-      frm.target = 'previewPop_unity';
-      popup = window.open(
-        'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp',
-        'previewPop_unity',
-        'toolbar=non, scrollbars=yes, width=810,height=680'
-      );
-      frm.action =
-        'http://info.childcare.go.kr/info/pnis/search/preview/SummaryInfoSlPu.jsp';
-      frm.STCODE_POP.value = stcode;
-    } else {
-      //  (stcode.length == 10)  // 10자리 ? 유치원
-      // 보이기 전 유치원 시스템 점검여부 조회
-
-      popup = window.open(
-        'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do',
-        'previewPop_unity_kinder',
-        'toolbar=non, scrollbars=yes, width=800,height=680'
-      );
-
-      frm.target = 'previewPop_unity_kinder';
-      frm.action = 'https://e-childschoolinfo.moe.go.kr/presch/preschSumry.do';
-      frm.pPresch.value = stcode;
-    }
-
-    frm.submit();
-    popup?.focus();
+      frm.submit();
+      popup?.focus();
+    } catch (error) {}
   }, [selectCenter, naverMap]);
 
   const getLocation = useCallback(() => {
@@ -494,8 +355,8 @@ const Map: React.FC = () => {
       }
     }
 
-    function onErrorGeolocation() {
-      // console.log('error');
+    function onErrorGeolocation(geoError: any) {
+      console.log('error', geoError);
     }
     (() => {
       if (navigator.geolocation) {
@@ -513,13 +374,20 @@ const Map: React.FC = () => {
   }, [naverMap, onClickSearch]);
 
   useEffect(() => {
-    // initMap();
     if (!loading) {
       setNaverMap(initMap());
     }
   }, [loading]);
 
-  if (loading || error) {
+  useEffectOnce(() => {
+    if (naverMap) {
+      onClickSearch();
+      return true;
+    }
+    return false;
+  }, [naverMap]);
+
+  if (loading || scriptError) {
     return null;
   }
 
@@ -540,7 +408,7 @@ const Map: React.FC = () => {
       <div className="main-div">
         <aside className="search">
           <div className="row-center">
-            <Image src={LogoIcon} width={45} height={45} />
+            <Image src={LogoIcon} width={45} height={45} alt="LogoIcon" />
             <Search onClick={() => console.log('검색')} inputProps={{}} />
           </div>
           <Centers

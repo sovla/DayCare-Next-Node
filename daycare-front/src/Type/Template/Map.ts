@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { dummyCenter } from '@src/Container/Page/Map';
+import { dummyCenter } from '@src/assets/global/Dummy';
 import { SimpleCenterProps } from '@src/Type/Atom/Center';
 import { NextImageSrc } from '../Atom/Card';
 
