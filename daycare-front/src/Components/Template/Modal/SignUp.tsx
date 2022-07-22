@@ -126,6 +126,9 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
     useCallback(async () => {
       // 이메일 인증코드 발송 및 중복여부 확인
       try {
+        if (!RegExp.isEmail(email)) {
+          throw new AxiosError('이메일 형식이 아닙니다.');
+        }
         const response = await emailVerifyApi();
         if (response.data.statusCode === 200) {
           alert('해당 메일로 인증번호를 보냈습니다.');
@@ -150,14 +153,14 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
       </p>
       <InputText
         type="text"
-        placeholder="사용자 이름"
+        placeholder="사용자 이름 (2 ~ 20자 사이)"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
 
       <InputText
         type="password"
-        placeholder="비밀번호"
+        placeholder="비밀번호 (6 ~ 20자 사이)"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />

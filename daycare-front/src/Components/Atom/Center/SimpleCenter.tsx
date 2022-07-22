@@ -64,7 +64,7 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
     }
   }
   .address {
-    max-width: 250px;
+    max-width: 350px;
     display: block;
     word-break: keep-all;
   }

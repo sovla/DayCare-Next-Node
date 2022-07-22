@@ -92,6 +92,7 @@ select {
   font: inherit;
   vertical-align: baseline;
   font-family: CookieRun Regular;
+  -webkit-tap-highlight-color: #c1c1c180;
 }
 /* HTML5 display-role reset for older browsers */
 article,
