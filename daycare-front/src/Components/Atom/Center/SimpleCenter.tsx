@@ -43,7 +43,8 @@ const CenterDiv = styled.div`
       & > span {
         padding-left: 5px;
       }
-      & > a {
+      & > a,
+      & > button {
         padding-left: 5px;
         text-decoration: none;
       }
@@ -71,7 +72,6 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
   const { address, image, name, tel, homepage, isSchoolBus, type } = props;
 
   const onClickHomepage = useCallback(() => {
-    const urlReg = /(https?:\/\/)?([\da-z\.-]+)\.([a-z]{2,6})([\/\w\.-]*)*\/?/;
     if (!homepage) {
       return;
     }
@@ -115,9 +115,9 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
               alt="HomePageIcon"
             />
 
-            <a href="#" onClick={onClickHomepage}>
+            <button type="button" onClick={onClickHomepage}>
               <span className="homepage">{homepage}</span>
-            </a>
+            </button>
           </div>
         )}
       </div>
