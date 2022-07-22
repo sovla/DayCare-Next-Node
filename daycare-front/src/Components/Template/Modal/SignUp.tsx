@@ -62,7 +62,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
   const [verificationCode, setVerificationCode] = useState('');
   const { ErrorModal, setErrorStatus } = useError();
 
-  const { api: emailVerifyApi, isLoading } = useApi<userEmailVerifyType>({
+  const { api: emailVerifyApi } = useApi<userEmailVerifyType>({
     url: '/user/email',
     data: {
       email,
@@ -70,18 +70,16 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
     method: 'post',
   });
 
-  const { api: signUpApi, isLoading: isSignUpLoading } = useApi<userSignUpType>(
-    {
-      url: '/user',
-      data: {
-        email,
-        name,
-        password,
-        verificationCode,
-      },
-      method: 'post',
-    }
-  );
+  const { api: signUpApi } = useApi<userSignUpType>({
+    url: '/user',
+    data: {
+      email,
+      name,
+      password,
+      verificationCode,
+    },
+    method: 'post',
+  });
 
   // console.log(isLoading, isSignUpLoading, ' 로딩기능 추가예정 제거');
 

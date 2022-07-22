@@ -1,11 +1,7 @@
 import { DetailCenterProps } from '@src/Type/Template/Map';
 import Image from 'next/image';
 import React from 'react';
-import { DetailMenuButton } from 'stories/Atom/Button.stories';
 import styled from 'styled-components';
-import SaveIcon from '@src/assets/image/SaveIcon.png';
-import ShareIcon from '@src/assets/image/ShareIcon.png';
-import ReviewIcon from '@src/assets/image/ReviewIcon.png';
 import Theme from '@src/assets/global/Theme';
 
 const CenterAside = styled.aside`

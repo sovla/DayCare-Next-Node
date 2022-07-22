@@ -13,7 +13,6 @@ import { category as categoryType } from '@src/Type/API/category';
 import { reviewWriteType, reviewListType } from '@src/Type/API/review';
 import API from '@src/API';
 import { AxiosResponse } from 'axios';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import useError from '@src/CustomHook/useError';
 import { useSelector } from 'react-redux';
