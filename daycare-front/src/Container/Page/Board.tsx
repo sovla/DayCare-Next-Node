@@ -1,7 +1,6 @@
 import Theme from '@src/assets/global/Theme';
 import IconButton from '@src/Components/Atom/Button/IconButton';
 import WriteIcon from '@src/assets/image/WriteIcon.png';
-import Search from '@src/Components/Atom/Input/Search';
 import Categories from '@src/Components/Template/Board/Categories';
 import Pagination from '@src/Components/Template/Board/Pagination';
 import Table from '@src/Components/Template/Board/Table';
@@ -62,7 +61,8 @@ const ContainerDiv = styled.div`
 
 const Board: React.FC<{
   category: categoryType[];
-}> = ({ category }) => {
+}> = (props) => {
+  const { category } = props;
   const [selectCategory, setSelectCategory] = useState(0);
   const [reviewList, setReviewList] = useState<reviewListType[]>([]);
   const [selectPage, setSelectPage] = useState(1);
@@ -90,7 +90,7 @@ const Board: React.FC<{
         })
       );
     }
-  }, [selectCategory]);
+  }, [dispatch, selectCategory]);
 
   const onClickWrite = useCallback(() => {
     try {
@@ -106,7 +106,7 @@ const Board: React.FC<{
         })
       );
     }
-  }, []);
+  }, [dispatch, router, user.auth]);
 
   useEffect(() => {
     if (selectCategory) {
@@ -136,7 +136,7 @@ const Board: React.FC<{
             onClickCategory={setSelectCategory}
             selectCategory={selectCategory}
           />
-          <Search inputProps={{}} onClick={() => {}} />
+          {/* <Search inputProps={{}} onClick={() => {}} /> */}
         </div>
       </div>
       <div className="nav-menu">

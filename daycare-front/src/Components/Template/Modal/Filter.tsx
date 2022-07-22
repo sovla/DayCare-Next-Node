@@ -78,22 +78,22 @@ const StyledModalOverlay = styled.div<ModalProps>`
 const Filter: React.FC<FilterProps> = (props) => {
   const { isShow, setIsShow, returnFilter, filter } = props;
 
-  const [type, setType] = useState<string[]>(filter.type);
+  const [type, setType] = useState<string[]>(filter?.type);
   const [selectCity, setSelectCity] = useState<string>(filter?.city ?? '선택');
   const [selectCityDetail, setSelectCityDetail] = useState<string>(
     filter?.cityDetail ?? '선택'
   );
   const [personnel, setPersonnel] = useState<number | null>(
-    filter?.personnel === null ? null : filter.personnel ? 1 : 2
+    filter?.personnel === null ? null : filter?.personnel ? 1 : 2
   );
   const [characteristic, setCharacteristic] = useState<string[]>(
     filter.characteristic
   );
-  const [classType, setClassType] = useState<string[]>(filter.classType);
+  const [classType, setClassType] = useState<string[]>(filter?.classType);
   const [employeeCount, setEmployeeCount] = useState<number | null>(
-    filter.employeeCount
+    filter?.employeeCount
   );
-  const [employee, setEmployee] = useState<string[]>(filter.employee);
+  const [employee, setEmployee] = useState<string[]>(filter?.employee);
 
   const menuList = useMemo(
     () => ({

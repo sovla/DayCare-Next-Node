@@ -64,7 +64,8 @@ const StyledWriteContainer = styled.div`
   }
 `;
 
-const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
+const BoardWrite: React.FC<BoardWriteProps> = (props) => {
+  const { category } = props;
   const editorRef = useRef<Editor>(null);
   const router = useRouter();
 
@@ -126,7 +127,7 @@ const BoardWrite: React.FC<BoardWriteProps> = ({ category }) => {
 
   useEffect(() => {
     if (!user.auth) {
-      router.replace('/board');
+      router?.replace('/board');
       window.alert('로그인 후 이용 가능합니다.');
     }
   }, []);
