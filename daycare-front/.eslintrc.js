@@ -46,6 +46,8 @@ module.exports = {
     'object-curly-newline': ['off'],
     'jsx-a11y/no-static-element-interactions': ['off'],
     'jsx-a11y/click-events-have-key-events': ['off'],
+    'implicit-arrow-linebreak': ['off'],
+    'operator-linebreak': ['off'],
   },
   settings: {
     'import/resolver': {
