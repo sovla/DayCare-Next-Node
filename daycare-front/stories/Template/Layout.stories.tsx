@@ -2,9 +2,36 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import MenuComponent from '@src/Components/Template/Layout/Menu';
+import { Provider } from 'react-redux';
+import { makeStore } from '@src/Store/store';
 
 export default {
   title: 'Template/Layout',
+  decorators: [
+    (story: any) => (
+      <Provider store={makeStore}>
+        <div
+          id="modal-root"
+          style={{
+            position: 'fixed',
+            zIndex: 2000,
+            left: '0px',
+            top: '0px',
+          }}
+        />
+        <div
+          id="error-root"
+          style={{
+            position: 'fixed',
+            zIndex: 2000,
+            left: '0px',
+            top: '0px',
+          }}
+        />
+        {story()}
+      </Provider>
+    ),
+  ],
 } as ComponentMeta<typeof MenuComponent>;
 
 const MenuTemplate: ComponentStory<typeof MenuComponent> = (args) => (

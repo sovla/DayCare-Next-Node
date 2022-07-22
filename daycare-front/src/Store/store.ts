@@ -1,15 +1,42 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
 import errorState from './errorState';
-import userState from './userState';
+import userState, { mockUserState } from './userState';
 
-const makeStore = configureStore({
+export const makeStore = configureStore({
   reducer: {
     // the convention is to name this photos rather
     // than photosStore but photosStore is clearer to me.
     // anyOtherStore: anyOtherSlice,
     // middleware: ['array of middlewares'],
     user: userState,
+    error: errorState,
+  },
+  devTools: true,
+  middleware: (curryGetDefaultMiddleware) =>
+    curryGetDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ['error/changeError'],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: [
+          'error',
+          'error.payload.errorStatus',
+          'error.errorStatus',
+        ],
+        // Ignore these paths in the state
+        ignoredPaths: ['error.payload.errorStatus'],
+      },
+    }),
+});
+
+export const mockStore = configureStore({
+  reducer: {
+    // the convention is to name this photos rather
+    // than photosStore but photosStore is clearer to me.
+    // anyOtherStore: anyOtherSlice,
+    // middleware: ['array of middlewares'],
+    user: mockUserState,
     error: errorState,
   },
   devTools: true,

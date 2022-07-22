@@ -61,17 +61,17 @@ const Menu: React.FC = () => {
   return (
     <Nav>
       <ul>
-        <StyledMenuLi isActive={router.asPath === '/'}>
+        <StyledMenuLi isActive={router?.asPath === '/'}>
           <Link href="/">
             <a>소개</a>
           </Link>
         </StyledMenuLi>
-        <StyledMenuLi isActive={router.asPath === '/map'}>
+        <StyledMenuLi isActive={router?.asPath === '/map'}>
           <Link href="/map">
             <a>지도</a>
           </Link>
         </StyledMenuLi>
-        <StyledMenuLi isActive={router.asPath === '/board'}>
+        <StyledMenuLi isActive={router?.asPath === '/board'}>
           <Link href="/board">
             <a>리뷰</a>
           </Link>

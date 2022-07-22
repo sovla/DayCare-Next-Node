@@ -16,7 +16,7 @@ const Categories: React.FC<CategoriesProps> = (props) => {
       {categoryList.map((v) => (
         <CategoryButton
           content={v.title}
-          key={v.join_date}
+          key={v.id}
           onClick={() => onClickCategory(v.id)}
           isSelect={selectCategory === v.id}
         />

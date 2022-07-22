@@ -62,6 +62,7 @@ Centers.argTypes = {
   centerList: {
     defaultValue: [
       {
+        id: 0,
         name: '전포연수어린이집',
         address: '부산 남구 고동골로60번길 29 하승어린이집',
         type: '공립',
@@ -71,6 +72,7 @@ Centers.argTypes = {
         image: Dummy,
       },
       {
+        id: 1,
         name: '전포연수어린이집',
         address: '부산 남구 고동골로60번길 29 하승어린이집',
         type: '공립',
@@ -80,6 +82,7 @@ Centers.argTypes = {
         image: Dummy,
       },
       {
+        id: 2,
         name: '전포연수어린이집',
         address: '부산 남구 고동골로60번길 29 하승어린이집',
         type: '공립',
@@ -89,6 +92,7 @@ Centers.argTypes = {
         image: Dummy,
       },
       {
+        id: 3,
         name: '전포연수어린이집',
         address: '부산 남구 고동골로60번길 29 하승어린이집',
         type: '공립',
@@ -98,6 +102,7 @@ Centers.argTypes = {
         image: Dummy,
       },
       {
+        id: 4,
         name: '전포연수어린이집',
         address: '부산 남구 고동골로60번길 29 하승어린이집',
         type: '공립',
@@ -110,6 +115,15 @@ Centers.argTypes = {
     description: '어린이집 리스트',
     control: {
       type: 'array',
+    },
+  },
+  selectCenter: {
+    description: '선택한 어린이집',
+    defaultValue: {
+      id: 0,
+    },
+    control: {
+      type: 'object',
     },
   },
 };

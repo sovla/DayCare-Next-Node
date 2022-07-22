@@ -38,6 +38,13 @@ CategoryButton.argTypes = {
       type: 'text',
     },
   },
+  isSelect: {
+    description: '버튼 선택여부',
+    defaultValue: true,
+    control: {
+      type: 'boolean',
+    },
+  },
 };
 
 export const DetailMenuButton = DetailMenuButtonTemplate.bind({});

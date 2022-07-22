@@ -33,7 +33,7 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
         color: ${Theme.color.blue_00};
         width: fit-content;
         max-width: 320px;
-        height: 48px;
+        max-height: 48px;
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -70,7 +70,7 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
     max-width: 350px;
     display: block;
     word-break: keep-all;
-    height: 38px;
+    max-height: 38px;
     overflow: hidden;
   }
   div:nth-child(2) {

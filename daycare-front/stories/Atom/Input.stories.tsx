@@ -6,6 +6,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import InputTextComponents from '@src/Components/Atom/Input/InputText';
 import SearchComponent from '@src/Components/Atom/Input/Search';
 import SelectComponent from '@src/Components/Atom/Input/Select';
+import CheckBoxComponent from '@src/Components/Atom/Input/CheckBox';
 
 export default {
   title: 'Atom/Input',
@@ -21,6 +22,10 @@ const SearchTemplate: ComponentStory<typeof SearchComponent> = (args) => (
 
 const SelectTemplate: ComponentStory<typeof SelectComponent> = (args) => (
   <SelectComponent {...args} />
+);
+
+const CheckBoxTemplate: ComponentStory<typeof CheckBoxComponent> = (args) => (
+  <CheckBoxComponent {...args} />
 );
 export const InputText = InputTextTemplate.bind({});
 
@@ -99,6 +104,26 @@ SelectCategory.argTypes = {
     defaultValue: ['전체', '어린이집 추천', '어린이집 꿀팁'],
     control: {
       type: 'array',
+    },
+  },
+};
+
+export const CheckBox = CheckBoxTemplate.bind({});
+
+CheckBox.argTypes = {
+  content: {
+    description: '내용',
+    defaultValue: '공립',
+    control: {
+      type: 'text',
+    },
+  },
+
+  isCheck: {
+    description: '체크여부',
+    defaultValue: true,
+    control: {
+      type: 'boolean',
     },
   },
 };

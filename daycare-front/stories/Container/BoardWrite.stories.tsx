@@ -3,20 +3,17 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import MapComponent from '@src/Container/Page/Map';
+import BoardWriteComponent from '@src/Container/Page/BoardWrite';
 import { Provider } from 'react-redux';
-import { makeStore } from '@src/Store/store';
-
-// import '@types/navermaps';
+import { mockStore } from '@src/Store/store';
 
 export default {
-  title: 'Container/Map',
-  component: MapComponent,
-
+  title: 'Container/BoardWrite',
+  component: BoardWriteComponent,
   parameters: { layout: 'fullscreen' },
   decorators: [
     (story: any) => (
-      <Provider store={makeStore}>
+      <Provider store={mockStore}>
         <div
           id="modal-root"
           style={{
@@ -39,10 +36,18 @@ export default {
       </Provider>
     ),
   ],
-} as ComponentMeta<typeof MapComponent>;
+} as ComponentMeta<typeof BoardWriteComponent>;
 
-const Template: ComponentStory<typeof MapComponent> = (args) => (
-  <MapComponent {...args} />
+const Template: ComponentStory<typeof BoardWriteComponent> = (args) => (
+  <BoardWriteComponent
+    {...args}
+    category={[
+      { id: 1, join_date: '2022-07-20', title: '공지사항' },
+      { id: 2, join_date: '2022-07-20', title: '어린이집' },
+      { id: 3, join_date: '2022-07-20', title: '어린이집 추천' },
+      { id: 4, join_date: '2022-07-20', title: '자유게시판' },
+    ]}
+  />
 );
 
-export const Map = Template.bind({});
+export const BoardWrite = Template.bind({});

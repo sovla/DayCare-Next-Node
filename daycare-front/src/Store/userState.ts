@@ -26,7 +26,6 @@ const initialState: userStateType = {
 
 export const userSlice = createSlice({
   name: 'user',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
     changeUser: (state, action: PayloadAction<user>) =>
@@ -34,28 +33,6 @@ export const userSlice = createSlice({
         ...state,
         auth: action.payload,
       }),
-    // changeOptionalUser: (state, action: PayloadAction<Partial<userState>>) => {
-    //     return (state = {
-    //         ...state,
-    //         ...action.payload,
-    //     });
-    // },
-    // changeProfileImage: (state, action: PayloadAction<userState['mt_profile']>) => {
-    //     return (state = {
-    //         ...state,
-    //         mt_profile: action.payload,
-    //     });
-    // },
-    // changeTell: (state, action: PayloadAction<Pick<userState, 'mt_hp' | 'mt_country'>>) => {
-    //     return (state = {
-    //         ...state,
-    //         mt_hp: action.payload.mt_hp,
-    //         mt_country: action.payload.mt_country,
-    //     });
-    // },
-    // clearUser: state => {
-    //     return (state = initialState);
-    // },
   },
 });
 
@@ -67,3 +44,26 @@ export const selectUser = (state: RootState) => state.user;
 const userState = userSlice.reducer;
 
 export default userState;
+
+const mockInitialState: userStateType = {
+  isLoading: true,
+  error: null,
+  auth: {
+    id: 1,
+    name: '테스트',
+    email: '테스트@naver.com',
+  },
+};
+const mockUserSlice = createSlice({
+  name: 'user',
+  initialState: mockInitialState,
+  reducers: {
+    changeUser: (state, action: PayloadAction<user>) =>
+      (state = {
+        ...state,
+        auth: action.payload,
+      }),
+  },
+});
+
+export const mockUserState = mockUserSlice.reducer;

@@ -4,9 +4,46 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import FilterComponent from '@src/Components/Template/Modal/Filter';
 import LoginComponent from '@src/Components/Template/Modal/Login';
 import SignUpComponent from '@src/Components/Template/Modal/SignUp';
+import { Provider } from 'react-redux';
+import { makeStore } from '@src/Store/store';
 
 export default {
   title: 'Template/Modal',
+  decorators: [
+    (story: any) => (
+      <Provider store={makeStore}>
+        <div
+          id="modal-root"
+          style={{
+            position: 'fixed',
+            zIndex: 2000,
+            left: '0px',
+            top: '0px',
+          }}
+        />
+        <div
+          id="error-root"
+          style={{
+            position: 'fixed',
+            zIndex: 2000,
+            left: '0px',
+            top: '0px',
+          }}
+        />
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#0003',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {story()}
+        </div>
+      </Provider>
+    ),
+  ],
 } as ComponentMeta<typeof FilterComponent>;
 
 const FilterTemplate: ComponentStory<typeof FilterComponent> = (args) => (
@@ -14,18 +51,7 @@ const FilterTemplate: ComponentStory<typeof FilterComponent> = (args) => (
 );
 
 const LoginTemplate: ComponentStory<typeof LoginComponent> = (args) => (
-  <div
-    style={{
-      width: '100%',
-      height: '100%',
-      backgroundColor: '#0003',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <LoginComponent {...args} />
-  </div>
+  <LoginComponent {...args} />
 );
 
 const SignUpTemplate: ComponentStory<typeof SignUpComponent> = (args) => (
@@ -35,91 +61,35 @@ const SignUpTemplate: ComponentStory<typeof SignUpComponent> = (args) => (
 export const Filter = FilterTemplate.bind({});
 
 Filter.argTypes = {
-  categoryList: {
-    description: '카테고리 리스트',
-    defaultValue: [
-      '전체',
-      '아이-자랑',
-      '어린이집 추천해요',
-      '아이-자랑',
-      '어린이집 추천해요',
-    ],
+  isShow: {
+    defaultValue: true,
+    description: '보이는 상태',
     control: {
-      type: 'array',
+      type: 'boolean',
+    },
+  },
+  filter: {
+    defaultValue: {
+      type: [],
+      city: null,
+      cityDetail: null,
+      personnel: null,
+      characteristic: [],
+      classType: [],
+      employeeCount: null,
+      employee: [],
+    },
+    description: '필터 object',
+    control: {
+      type: 'object',
     },
   },
 };
 
 export const Login = LoginTemplate.bind({});
 
-Login.argTypes = {
-  selectPage: {
-    defaultValue: 1,
-    description: '선택한 번호',
-    control: {
-      type: 'number',
-    },
-  },
-  maxPage: {
-    defaultValue: 20,
-    description: '마지막 번호',
-    control: {
-      type: 'number',
-    },
-  },
-};
+Login.argTypes = {};
 
 export const SignUp = SignUpTemplate.bind({});
 
-SignUp.argTypes = {
-  boardList: {
-    defaultValue: [
-      {
-        category: '1',
-        title: '어린이집 추천해요',
-        write: '김미미',
-        writeDate: '2020.07.02',
-        likeCount: '200',
-        viewCount: '100',
-        reviewCount: 10,
-      },
-      {
-        category: '1',
-        title: '어린이집 추천해요',
-        write: '김미미',
-        writeDate: '2020.07.02',
-        likeCount: '200',
-        viewCount: '100',
-        reviewCount: 10,
-      },
-      {
-        category: '1',
-        title: '어린이집 추천해요',
-        write: '김미미',
-        writeDate: '2020.07.02',
-        likeCount: '200',
-        viewCount: '100',
-        reviewCount: 10,
-      },
-      {
-        category: '1',
-        title: '어린이집 추천해요',
-        write: '김미미',
-        writeDate: '2020.07.02',
-        likeCount: '200',
-        viewCount: '100',
-        reviewCount: 10,
-      },
-      {
-        category: '1',
-        title: '어린이집 추천해요',
-        write: '김미미',
-        writeDate: '2020.07.02',
-        likeCount: '200',
-        viewCount: '100',
-        reviewCount: 10,
-      },
-    ],
-    description: '테이블 내용',
-  },
-};
+SignUp.argTypes = {};
