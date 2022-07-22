@@ -26,6 +26,25 @@ export class CenterService {
     private centerRepository: Repository<Center>,
   ) {}
 
+  async findCenters(str: string) {
+    const likeStr = `%${str}%`;
+    const findCenters = await this.centerRepository
+      .createQueryBuilder('center')
+      .where('operation_status != "폐지"')
+      .andWhere(
+        new Brackets(async (qb) => {
+          qb.orWhere(`name Like :str`, { str: likeStr });
+          qb.orWhere(`address_detail Like :str`, { str: likeStr });
+          qb.orWhere(`city Like :str`, { str: likeStr });
+          qb.orWhere(`city_detail Like :str`, { str: likeStr });
+        }),
+      )
+      .limit(50)
+      .getMany();
+
+    return findCenters;
+  }
+
   async findOne(id: string) {
     let findCenter = await this.centerRepository.findOne({
       where: {

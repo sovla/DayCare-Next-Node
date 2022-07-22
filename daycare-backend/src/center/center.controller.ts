@@ -8,6 +8,10 @@ import {
   Put,
   Query,
   Res,
+  UsePipes,
+  ValidationPipe,
+  Req,
+  Body,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -54,6 +58,19 @@ export class CenterController {
       })),
     });
     return this.centerService.findFilter(findFilterDto);
+  }
+
+  @Post()
+  async findCenters(@Res() res: Response, @Body() body: { title: string }) {
+    const findCenters = await this.centerService.findCenters(body.title);
+
+    res.statusCode = 200;
+
+    return res.send({
+      message: '정보 받아오기 완료',
+      statusCode: res.statusCode,
+      center: findCenters,
+    });
   }
 
   @Post('/basicInfo')
