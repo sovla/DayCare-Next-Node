@@ -5,7 +5,7 @@
 /* eslint-disable no-undef */
 import Centers from '@src/Components/Template/Map/Centers';
 import DetailCenter from '@src/Components/Template/Map/DetailCenter';
-import useScript from '@src/Util/useScript';
+import useScript from '@src/CustomHook/useScript';
 import Head from 'next/head';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
