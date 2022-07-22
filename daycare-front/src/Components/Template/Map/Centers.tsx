@@ -18,7 +18,7 @@ const CenterListDiv = styled.div`
 const Centers: React.FC<CentersProps> = (props) => {
   const { centerList, onClickCenter, selectCenter } = props;
 
-  const ref = useRef<any>();
+  const ref = useRef<HTMLDivElement>(null);
   const refs = useRef<HTMLDivElement[]>(new Array(centerList.length));
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Centers: React.FC<CentersProps> = (props) => {
 
       if (findDiv) {
         ref.current.scrollTo({
-          top: findDiv.offsetTop - 15 - findDiv.offsetHeight / 2,
+          top: findDiv.offsetTop - 30 - findDiv.offsetHeight / 2,
           behavior: 'smooth',
         });
       }
@@ -48,7 +48,7 @@ const Centers: React.FC<CentersProps> = (props) => {
             }
           }}
         >
-          <SimpleCenter {...v} />
+          <SimpleCenter {...v} isActive={selectCenter?.id === v.id} />
         </div>
       ))}
     </CenterListDiv>

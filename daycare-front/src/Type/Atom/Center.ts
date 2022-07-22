@@ -9,4 +9,5 @@ export interface SimpleCenterProps {
   image: NextImageSrc;
   type: string;
   isSchoolBus: boolean;
+  isActive?: boolean;
 }

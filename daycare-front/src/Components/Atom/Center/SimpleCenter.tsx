@@ -8,7 +8,7 @@ import TelIcon from '@src/assets/image/TelIcon.png';
 import HomePageIcon from '@src/assets/image/HomePageIcon.png';
 import Theme from '@src/assets/global/Theme';
 
-const CenterDiv = styled.div`
+const CenterDiv = styled.div<{ isActive: boolean }>`
   display: flex;
   width: 400px;
   max-width: 400px;
@@ -19,8 +19,11 @@ const CenterDiv = styled.div`
   &:hover {
     cursor: pointer;
   }
+  transition: 0.3s;
+  background-color: ${(p) => (p.isActive ? Theme.color.yellow_FFE : '#ffffff')};
   .center {
     padding: 10px;
+
     .introduction {
       display: flex;
       align-items: center;
@@ -69,7 +72,8 @@ const CenterDiv = styled.div`
 `;
 
 const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
-  const { address, image, name, tel, homepage, isSchoolBus, type } = props;
+  const { address, image, name, tel, homepage, isSchoolBus, type, isActive } =
+    props;
 
   const onClickHomepage = useCallback(() => {
     if (!homepage) {
@@ -84,7 +88,7 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
     window.open(`https://${homepage}`);
   }, [homepage]);
   return (
-    <CenterDiv>
+    <CenterDiv isActive={!!isActive}>
       <div className="center">
         <div className="introduction">
           <h5>{name}</h5>
