@@ -33,6 +33,9 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
         color: ${Theme.color.blue_00};
         width: fit-content;
         max-width: 320px;
+        height: 48px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       & > small {
         color: ${Theme.color.gray_99};
@@ -67,6 +70,8 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
     max-width: 350px;
     display: block;
     word-break: keep-all;
+    height: 38px;
+    overflow: hidden;
   }
   div:nth-child(2) {
     display: flex;
@@ -76,8 +81,7 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
 `;
 
 const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
-  const { address, image, name, tel, homepage, isSchoolBus, type, isActive } =
-    props;
+  const { address, name, tel, homepage, isSchoolBus, type, isActive } = props;
 
   const onClickHomepage = useCallback(() => {
     if (!homepage) {
@@ -129,7 +133,7 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
           </div>
         )}
       </div>
-      <div>
+      {/* <div>
         {image && (
           <Image
             src={image}
@@ -139,7 +143,7 @@ const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {
             alt="DaycareCenterImage"
           />
         )}
-      </div>
+      </div> */}
     </CenterDiv>
   );
 };
