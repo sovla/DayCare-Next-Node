@@ -82,7 +82,7 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
       <h3>로그인</h3>
       <InputText
         type="text"
-        placeholder="사용자 이름"
+        placeholder="이메일"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
