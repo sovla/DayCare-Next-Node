@@ -23,12 +23,7 @@ const StyledWriteContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  .nav-menu {
-    position: fixed;
-    top: 0px;
-    right: 30px;
-    z-index: 5;
-  }
+
   .row-div {
     display: flex;
     margin-bottom: 20px;

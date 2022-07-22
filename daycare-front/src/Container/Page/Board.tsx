@@ -25,12 +25,7 @@ const ContainerDiv = styled.div`
   .page-link {
     line-height: 1.5;
   }
-  .nav-menu {
-    position: fixed;
-    top: 0px;
-    right: 30px;
-    z-index: 5;
-  }
+
   .subject {
     padding: 90px 235px 20px 240px;
     & > h2 {

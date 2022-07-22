@@ -29,11 +29,6 @@ const ContainerDiv = styled.div`
     }
   }
 
-  .nav-menu {
-    position: fixed;
-    top: 0;
-    right: 30px;
-  }
   .cards {
     display: flex;
     justify-content: center;
@@ -48,6 +43,23 @@ const ContainerDiv = styled.div`
     height: 100%;
     opacity: 0.5;
     z-index: -5;
+  }
+
+  @media (max-width: 800px) {
+    .subject {
+      margin-left: 000px;
+      margin-top: 00px;
+      p {
+        font-size: 48px;
+      }
+      h1 {
+        color: ${Theme.color.blue_00};
+      }
+      & > div {
+        display: flex;
+        align-items: center;
+      }
+    }
   }
 `;
 

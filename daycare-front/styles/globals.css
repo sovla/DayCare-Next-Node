@@ -202,11 +202,21 @@ button {
   padding: 0px;
 }
 
-.nav-menu {
-  position: fixed;
-  top: 0px;
-  right: 30px;
-  z-index: 5;
+@media (min-width: 800px) {
+  .nav-menu {
+    position: fixed;
+    top: 0px;
+    right: 30px;
+    z-index: 5;
+  }
+}
+@media (max-width: 800px) {
+  .nav-menu {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    z-index: 5;
+  }
 }
 
 *::-webkit-scrollbar-track {

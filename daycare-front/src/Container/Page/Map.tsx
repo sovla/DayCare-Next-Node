@@ -47,12 +47,7 @@ const ContainerDiv = styled.div`
     justify-content: space-around;
     padding-right: 5px;
   }
-  .nav-menu {
-    position: fixed;
-    top: 0px;
-    right: 30px;
-    z-index: 5;
-  }
+
   .select-center {
     background-color: #ffffff;
     position: absolute;
