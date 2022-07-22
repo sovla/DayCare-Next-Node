@@ -23,9 +23,6 @@ function ormConfig(): TypeOrmModuleOptions {
     logging: false,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
-    extra: {
-      connectionLimit: 120,
-    },
   };
 
   return _ormConfing;
