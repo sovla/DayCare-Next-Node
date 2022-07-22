@@ -14,9 +14,9 @@ import { reviewWriteType, reviewListType } from '@src/Type/API/review';
 import API from '@src/API';
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import useError from '@src/CustomHook/useError';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
+import { changeError } from '@src/Store/errorState';
 
 const ContainerDiv = styled.div`
   width: 100vw;
@@ -67,10 +67,10 @@ const Board: React.FC<{
   const [reviewList, setReviewList] = useState<reviewListType[]>([]);
   const [selectPage, setSelectPage] = useState(1);
 
-  const { ErrorModal, setErrorStatus } = useError();
-
   const router = useRouter();
   const user = useSelector(selectUser);
+
+  const dispatch = useDispatch();
 
   const getReviewListApi = useCallback(async () => {
     // category_id 기준 리뷰 받아오기
@@ -83,7 +83,12 @@ const Board: React.FC<{
         setReviewList(response.data.review);
       }
     } catch (error) {
-      setErrorStatus(error);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
   }, [selectCategory]);
 
@@ -94,7 +99,12 @@ const Board: React.FC<{
       }
       router.push('/board/write');
     } catch (error) {
-      setErrorStatus(error);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
   }, []);
 
@@ -168,7 +178,6 @@ const Board: React.FC<{
           }}
         />
       </div>
-      <ErrorModal />
     </ContainerDiv>
   );
 };

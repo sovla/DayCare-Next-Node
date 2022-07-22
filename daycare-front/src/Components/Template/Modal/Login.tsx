@@ -9,7 +9,7 @@ import { sessionLoginType } from '@src/Type/API/session';
 import { useDispatch } from 'react-redux';
 import { changeUser } from '@src/Store/userState';
 import { LoginProps } from '@src/Type/Template/Modal';
-import useError from '@src/CustomHook/useError';
+import { changeError } from '@src/Store/errorState';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -51,7 +51,6 @@ const ContainerDiv = styled.div`
 const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { ErrorModal, setErrorStatus } = useError();
 
   const dispatch = useDispatch();
 
@@ -73,7 +72,12 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
         dispatch(changeUser(response.data.user));
       }
     } catch (error) {
-      setErrorStatus(error);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
   }, [dispatch, loginApi]);
 
@@ -108,7 +112,6 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
         </button>
       </p>
       <div className="line" />
-      <ErrorModal />
     </ContainerDiv>
   );
 };

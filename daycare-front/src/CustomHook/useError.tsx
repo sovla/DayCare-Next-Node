@@ -1,13 +1,15 @@
+/* eslint-disable react/jsx-curly-newline */
 /* eslint-disable no-unused-vars */
 import { selectUser } from '@src/Store/userState';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Login from '@src/Components/Template/Modal/Login';
 import styled from 'styled-components';
 import SignUp from '@src/Components/Template/Modal/SignUp';
 import Theme from '@src/assets/global/Theme';
 import ReactDOM from 'react-dom';
 import { AxiosError, AxiosResponse } from 'axios';
+import { changeError, selectError } from '@src/Store/errorState';
 
 export type ModalProps = {
   isShow: boolean;
@@ -69,12 +71,13 @@ type ErrorType = {
 const useError = () => {
   //  기능 에러 핸들링
   //  1. function을 통해 체크 할 예정 return으로 넘겨줌
-  //  2.
-  const user = useSelector(selectUser);
 
-  const [errorStatus, setErrorStatus] = useState<any>(null);
+  const { errorStatus } = useSelector(selectError);
+
+  const dispatch = useDispatch();
+
   const [isBrowser, setIsBrowser] = useState<boolean>(false);
-
+  console.log(errorStatus, 'errorStatus');
   useEffect(() => {
     setIsBrowser(true);
   }, []);
@@ -94,7 +97,14 @@ const useError = () => {
           <StyledModalContainer>
             <p>{message}</p>
             <button
-              onClick={() => setErrorStatus(null)}
+              onClick={() =>
+                dispatch(
+                  changeError({
+                    errorStatus: null,
+                    isShow: false,
+                  })
+                )
+              }
               type="button"
               className="close-button"
             >
@@ -107,9 +117,9 @@ const useError = () => {
     }
 
     return null;
-  }, [errorStatus, isBrowser]);
+  }, [dispatch, errorStatus, isBrowser]);
 
-  return { setErrorStatus, ErrorModal };
+  return { ErrorModal };
 };
 
 export default useError;

@@ -10,8 +10,8 @@ import { userEmailVerifyType, userSignUpType } from '@src/Type/API/user';
 import RegExp from '@src/Util/RegExp';
 import { useDispatch } from 'react-redux';
 import { changeUser } from '@src/Store/userState';
-import useError from '@src/CustomHook/useError';
 import { AxiosError } from 'axios';
+import { changeError } from '@src/Store/errorState';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -60,7 +60,6 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
-  const { ErrorModal, setErrorStatus } = useError();
 
   const { api: emailVerifyApi } = useApi<userEmailVerifyType>({
     url: '/user/email',
@@ -112,7 +111,12 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
             dispatch(changeUser(response.data.user));
           }
         } catch (error) {
-          setErrorStatus(error);
+          dispatch(
+            changeError({
+              errorStatus: error,
+              isShow: true,
+            })
+          );
         }
       },
       [dispatch, email, name, password, signUpApi, verificationCode.length]
@@ -127,7 +131,12 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
           alert('해당 메일로 인증번호를 보냈습니다.');
         }
       } catch (error) {
-        setErrorStatus(error);
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
       }
     }, [email]);
 
@@ -196,7 +205,6 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         </button>
       </p>
       <div className="line" />
-      <ErrorModal />
     </ContainerDiv>
   );
 };

@@ -9,10 +9,12 @@ import { useEffect } from 'react';
 import API from '@src/API';
 import { AxiosResponse } from 'axios';
 import { sessionLoginType } from '@src/Type/API/session';
+import useError from '@src/CustomHook/useError';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const { ErrorModal } = useError();
 
   useEffect(() => {
     if (!user.auth) {
@@ -26,7 +28,12 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     }
   }, []);
 
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Component {...pageProps} />
+      <ErrorModal />
+    </>
+  );
 };
 
 export default wrapper.withRedux(MyApp);

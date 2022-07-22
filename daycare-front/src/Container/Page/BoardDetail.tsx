@@ -17,14 +17,14 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import HeartIcon from '@src/assets/image/HeartIcon.png';
 import HeartEmptyIcon from '@src/assets/image/HeartEmptyIcon.png';
 import CloseIcon from '@src/assets/image/CloseIcon.png';
 import API from '@src/API';
 import { AxiosError, AxiosResponse } from 'axios';
-import useError from '@src/CustomHook/useError';
+import { changeError } from '@src/Store/errorState';
 
 const StyledContainer = styled.div`
   width: 100vw;
@@ -136,8 +136,8 @@ const StyledReply = styled.div<{ isLike: boolean }>`
 const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   const user = useSelector(selectUser);
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const { ErrorModal, setErrorStatus } = useError();
   const [replyComment, setReplyComment] = useState('');
   const [isLike, setIsLike] = useState(
     !!review.likes.find((v) => v.id === user.auth?.id)
@@ -193,9 +193,14 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         });
       }
     } catch (error) {
-      setErrorStatus(error as any);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
-  }, [user.auth, replyWriteApi, review.reply, setErrorStatus]);
+  }, [user.auth, replyWriteApi, review.reply]);
 
   const reviewDeleteApiHandle = useCallback(async () => {
     try {
@@ -208,9 +213,14 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         router.push('/board');
       }
     } catch (error) {
-      setErrorStatus(error);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
-  }, [reviewDeleteApi, router, setErrorStatus, user.auth]);
+  }, [reviewDeleteApi, router, user.auth]);
 
   const onClickLike = useCallback(async () => {
     try {
@@ -227,9 +237,14 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         setIsLike(response.data.like);
       }
     } catch (error) {
-      setErrorStatus(error);
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
-  }, [user.auth, review.id, setErrorStatus]);
+  }, [user.auth, review.id]);
 
   const onClickDeleteReply = useCallback(
     async (id: number) => {
@@ -248,10 +263,15 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
           }
         }
       } catch (error) {
-        setErrorStatus(error);
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
       }
     },
-    [replyDeleteApi, router, setErrorStatus, user.auth]
+    [replyDeleteApi, router, user.auth]
   );
 
   const onClickReplyLike = useCallback(
@@ -270,7 +290,12 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
           router.reload();
         }
       } catch (error) {
-        setErrorStatus(error);
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
       }
     },
     [user]
@@ -289,7 +314,6 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <meta name="description" content="DayCareBoardDetail" />
         <link rel="icon" href="/LogoIcon.png" />
       </Head>
-      <ErrorModal />
       <div className="review">
         <h3>{review.title}</h3>
 
