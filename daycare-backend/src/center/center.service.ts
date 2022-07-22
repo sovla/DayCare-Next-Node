@@ -48,8 +48,8 @@ export class CenterService {
           },
         },
       );
-      Array.isArray(response.data) &&
-        response.data.forEach(async (v, i) => {
+      if (Array.isArray(response.data)) {
+        for (const v of response.data) {
           if (
             (+v.latitude == +findCenter.lat &&
               +v.longitude == +findCenter.lon) ||
@@ -69,11 +69,9 @@ export class CenterService {
               },
             });
           }
-
-          return;
-        });
+        }
+      }
     }
-
     return findCenter;
   }
 
