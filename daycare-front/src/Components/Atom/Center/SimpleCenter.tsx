@@ -31,10 +31,8 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
 
       & > h5 {
         color: ${Theme.color.blue_00};
-        width: min-content;
-        max-width: 200px;
-        word-wrap: break-word;
-        word-break: keep-all;
+        width: fit-content;
+        max-width: 320px;
       }
       & > small {
         color: ${Theme.color.gray_99};
@@ -53,6 +51,12 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
       }
       .homepage {
         color: ${Theme.color.grean_00};
+        max-width: 350px;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
         &:hover {
           color: ${Theme.color.blue_00};
         }
