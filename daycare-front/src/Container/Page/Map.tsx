@@ -300,6 +300,9 @@ const Map: React.FC = () => {
         });
       })
       .catch((error) => {
+        if (error instanceof TypeError) {
+          return;
+        }
         dispatch(
           changeError({
             errorStatus: error,
