@@ -165,7 +165,7 @@ const Board: React.FC<{
         <div className="pagination">
           <Pagination
             selectPage={selectPage}
-            maxPage={Math.floor(reviewList.length / 10)}
+            maxPage={Math.floor(reviewList.length / 10) + 1}
             onClickPage={setSelectPage}
           />
         </div>
