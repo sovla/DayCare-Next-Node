@@ -21,6 +21,8 @@ import Filter from '@src/Components/Template/Modal/Filter';
 import { filterType } from '@src/Type/Template/Modal';
 import { changeFilterData, dummyCenter } from '@src/assets/global/Dummy';
 import useEffectOnce from '@src/CustomHook/useEffectOnce';
+import { useDispatch } from 'react-redux';
+import { changeError } from '@src/Store/errorState';
 
 const ContainerDiv = styled.div`
   display: flex;
@@ -172,6 +174,8 @@ const Map: React.FC = () => {
   });
   // 필터 오브젝트
 
+  const dispatch = useDispatch();
+
   const formRef = useRef<any>();
   // popup 열기 위한 폼
 
@@ -192,24 +196,32 @@ const Map: React.FC = () => {
   const onClickCenter = useCallback(
     async (id: number, map?: naver.maps.Map | null) => {
       // 지도위에서 센터를 선택하거나 왼쪽 센터리스트에서 선택한 경우
+      try {
+        API.get(`center/${id}`).then((res) => {
+          setSelectCenter(res.data.center);
 
-      API.get(`center/${id}`).then((res) => {
-        setSelectCenter(res.data.center);
+          const currentMap = map ?? naverMap;
+          // 파라미터로 맵을 받거나 현재 맵인 경우 센터 가운데로 지정
 
-        const currentMap = map ?? naverMap;
-        // 파라미터로 맵을 받거나 현재 맵인 경우 센터 가운데로 지정
+          if (!currentMap) {
+            return null;
+          }
 
-        if (!currentMap) {
-          return null;
-        }
-
-        currentMap.setCenter(
-          new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
+          currentMap.setCenter(
+            new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
+          );
+          currentMap.setZoom(
+            currentMap.getZoom() > 15 ? currentMap.getZoom() : 15
+          );
+        });
+      } catch (error) {
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
         );
-        currentMap.setZoom(
-          currentMap.getZoom() > 15 ? currentMap.getZoom() : 15
-        );
-      });
+      }
     },
     [naverMap]
   );
@@ -235,57 +247,66 @@ const Map: React.FC = () => {
         employee_count: filter.employeeCount,
         radius: 500,
       },
-    }).then((res) => {
-      // 성공시
-      // 1. 센터리스트 넣어주기
-      // 2. 새로운 네이버 맵에 마커 찍어서 넣어주기
-      // 3. 그 마커에 이벤트 걸어주기
+    })
+      .then((res) => {
+        // 성공시
+        // 1. 센터리스트 넣어주기
+        // 2. 새로운 네이버 맵에 마커 찍어서 넣어주기
+        // 3. 그 마커에 이벤트 걸어주기
 
-      setCenterList(res.data.center);
+        setCenterList(res.data.center);
 
-      const map = new naver.maps.Map('map', {
-        center: naverMap.getCenter(),
-        zoom: naverMap?.getZoom() ?? 10,
-      });
-
-      for (let index = 0; index < res.data.center.length; index += 1) {
-        const v = res.data.center[index];
-
-        const marker = new naver.maps.Marker({
-          map,
-          position: new naver.maps.LatLng(+v.lat, +v.lng),
-          title: v.name,
-          clickable: true,
+        const map = new naver.maps.Map('map', {
+          center: naverMap.getCenter(),
+          zoom: naverMap?.getZoom() ?? 10,
         });
 
-        const infowindow = new naver.maps.InfoWindow({
-          content: [
-            `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
-            `<span class="ico _icon">${v.name}</span>`,
-            '<span class="shd"></span>',
-            '</div>',
-          ].join(''),
-        });
+        for (let index = 0; index < res.data.center.length; index += 1) {
+          const v = res.data.center[index];
 
-        marker.addListener('mouseover', () => {
-          infowindow.open(map, marker);
-        });
-        marker.addListener('mouseout', () => {
-          infowindow.close();
-        });
-        marker.addListener('click', () => {
-          onClickCenter(v.id);
-          if (infowindow.getMap()) {
+          const marker = new naver.maps.Marker({
+            map,
+            position: new naver.maps.LatLng(+v.lat, +v.lng),
+            title: v.name,
+            clickable: true,
+          });
+
+          const infowindow = new naver.maps.InfoWindow({
+            content: [
+              `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
+              `<span class="ico _icon">${v.name}</span>`,
+              '<span class="shd"></span>',
+              '</div>',
+            ].join(''),
+          });
+
+          marker.addListener('mouseover', () => {
             infowindow.open(map, marker);
-          }
+          });
+          marker.addListener('mouseout', () => {
+            infowindow.close();
+          });
+          marker.addListener('click', () => {
+            onClickCenter(v.id);
+            if (infowindow.getMap()) {
+              infowindow.open(map, marker);
+            }
+          });
+        }
+        setNaverMap(map);
+        setLocation({
+          lat: naverMap.getCenter().y,
+          lon: naverMap.getCenter().x,
         });
-      }
-      setNaverMap(map);
-      setLocation({
-        lat: naverMap.getCenter().y,
-        lon: naverMap.getCenter().x,
+      })
+      .catch((error) => {
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
       });
-    });
   }, [naverMap, onClickCenter, filter]);
 
   const onClickDetailInformation = useCallback(async () => {
@@ -330,7 +351,14 @@ const Map: React.FC = () => {
 
       frm.submit();
       popup?.focus();
-    } catch (error) {}
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
+    }
   }, [selectCenter, naverMap]);
 
   const getLocation = useCallback(() => {
@@ -355,8 +383,13 @@ const Map: React.FC = () => {
       }
     }
 
-    function onErrorGeolocation(geoError: any) {
-      console.log('error', geoError);
+    function onErrorGeolocation() {
+      dispatch(
+        changeError({
+          errorStatus: new Error('현재 위치가 지원되지 않습니다.'),
+          isShow: true,
+        })
+      );
     }
     (() => {
       if (navigator.geolocation) {
