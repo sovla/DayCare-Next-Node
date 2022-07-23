@@ -53,6 +53,9 @@ const ContainerDiv = styled.div`
   button {
     cursor: pointer;
   }
+  @media (max-width: 425px) {
+    width: 100vw;
+  }
 `;
 
 const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {

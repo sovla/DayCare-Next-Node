@@ -42,6 +42,12 @@ const StyledModalOverlay = styled.div<ModalProps>`
       background-color: ${Theme.color.blue_00};
     }
   }
+  @media (max-width: 768px) {
+    .close-button {
+      right: 10px;
+      top: 10px;
+    }
+  }
 `;
 
 const StyledModalContainer = styled.div`
