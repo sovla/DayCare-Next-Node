@@ -45,6 +45,17 @@ const StyledModalOverlay = styled.div<ModalProps>`
       background-color: ${Theme.color.blue_00};
     }
   }
+  @media (max-width: 768px) {
+    * {
+      overflow: visible;
+    }
+    .close-button {
+      right: -10px;
+      top: -10px;
+      background-color: #fff0;
+      font-size: 20px;
+    }
+  }
 `;
 
 const StyledModalContainer = styled.div`

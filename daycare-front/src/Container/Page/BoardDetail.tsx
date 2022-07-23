@@ -51,6 +51,10 @@ const StyledContainer = styled.div`
     max-height: 75%;
     overflow-x: hidden;
     overflow-y: scroll;
+    & * {
+      width: 100%;
+      word-break: break-all;
+    }
   }
   .row-center {
     display: flex;
@@ -107,6 +111,49 @@ const StyledContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding-bottom: 100px;
+    padding-top: 50px;
+    overflow-y: scroll;
+    justify-content: start;
+    .review {
+      width: 90vw;
+      overflow: visible;
+      #content {
+        width: 100%;
+        min-height: 200px;
+        height: 200px;
+        overflow-y: scroll;
+        max-height: 600px;
+      }
+      .buttons {
+        & > button {
+          margin-left: 10px;
+        }
+      }
+    }
+    .reply {
+      width: 90vw;
+      margin-top: 30px;
+      margin-left: 0px;
+      height: max-content;
+      overflow: visible;
+      & > section {
+        height: max-content;
+      }
+      .reply-form {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      & > h5 {
+        margin-bottom: 20px;
+      }
+    }
   }
 `;
 

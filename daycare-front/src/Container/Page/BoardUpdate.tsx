@@ -49,6 +49,29 @@ const StyledWriteContainer = styled.div`
       }
     }
   }
+  @media (max-width: 768px) {
+    padding-bottom: 100px;
+    overflow-y: scroll;
+    .row-div {
+      flex-direction: column;
+      max-width: 100vw;
+      margin-top: 20px;
+      & > select {
+        min-width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+      & > input {
+        margin-left: 0px;
+      }
+    }
+    form {
+      max-width: 100vw;
+      & > div:nth-of-type(2) {
+        height: 300px !important;
+      }
+    }
+  }
 `;
 
 const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {

@@ -48,7 +48,7 @@ const ContainerDiv = styled.div`
     padding-right: 5px;
   }
 
-  .select-center {
+  .map-select-center {
     background-color: #ffffff;
     position: absolute;
     right: 0px;
@@ -123,6 +123,97 @@ const ContainerDiv = styled.div`
   }
   .main-div {
     position: relative;
+  }
+  @media (max-width: 768px) {
+    .map-select-center {
+      position: fixed;
+      left: 0px;
+      top: 0px;
+      right: none;
+      transform: none;
+      z-index: 2500;
+      .close-button {
+        width: 30px;
+        height: 30px;
+        right: 20px;
+        top: 20px;
+        border-radius: 4px;
+      }
+    }
+    #map {
+      width: 100vw;
+      height: calc(100vh - 55px - 80px);
+      margin-top: 55px;
+      & > #mapReloadButton {
+        position: absolute;
+        bottom: calc(30vh);
+        left: 50%;
+        transform: translate(-50%, 50%);
+        cursor: pointer;
+        z-index: 1000;
+        & > p {
+          color: #ffffff;
+          font-size: 16px;
+        }
+      }
+
+      & .map-buttons {
+        right: 15px;
+        top: 30px;
+        & .location-button {
+          margin-bottom: 5px;
+        }
+        & > button:last-of-type {
+          width: 40px;
+          height: 40px;
+          & * {
+            width: 30px !important;
+            height: 30px !important;
+          }
+        }
+      }
+    }
+    .main-div {
+      position: absolute;
+
+      .search {
+        width: 100vw;
+        position: relative;
+        & > .row-center {
+          position: fixed;
+          top: 0px;
+          left: 0px;
+          z-index: 2000;
+          background-color: ${Theme.color.yellow_FFE};
+        }
+        & > div:last-of-type {
+          width: 100vw;
+          position: fixed;
+          bottom: 90px;
+          left: 0px;
+          display: flex;
+          overflow-x: scroll;
+          overflow-y: hidden;
+          z-index: 2000;
+          justify-content: start;
+          padding: 0px;
+          & > div {
+            min-width: 320px;
+            margin: 0px calc((100vw - 640px) / 4);
+          }
+        }
+      }
+    }
+  }
+  @media (max-width: 640px) {
+    .main-div > .search {
+      & > div:last-of-type {
+        & > div {
+          min-width: 320px;
+          margin: 0px calc((100vw - 320px) / 2);
+        }
+      }
+    }
   }
 `;
 
@@ -500,7 +591,7 @@ const Map: React.FC = () => {
           />
         </aside>
         {selectCenter && (
-          <div className="select-center">
+          <div className="map-select-center">
             <DetailCenter
               onClickDetailInformation={onClickDetailInformation}
               image={NoImage}

@@ -26,6 +26,55 @@ const RowDiv = styled.div`
     color: ${Theme.color.orange_FF};
     margin-left: 3px;
   }
+  @media (max-width: 1440px) {
+    width: calc(100vw - 80px);
+    margin: 0px 40px;
+  }
+  @media (max-width: 768px) {
+    width: 90vw;
+    display: grid;
+    margin: 0px 5vw 5px;
+
+    grid-auto-rows: minmax(15px, auto);
+    grid-auto-columns: minmax(15px, auto);
+    grid-template-columns:
+      minmax(15px, auto) minmax(15px, auto) minmax(15px, auto)
+      minmax(15px, auto);
+    grid-template-rows: 50px 50px;
+    justify-content: start;
+    gap: 5px;
+    height: 100px;
+    border-radius: 16px;
+
+    & > .category {
+      display: none;
+    }
+    & > .title {
+      grid-column-start: 1;
+      grid-column-end: 5;
+      grid-row-start: 1;
+      grid-row-end: 2;
+      width: fit-content;
+      & > span {
+        font-size: 16px;
+        margin-left: 10px;
+      }
+    }
+    & > div:not(.title) {
+      width: auto;
+      & * {
+        color: ${Theme.color.gray_99};
+        font-size: 12px;
+      }
+    }
+
+    & > .viewCount > span::before {
+      content: '조회수 ';
+    }
+    & > .likeCount > span::before {
+      content: '좋아요 ';
+    }
+  }
 `;
 
 const Row: React.FC<RowProps> = ({

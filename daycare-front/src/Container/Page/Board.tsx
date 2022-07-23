@@ -52,6 +52,66 @@ const ContainerDiv = styled.div`
     left: 50%;
     transform: translateX(-50%);
   }
+  @media (max-width: 1440px) {
+    min-height: 100vh;
+    height: 100vh;
+    padding-bottom: 100px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    .subject {
+      padding: 20px 20px;
+      & > h2 {
+        margin-bottom: 20px;
+      }
+      & > div {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+    .pagination {
+      position: relative;
+      width: max-content;
+      padding: 40px 20px 0px;
+      max-width: 100vw;
+      transform: translateX(0%);
+      left: 0;
+      bottom: 0;
+    }
+  }
+  @media (max-width: 768px) {
+    min-height: 100vh;
+    height: 100vh;
+    padding-bottom: 100px;
+    overflow-y: scroll;
+
+    .subject {
+      padding: 20px 20px;
+      & > h2 {
+        margin-bottom: 20px;
+      }
+      & > div {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+    .table {
+      & > div:first-of-type {
+        display: none;
+      }
+    }
+    .icon-button {
+      bottom: 100px;
+    }
+    .pagination {
+      position: relative;
+      width: max-content;
+      padding: 0px 20px;
+      max-width: 100vw;
+      transform: translateX(0%);
+      left: 0;
+      bottom: 0;
+    }
+  }
 `;
 
 const Board: React.FC<{

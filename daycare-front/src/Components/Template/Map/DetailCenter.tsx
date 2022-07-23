@@ -60,6 +60,8 @@ const CenterAside = styled.aside`
     width: 100%;
     display: flex;
     justify-content: center;
+    min-height: 50px;
+    margin-bottom: 20px;
     button {
       border: 1px solid ${Theme.color.gray_D9};
       border-radius: 30px;
@@ -69,6 +71,32 @@ const CenterAside = styled.aside`
         background-color: ${Theme.color.blue_00};
         & > p {
           color: #ffffff;
+        }
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    width: 100vw;
+    min-width: 320px;
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    overflow-y: scroll;
+    & > div:first-of-type {
+      min-height: 200px;
+    }
+    .information {
+      display: block;
+      overflow: visible;
+      .row-div {
+        min-width: 320px;
+        max-width: 100vw;
+        height: fit-content;
+        min-height: fit-content;
+        & > p:first-child {
+          width: 150px;
+        }
+        & > p:last-child {
+          width: calc(100% - 150px);
         }
       }
     }

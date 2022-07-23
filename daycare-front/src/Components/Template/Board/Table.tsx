@@ -14,7 +14,6 @@ const StyledRow = styled.div`
 
 const Table: React.FC<TableProps> = (props) => {
   const { boardList, selectPage } = props;
-
   const router = useRouter();
   return (
     <>

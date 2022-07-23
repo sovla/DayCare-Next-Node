@@ -30,6 +30,23 @@ const StyledModalOverlay = styled.div<ModalProps>`
     background-color: #fff;
     border-radius: 16px;
     padding: 20px 0px 0px 20px;
+    & > .close-button {
+      width: 50px;
+      height: 50px;
+      background-color: #fff;
+      position: absolute;
+      right: -70px;
+      top: 10px;
+      z-index: 2010;
+      font-size: 30px;
+      font-weight: bold;
+      border-radius: 16px;
+      transition: 0.3s;
+      &:hover {
+        cursor: pointer;
+        background-color: ${Theme.color.blue_00};
+      }
+    }
     & .filter-row {
       display: flex;
       align-items: center;
@@ -56,21 +73,51 @@ const StyledModalOverlay = styled.div<ModalProps>`
       }
     }
   }
-  .close-button {
-    width: 50px;
-    height: 50px;
-    background-color: #fff;
-    position: absolute;
-    right: -70px;
-    top: 10px;
-    z-index: 2010;
-    font-size: 30px;
-    font-weight: bold;
-    border-radius: 16px;
-    transition: 0.3s;
-    &:hover {
-      cursor: pointer;
-      background-color: ${Theme.color.blue_00};
+
+  @media (max-width: 768px) {
+    overflow: scroll;
+    max-width: 100vw;
+    min-width: 320px;
+    * {
+      transition: 0.3s;
+    }
+    .modal-content {
+      position: fixed;
+      top: 10vh;
+      left: 0;
+      min-width: 320px;
+      width: 100vw;
+      max-width: 100vw;
+      height: 90vh;
+      overflow-y: scroll;
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 20px 20px;
+      & > .close-button {
+        width: 40px;
+        height: 40px;
+        position: fixed;
+        right: 10px;
+        top: 10px;
+        z-index: 2010;
+        font-size: 30px;
+        font-weight: bold;
+      }
+    }
+    span,
+    div,
+    a {
+      width: max-content;
+    }
+    .filter-row {
+      flex-wrap: wrap;
+      max-width: 100%;
+      padding-right: 10px;
+      & > p {
+        line-height: 25px;
+        width: 100% !important;
+        margin-bottom: 10px;
+      }
     }
   }
 `;

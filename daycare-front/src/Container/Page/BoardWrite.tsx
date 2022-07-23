@@ -19,8 +19,9 @@ import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import { useRouter } from 'next/router';
 import useApi from '@src/CustomHook/useApi';
 import { reviewWriteType } from '@src/Type/API/review';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
+import { changeError } from '@src/Store/errorState';
 
 const StyledWriteContainer = styled.div`
   background-color: ${Theme.color.yellow_FFE};
@@ -57,6 +58,32 @@ const StyledWriteContainer = styled.div`
       }
     }
   }
+  @media (max-width: 768px) {
+    margin-bottom: 85px;
+    height: 100vh;
+    overflow-y: visible;
+    .row-div {
+      flex-direction: column;
+      max-width: 100vw;
+      margin-top: 20px;
+      & > select {
+        min-width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+      & > input {
+        margin-left: 0px;
+      }
+    }
+    form {
+      max-width: 100vw;
+      height: 100vh;
+
+      & > div:nth-of-type(2) {
+        height: 300px !important;
+      }
+    }
+  }
 `;
 
 const BoardWrite: React.FC<BoardWriteProps> = (props) => {
@@ -68,6 +95,7 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
   const [title, setTitle] = useState('');
 
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   const { api: reviewWriteApi } = useApi<reviewWriteType>({
     url: '/review',
@@ -88,17 +116,20 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
       e.preventDefault();
-      if (!editorRef.current) {
-        return null;
-      }
+      try {
+        if (!editorRef.current) {
+          return;
+        }
 
-      const response = await reviewWriteApi({
-        content: editorRef.current.getInstance().getHTML(),
-      });
-      if (response.data.statusCode === 200) {
-        router.push('/board');
+        const response = await reviewWriteApi({
+          content: editorRef.current.getInstance().getHTML(),
+        });
+        if (response.data.statusCode === 200) {
+          router.push('/board');
+        }
+      } catch (error) {
+        dispatch(changeError({ errorStatus: error, isShow: true }));
       }
-      return true;
     };
 
   const onChangeCategory: React.ChangeEventHandler<HTMLSelectElement> =

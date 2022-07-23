@@ -7,6 +7,26 @@ const ContainerDiv = styled.div`
   & > button {
     margin-right: 10px;
   }
+  @media (max-width: 768px) {
+    display: flex;
+    width: max-content;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    *::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);
+      background-color: #f5f5f5;
+    }
+
+    *::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+      background-color: #f5f5f5;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background-color: #000000;
+    }
+  }
 `;
 
 const Categories: React.FC<CategoriesProps> = (props) => {

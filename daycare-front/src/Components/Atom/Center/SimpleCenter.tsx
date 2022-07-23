@@ -78,6 +78,13 @@ const CenterDiv = styled.div<{ isActive: boolean }>`
     align-items: center;
     margin-right: 10px;
   }
+  @media (max-width: 768px) {
+    width: 320px;
+    max-width: 320px;
+    .homepage {
+      max-width: 270px !important;
+    }
+  }
 `;
 
 const SimpleCenter: React.FC<SimpleCenterProps> = (props) => {

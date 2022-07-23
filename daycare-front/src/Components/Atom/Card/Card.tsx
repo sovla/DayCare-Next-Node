@@ -41,6 +41,9 @@ const Card = styled.div`
     width: 284px;
     overflow: hidden;
   }
+  @media (max-width: 1024px) {
+    min-width: 300px;
+  }
 `;
 
 const CardComponents: React.FC<CardProps> = (props) => {

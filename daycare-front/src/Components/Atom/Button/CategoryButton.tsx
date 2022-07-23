@@ -6,8 +6,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Button = styled.button<{ isSelect: boolean }>`
-  width: 'fit-content';
-  height: '40px';
+  width: fit-content;
+  height: 40px;
   padding: 8px 20px;
   text-align: center;
   border-radius: 30px;
@@ -17,6 +17,12 @@ const Button = styled.button<{ isSelect: boolean }>`
   cursor: pointer;
   & > p {
     color: ${(p) => (p.isSelect ? '#ffffff' : '#000000')};
+  }
+  @media (max-width: 768px) {
+    overflow: visible;
+    & > p {
+      width: max-content;
+    }
   }
 `;
 

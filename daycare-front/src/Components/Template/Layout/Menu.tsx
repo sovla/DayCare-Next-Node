@@ -29,6 +29,32 @@ const Nav = styled.nav`
       text-align: center;
     }
   }
+  @media (max-width: 768px) {
+    & > ul {
+      width: 100vw;
+      height: 80px;
+      border-radius: 16px 16px 0px 0px;
+
+      & > li:nth-child(-n + 3) {
+        margin-top: 0px;
+        width: max-content;
+        text-align: center;
+        & > a {
+          font-size: 24px;
+          width: fit-content;
+          margin-top: 10px;
+        }
+      }
+      & > li {
+        display: flex;
+        align-items: center;
+        * {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+  }
 `;
 
 const StyledMenuLi = styled.li<{ isActive: boolean }>`

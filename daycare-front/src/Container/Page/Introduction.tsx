@@ -45,20 +45,35 @@ const ContainerDiv = styled.div`
     z-index: -5;
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 768px) {
+    padding-bottom: 100px;
+    height: 100vh;
+    overflow-y: scroll;
     .subject {
-      margin-left: 000px;
-      margin-top: 00px;
+      margin-left: 40px;
+      margin-top: 40px;
+      & > p {
+        margin-bottom: 10px;
+      }
       p {
-        font-size: 48px;
+        font-size: 24px;
       }
       h1 {
         color: ${Theme.color.blue_00};
+        font-size: 36px;
       }
       & > div {
-        display: flex;
-        align-items: center;
+        display: inline;
+
+        & > p,
+        h1 {
+          display: inline;
+        }
       }
+    }
+
+    .cards {
+      margin-top: 30px;
     }
   }
 `;
