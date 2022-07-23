@@ -320,7 +320,7 @@ const Map: React.FC = () => {
     [dispatch, naverMap]
   );
 
-  const createMapAndMarker = useCallback(
+  const createMarkers = useCallback(
     (res: { data: { center: any[] } }) => {
       if (!naverMap) {
         return;
@@ -346,6 +346,9 @@ const Map: React.FC = () => {
           ].join(''),
         });
 
+        marker.addListener('mousedown', () => {
+          infowindow.open(naverMap, marker);
+        });
         marker.addListener('mouseover', () => {
           infowindow.open(naverMap, marker);
         });
@@ -365,6 +368,7 @@ const Map: React.FC = () => {
           v.clearListeners('click');
           v.clearListeners('mouseout');
           v.clearListeners('mouseover');
+          v.clearListeners('mousedown');
           v.setMap(null);
         });
         return markers;
@@ -406,7 +410,7 @@ const Map: React.FC = () => {
         // 3. 그 마커에 이벤트 걸어주기
 
         setCenterList(res.data.center);
-        createMapAndMarker(res);
+        createMarkers(res);
       })
       .catch((error) => {
         if (error instanceof TypeError) {
@@ -522,7 +526,7 @@ const Map: React.FC = () => {
     const response = await findCentersApi();
     if (response.data.statusCode === 200) {
       setCenterList(response.data.center);
-      createMapAndMarker(response);
+      createMarkers(response);
     }
   }, [findCentersApi]);
 
