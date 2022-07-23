@@ -383,7 +383,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
               alt="reviewLikeIcon"
             />
           </button>
-          {user.auth && review.user_id === user.auth.id && (
+          {user.auth && review.user.id === user.auth.id && (
             <>
               <BlueButton
                 content="수정"

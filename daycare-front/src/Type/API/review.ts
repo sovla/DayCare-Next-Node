@@ -13,7 +13,10 @@ export interface reviewListType {
   image5: string;
   title: string;
   update_date: null | string;
-  user_id: number;
+  user: {
+    id: number;
+    name: string;
+  };
   view_count: number;
   write_date: string;
   likes: number;
@@ -49,7 +52,6 @@ export interface reviewDetailType {
   image5: string;
   title: string;
   update_date: null | string;
-  user_id: number;
   user: {
     id: number;
     name: string;

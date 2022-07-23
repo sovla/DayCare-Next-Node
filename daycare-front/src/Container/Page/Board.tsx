@@ -207,7 +207,7 @@ const Board: React.FC<{
               title: v.title,
               likeCount: `${v.likes}`,
               viewCount: `${v.view_count}`,
-              write: `${v.user_id}`,
+              write: `${v.user.name}`,
               writeDate: `${writeDate
                 .toISOString()
                 .substring(0, 10)
