@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Reply } from './reply.entity';
 import { ReplyLike } from './replylike.entity';
+import { Review } from './review.entity';
 import { ReviewLike } from './reviewlike.entity';
 
 @Entity()
@@ -43,6 +44,12 @@ export class User {
     default: 0,
   })
   delete_account: number;
+
+  @OneToMany(() => Review, (review) => review.user, {
+    eager: false,
+    lazy: true,
+  })
+  reviews: Review[];
 
   @OneToMany(() => ReviewLike, (reviewLike) => reviewLike.user, {
     eager: false,

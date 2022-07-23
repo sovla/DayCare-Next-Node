@@ -39,11 +39,23 @@ export class ReviewService {
     }
 
     if (createReviewDto.category_id) {
+      const findUser = await this.userRepository.findOne({
+        select: {
+          id: true,
+        },
+        where: {
+          id: createReviewDto.id,
+        },
+      });
+      if (!findUser) {
+        throw new HttpException('찾을 수 없는 회원입니다.', 401);
+      }
+
       const saveReview = await this.reviewRepository.save({
         title: createReviewDto.title,
         category_id: createReviewDto.category_id,
         content: createReviewDto.content,
-        user_id: createReviewDto.id,
+        user: findUser,
         write_date: moment().format('YYYY-MM-DD HH:mm:ss'),
       });
       return saveReview;
@@ -93,28 +105,54 @@ export class ReviewService {
       if (!findCategory) {
         throw new HttpException('존재하지 않는 어린이집입니다.', 400);
       }
+      // const findReviews = await this.reviewRepository
+      //   .createQueryBuilder('review')
+      //   .where('review.category_id = :category_id', { category_id })
+      //   .andWhere('review.delete_date IS NOT NULL')
+      //   .leftJoinAndSelect('review.user_id', 'user')
+      //   .getMany();
 
       const findReviews = await this.reviewRepository.find({
+        select: {
+          category_id: true,
+          center_id: true,
+          content: true,
+          delete_date: true,
+          id: true,
+          likes: true,
+          reply: true,
+          title: true,
+          update_date: true,
+          view_count: true,
+          write_date: true,
+          user: {
+            id: true,
+            name: true,
+          },
+        },
         where: {
           category_id: category_id,
           delete_date: IsNull(),
         },
+        order: {
+          id: 'desc',
+        },
+        relations: ['user'],
       });
-
       return findReviews.map((v) => ({
         ...v,
         likes: v.likes.length,
-        reply: v.reply.length,
+        reply: v.reply.filter((v) => v.delete_date == null).length,
       }));
     }
 
     if (type === 'review_id') {
       const review_id = id;
-
       const findReview = await this.reviewRepository.findOne({
         where: {
           id: review_id,
         },
+        relations: ['user'],
       });
       const saveReview = await this.reviewRepository.save({
         ...findReview,
@@ -123,19 +161,12 @@ export class ReviewService {
       if (!findReview) {
         throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
       }
-
-      const findUser = await this.userRepository.findOne({
-        where: {
-          id: findReview.user_id,
-        },
-      });
-
       return {
         ...findReview,
         user: {
-          id: findUser.id,
-          name: findUser.name,
-          email: findUser.email,
+          id: findReview.user.id,
+          name: findReview.user.name,
+          email: findReview.user.email,
         },
         reply: findReview.reply
           .filter((v) => v.delete_date == null)

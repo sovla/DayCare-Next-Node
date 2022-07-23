@@ -2,11 +2,13 @@ import { Reply } from './reply.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ReviewLike } from './reviewlike.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Review {
@@ -73,11 +75,6 @@ export class Review {
 
   @Column({
     type: 'int',
-  })
-  user_id: number;
-
-  @Column({
-    type: 'int',
     default: 0,
   })
   view_count: number;
@@ -87,6 +84,10 @@ export class Review {
     nullable: true,
   })
   center_id: number;
+
+  @ManyToOne(() => User, (user) => user.reviews)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column({
     type: 'int',

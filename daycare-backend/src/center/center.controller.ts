@@ -41,7 +41,8 @@ export class CenterController {
     const findCenters = await this.centerService.findFilter(findFilterDto);
 
     res.statusCode = 200;
-    res.send({
+
+    return res.send({
       statusCode: res.statusCode,
       message: '정보 받아오기 완료',
       center: findCenters.map((v) => ({
@@ -57,7 +58,6 @@ export class CenterController {
         id: v.id,
       })),
     });
-    return this.centerService.findFilter(findFilterDto);
   }
 
   @Post()
@@ -69,7 +69,18 @@ export class CenterController {
     return res.send({
       message: '정보 받아오기 완료',
       statusCode: res.statusCode,
-      center: findCenters,
+      center: findCenters.map((v) => ({
+        homepage: v.homepage,
+        address_detail: v.address_detail,
+        tel: v.tel,
+        name: v.name,
+        image: '일단없음',
+        lat: v.lat,
+        lng: v.lon,
+        school_vehicle: v.school_vehicle,
+        type: v.type,
+        id: v.id,
+      })),
     });
   }
 
