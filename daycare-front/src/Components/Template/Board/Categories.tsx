@@ -11,7 +11,7 @@ const ContainerDiv = styled.div`
     display: flex;
     width: max-content;
     overflow-y: hidden;
-    overflow-x: scroll;
+    overflow-x: auto;
     *::-webkit-scrollbar-track {
       -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);
       background-color: #f5f5f5;

@@ -45,6 +45,7 @@ const RowDiv = styled.div`
     gap: 5px;
     height: 100px;
     border-radius: 16px;
+    padding: 0px 10px;
 
     & > .category {
       display: none;
