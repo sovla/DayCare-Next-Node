@@ -12,37 +12,38 @@
 
 > 어린이집 찾기전 읽기 좋은 글들을 소개하고 있습니다.
 
-![](https://velog.velcdn.com/images/gavri/post/308feaa3-44fa-454c-8166-fb24813c5367/image.png)
+![daycare-center shop_map (1)](https://user-images.githubusercontent.com/41351496/180743508-318d2f64-91f5-4d06-906a-dcdb5ab08e5b.png)
 
 ### 2.지도
 
 > 현재 위치로 검색 버튼을 통해 거리순으로 어린이집을 찾을 수 있습니다.
 
-![](https://velog.velcdn.com/images/gavri/post/9a1694af-1ee5-4a7a-9983-0f80b6696cb7/image.png)
+![daycare-center shop_map (2)](https://user-images.githubusercontent.com/41351496/180743512-4b3c74f3-da75-4867-b01a-689e10ec8363.png)
+![daycare-center shop_map (3)](https://user-images.githubusercontent.com/41351496/180743515-31ea1ef9-ce1c-423c-a621-0e559e5e025f.png)
 
 ### 3.검색
 
 > 어린이집 이름, 주소로 적용된 데이터가 있을 경우 해당 데이터로 나타냅니다.
 
-![](https://velog.velcdn.com/images/gavri/post/0d1bd730-d00a-434c-8dfd-cad866f059bf/image.png)
+![daycare-center shop_board_261 (1)](https://user-images.githubusercontent.com/41351496/180743493-c56e4e19-dd57-4d1b-86ad-c8c0b427a80a.png)
 
 ### 4.필터링
 
 > 기존 서비스를 보며 필요한 필터링 기능을 추가하였습니다.
 
-![](https://velog.velcdn.com/images/gavri/post/8bf12297-afe0-4794-bca2-85c174886863/image.png)
+![daycare-center shop_map (4)](https://user-images.githubusercontent.com/41351496/180743519-d8240663-2231-48bd-af5d-1aa21130282a.png)
 
 ### 5.게시판
 
 > 어린이집 관련 내용 공유 및 자유 게시판으로 활용하고 있습니다.
 
-![](https://velog.velcdn.com/images/gavri/post/843c3684-a709-4c2e-b95b-ae57d40f43ec/image.png)
+![daycare-center shop_map (5)](https://user-images.githubusercontent.com/41351496/180743523-e5bdcb34-647a-4b20-ab20-2b65ffc2d9aa.png)
 
 ### 6.게시판 상세보기
 
 > 댓글을 통해 사용자들 간에 소통이 가능하도록 했습니다.
 
-![](https://velog.velcdn.com/images/gavri/post/49f9c5c3-f159-4b5a-b42a-0cafcf65802e/image.png)
+![daycare-center shop_board_261](https://user-images.githubusercontent.com/41351496/180743506-8463ebe2-b9e8-48ca-9dca-cc64133f298d.png)
 
 ## Project Structure
 
