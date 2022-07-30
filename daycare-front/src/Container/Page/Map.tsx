@@ -34,7 +34,6 @@ import {
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { queryToString } from '@src/Util';
-import { compress, decompress } from 'shrink-string';
 
 const ContainerDiv = styled.div`
   display: flex;

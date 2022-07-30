@@ -159,6 +159,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         placeholder="사용자 이름 (2 ~ 20자 사이)"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        autoComplete="name"
       />
 
       <InputText
@@ -166,6 +167,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         placeholder="비밀번호 (6 ~ 20자 사이)"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        autoComplete="password"
       />
       <div className="email">
         <InputText
@@ -173,6 +175,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
           placeholder="이메일 주소"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
         />
         {email.length > 0 && (
           <BlueButton
@@ -195,6 +198,7 @@ const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
         placeholder="이메일 인증코드"
         value={verificationCode}
         onChange={(e) => setVerificationCode(e.target.value)}
+        autoComplete="email_authorization_code"
       />
       <BlueButton
         content="가입"

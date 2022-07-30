@@ -25,6 +25,8 @@ import CloseIcon from '@src/assets/image/CloseIcon.png';
 import API from '@src/API';
 import { AxiosError, AxiosResponse } from 'axios';
 import { changeError } from '@src/Store/errorState';
+import Viewer from '@toast-ui/editor/dist/toastui-editor-viewer';
+import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 
 const StyledContainer = styled.div`
   width: 100vw;
@@ -33,22 +35,30 @@ const StyledContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
   .review {
     width: 40%;
-    height: 700px;
+    min-height: 700px;
+    height: 100%;
+    max-height: 700px;
     background-color: #ffffff;
     border-radius: 16px;
     border: 1px solid ${Theme.color.gray_C1};
     padding: 10px 20px;
+    overflow-y: visible;
     & > h3 {
       max-width: 100%;
-      height: auto;
+      min-height: fit-content;
+      max-height: 75px;
+      text-overflow: ellipsis;
+      overflow: hidden;
       overflow-wrap: anywhere;
     }
   }
-  #content {
-    height: 75%;
-    max-height: 75%;
+  #viewer {
+    min-height: 50%;
+    height: 70%;
+    max-height: 70%;
     overflow-x: hidden;
     overflow-y: scroll;
     & * {
@@ -122,7 +132,7 @@ const StyledContainer = styled.div`
     .review {
       width: 90vw;
       overflow: visible;
-      #content {
+      #viewer {
         width: 100%;
         min-height: 200px;
         height: 200px;
@@ -349,9 +359,14 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   );
 
   useEffect(() => {
-    const contentDiv = document.getElementById('content');
+    const contentDiv = document.getElementById('viewer');
+
     if (contentDiv) {
-      contentDiv.innerHTML = review.content;
+      const viewer = new Viewer({
+        el: contentDiv,
+        initialValue: review.content,
+      });
+      console.log(viewer);
     }
   }, []);
   return (
@@ -372,7 +387,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         </small>
         <small> 조회 {review.view_count}</small>
         <hr />
-        <div id="content" />
+        <div id="viewer" />
         <hr />
         <div className="buttons">
           <button type="button" className="heart" onClick={onClickLike}>
@@ -481,6 +496,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
                 replyWriteApiHandle();
               }
             }}
+            autoComplete="off"
           />
           <BlueButton
             content="작성"

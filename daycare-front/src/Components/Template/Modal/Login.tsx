@@ -93,6 +93,7 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
         placeholder="이메일"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        autoComplete="email"
       />
 
       <InputText
@@ -100,6 +101,7 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
         placeholder="비밀번호"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        autoComplete="password"
       />
       <BlueButton
         content="로그인"

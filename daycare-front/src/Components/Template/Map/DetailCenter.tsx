@@ -60,7 +60,7 @@ const CenterAside = styled.aside`
     width: 100%;
     display: flex;
     justify-content: center;
-    min-height: 50px;
+    height: 50px;
     margin-bottom: 20px;
     button {
       border: 1px solid ${Theme.color.gray_D9};
