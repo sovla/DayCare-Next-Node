@@ -66,11 +66,13 @@ export class UserController {
   @Post('/email')
   async verifyEmail(@Body('email') email: string, @Res() res: Response) {
     // 이메일 인증 및 중복 확인
-    if (await this.userService.verifyEmail(email)) {
+    const randomNumber = await this.userService.verifyEmail(email);
+    if (randomNumber.length) {
       res.statusCode = 200;
       return res.send({
         statusCode: res.statusCode,
         message: '사용가능한 email입니다.',
+        code: randomNumber,
       });
     }
   }

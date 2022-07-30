@@ -28,7 +28,6 @@ export class SessionController {
   @Post()
   async login(@Res() res: Response, @Req() req: Request) {
     const loginDto = req.body as LoginDTO;
-    console.log(req.ip);
     if (req.cookies['jwt'] && !loginDto?.email) {
       const data = this.jwtService.decode(req.cookies['jwt']);
       const findUser = await this.sessionService.silentLogin(data['id']);

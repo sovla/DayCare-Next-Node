@@ -112,7 +112,7 @@ export class UserService {
     this.cacheManager.set(email, random, { ttl: 3000 });
     // 이메일 인증코드 캐시에 저장
 
-    return true;
+    return random;
   }
 
   updateUser(req: Request, updateUserDto: UpdateUserDto) {

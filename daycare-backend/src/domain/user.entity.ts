@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { CenterLike } from './centerLike.entity';
 import { Reply } from './reply.entity';
 import { ReplyLike } from './replylike.entity';
 import { Review } from './review.entity';
@@ -68,4 +69,7 @@ export class User {
     lazy: true,
   })
   reply_likes: ReplyLike[];
+
+  @OneToMany(() => CenterLike, (centerLike) => centerLike.user)
+  center_likes: CenterLike[];
 }
