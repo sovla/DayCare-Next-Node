@@ -88,7 +88,6 @@ const useError = () => {
   const dispatch = useDispatch();
 
   const [isBrowser, setIsBrowser] = useState<boolean>(false);
-  console.log(errorStatus, 'errorStatus');
   useEffect(() => {
     setIsBrowser(true);
   }, []);

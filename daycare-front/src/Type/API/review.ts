@@ -81,11 +81,9 @@ export interface reviewGetListType extends APIType {
 }
 
 export interface reviewGetType extends APIType {
-  url: '/review';
+  url: `/review/review_id=${string}`;
   method: 'get';
-  request: {
-    review_id: number;
-  };
+  request: {};
 
   response: {
     statusCode: 200 | 400 | 401 | 403;

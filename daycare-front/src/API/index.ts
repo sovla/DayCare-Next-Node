@@ -1,11 +1,12 @@
 import Axios from 'axios';
+import https from 'https';
 
 const API = Axios.create({
-  baseURL: 'http://61.99.114.169:3002/',
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-  },
+  baseURL: 'https://daycare-center.shop/api/',
   withCredentials: true,
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+  }),
 });
 
 export default API;

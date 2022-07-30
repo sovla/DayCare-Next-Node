@@ -590,7 +590,6 @@ const Map: React.FC = () => {
           crossOrigin="anonymous"
           async
         />
-        <script src="/js/MarketClustering.js" async />
       </Head>
       <div className="main-div">
         <aside className="search">
