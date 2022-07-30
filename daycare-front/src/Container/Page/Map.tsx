@@ -32,6 +32,9 @@ import {
   getSearchCentersType,
 } from '@src/Type/API/center';
 import { AxiosResponse } from 'axios';
+import { useRouter } from 'next/router';
+import { queryToString } from '@src/Util';
+import { compress, decompress } from 'shrink-string';
 
 const ContainerDiv = styled.div`
   display: flex;
@@ -269,6 +272,7 @@ const Map: React.FC = () => {
   });
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const formRef = useRef<any>();
   // popup 열기 위한 폼
@@ -293,9 +297,12 @@ const Map: React.FC = () => {
       try {
         API.get(`center/${id}`).then((res) => {
           setSelectCenter(res.data.center);
-
           const currentMap = naverMap;
           // 파라미터로 맵을 받거나 현재 맵인 경우 센터 가운데로 지정
+
+          router.replace(
+            `map?${queryToString({ ...router.query, center: id })}`
+          );
 
           if (!currentMap) {
             return null;
@@ -317,7 +324,7 @@ const Map: React.FC = () => {
         );
       }
     },
-    [dispatch, naverMap]
+    [dispatch, naverMap, router]
   );
 
   const createMarkers = useCallback(
@@ -408,7 +415,13 @@ const Map: React.FC = () => {
         // 1. 센터리스트 넣어주기
         // 2. 새로운 네이버 맵에 마커 찍어서 넣어주기
         // 3. 그 마커에 이벤트 걸어주기
-
+        router.replace(
+          `map?${queryToString({
+            ...router.query,
+            lat: naverMap.getCenter().y,
+            lon: naverMap.getCenter().x,
+          })}`
+        );
         setCenterList(res.data.center);
         createMarkers(res);
       })
@@ -423,7 +436,7 @@ const Map: React.FC = () => {
           })
         );
       });
-  }, [naverMap, onClickCenter, filter]);
+  }, [naverMap, onClickCenter, filter, router.query]);
 
   const onClickDetailInformation = useCallback(async () => {
     try {
@@ -538,11 +551,29 @@ const Map: React.FC = () => {
 
   useEffectOnce(() => {
     if (naverMap) {
+      const query = router.query as {
+        lat?: string;
+        lon?: string;
+      };
+      if (query?.lat && query?.lon) {
+        naverMap.setCenter(new naver.maps.LatLng(+query.lat, +query.lon));
+      }
+
       onClickSearch();
       return true;
     }
     return false;
   }, [naverMap]);
+
+  useEffectOnce(() => {
+    if (centerList.length) {
+      if (router.query?.center) {
+        onClickCenter(+router.query.center);
+        return true;
+      }
+    }
+    return false;
+  }, [centerList]);
 
   if (loading || scriptError) {
     return null;
@@ -576,6 +607,7 @@ const Map: React.FC = () => {
                     onClickInformationSearch();
                   }
                 },
+                autoComplete: 'none',
               }}
             />
           </div>
