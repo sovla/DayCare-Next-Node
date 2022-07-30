@@ -17,6 +17,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { CenterService } from './center.service';
 import { FindFilterDTO } from './dto/findFilter-center.dto';
+import { LikeDto } from './dto/like-center.dto';
 
 @Controller('center')
 export class CenterController {
@@ -30,6 +31,25 @@ export class CenterController {
       statusCode: res.statusCode,
       message: '정보 받아오기 완료',
       center: findCenter,
+    });
+  }
+
+  @Get('like/:id')
+  @UsePipes(ValidationPipe)
+  async likeCenter(
+    @Query('id') id: string,
+    @Param('id') center_id: string,
+    @Res() res: Response,
+  ) {
+    const isLike = await this.centerService.likeCenter({
+      id,
+      center_id,
+    });
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '정보 받아오기 완료',
+      center: isLike,
     });
   }
 

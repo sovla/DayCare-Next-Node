@@ -26,12 +26,10 @@ export class SessionController {
   ) {}
 
   @Post()
-  async login(
-    @Body() loginDto: LoginDTO,
-    @Res() res: Response,
-    @Req() req: Request,
-  ) {
-    if (req.cookies['jwt']) {
+  async login(@Res() res: Response, @Req() req: Request) {
+    const loginDto = req.body as LoginDTO;
+    console.log(req.ip);
+    if (req.cookies['jwt'] && !loginDto?.email) {
       const data = this.jwtService.decode(req.cookies['jwt']);
       const findUser = await this.sessionService.silentLogin(data['id']);
       if (findUser) {
@@ -60,6 +58,11 @@ export class SessionController {
         });
       }
     }
+
+    if (!loginDto) {
+      return new HttpException('로그인에 필요한 필수값이 없습니다', 400);
+    }
+
     const findUser = await this.sessionService.login(loginDto);
     if (findUser) {
       const result = {
@@ -76,7 +79,6 @@ export class SessionController {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24hours
       });
-      console.log('무사히 return', res);
       return res.send({
         statusCode: res.statusCode,
         message: `${findUser.name}님 로그인 성공하셨습니다.`,

@@ -6,6 +6,7 @@ import {
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CenterLike } from './centerLike.entity';
 
 @Entity()
 export class Center {
@@ -532,4 +533,7 @@ export class Center {
     comment: '평가인증여부',
   })
   certification: string; // 평가인증여부
+
+  @OneToMany(() => CenterLike, (centerLike) => centerLike.center)
+  center_likes: CenterLike[];
 }

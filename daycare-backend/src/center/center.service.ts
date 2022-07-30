@@ -1,7 +1,7 @@
 import { Length } from 'class-validator';
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prefer-const */
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Center } from 'src/domain/center.entity';
 import {
@@ -16,6 +16,9 @@ import { FindFilterDTO } from './dto/findFilter-center.dto';
 import * as XLSX from 'xlsx';
 import * as moment from 'moment-timezone';
 import axios from 'axios';
+import { LikeDto } from './dto/like-center.dto';
+import { User } from 'src/domain/user.entity';
+import { CenterLike } from 'src/domain/centerLike.entity';
 
 const FormData = require('form-data');
 
@@ -24,6 +27,12 @@ export class CenterService {
   constructor(
     @InjectRepository(Center)
     private centerRepository: Repository<Center>,
+
+    @InjectRepository(CenterLike)
+    private centerLikeRepository: Repository<CenterLike>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async findCenters(str: string) {
@@ -43,6 +52,51 @@ export class CenterService {
       .getMany();
 
     return findCenters;
+  }
+  async likeCenter(likeDto: LikeDto) {
+    const findCenter = await this.centerRepository.findOne({
+      where: {
+        id: +likeDto.center_id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (!findCenter) {
+      throw new HttpException('해당 센터는 존재하지 않습니다', 400);
+    }
+
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: +likeDto.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!findUser) {
+      throw new HttpException('존재하지 않는 유저입니다', 400);
+    }
+    const findCenterLike = await this.centerLikeRepository.findOne({
+      where: {
+        center: findCenter,
+        user: findUser,
+      },
+    });
+    if (findCenterLike) {
+      this.centerLikeRepository.delete({
+        id: findCenterLike.id,
+      });
+      return false;
+    }
+
+    this.centerLikeRepository.insert({
+      center: findCenter,
+      user: findUser,
+    });
+
+    return true;
   }
 
   async findOne(id: string) {

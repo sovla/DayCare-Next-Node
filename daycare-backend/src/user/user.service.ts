@@ -52,7 +52,6 @@ export class UserService {
     }
 
     if (verificationCode !== createUserDto.verificationCode) {
-      console.log(verificationCode);
       throw new HttpException(
         '이메일 인증코드가 맞지 않습니다.',
         HttpStatus.BAD_REQUEST,
