@@ -7,6 +7,7 @@ import InputTextComponents from '@src/Components/Atom/Input/InputText';
 import SearchComponent from '@src/Components/Atom/Input/Search';
 import SelectComponent from '@src/Components/Atom/Input/Select';
 import CheckBoxComponent from '@src/Components/Atom/Input/CheckBox';
+import InputFileComponent from '@src/Components/Atom/Input/InputFile';
 
 export default {
   title: 'Atom/Input',
@@ -26,6 +27,10 @@ const SelectTemplate: ComponentStory<typeof SelectComponent> = (args) => (
 
 const CheckBoxTemplate: ComponentStory<typeof CheckBoxComponent> = (args) => (
   <CheckBoxComponent {...args} />
+);
+
+const InputFileTemplate: ComponentStory<typeof InputFileComponent> = (args) => (
+  <InputFileComponent {...args} />
 );
 export const InputText = InputTextTemplate.bind({});
 
@@ -127,3 +132,7 @@ CheckBox.argTypes = {
     },
   },
 };
+
+export const InputFile = InputFileTemplate.bind({});
+
+InputFile.argTypes = {};
