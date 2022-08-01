@@ -49,14 +49,7 @@
 로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.
 
 ```TypeScript
-const { api: loginApi } = useApi<sessionLoginType>({
-    url: '/session',
-    data: {
-      email,
-      password,
-    },
-    method: 'post',
-  });
+
 
   const loginApiHandle = useCallback(async () => {
     try {
@@ -83,9 +76,14 @@ const { api: loginApi } = useApi<sessionLoginType>({
     }
   }, [email, password]);
 ```
-useApi Custom Hook & Type
+RegExp 클래스를 만들어 정규식 및 문자열 길이에 관한 메소드를 선언 해 사용했습니다.
+
+로그인시 이메일, 패스워드가 정한 규칙에 맞는지 확인한 후 맞지 않을 경우 전역 error 상태를 변경하여 에러가 발생하도록 하였습니다.
+
+로그인 성공의 경우 전역 user 상태를 변경하여 유저 권한이 필요한 페이지에서 분별할 수 있도록 하였습니다.
 
 ```TypeScript
+
 const useApi = <T extends APIType>({
   url,
   data,
@@ -143,11 +141,20 @@ interface sessionLoginType extends APIType {
   };
 }
 
+const { api: loginApi } = useApi<sessionLoginType>({
+    url: '/session',
+    data: {
+      email,
+      password,
+    },
+    method: 'post',
+  });
+
 ```
+공통적인 기능인 API 호출을 커스텀 훅을 통해 중복되던 코드를 제거했습니다.
 
-공통적인 기능인 API 호출에 대해 커스텀 훅을 통해 관리하여 중복되던 기존 소스량을 줄였습니다.
+TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 넣게 만들어 필수 파라미터, API 호출시 리턴 되는 값, url, method를 지정하여 잘못된 데이터가 들어가지 않도록 방지하였습니다.
 
-TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 useApi<sessionLoginType>에 선언할 경우 리턴 되는 값 또는 필수 값이 제대로 들어오지 않을 경우 타입에러를 일으켜 잘못된 데이터가 들어오는 것을 방지하였습니다.
 
 ```TypeScript
 // Controller
@@ -216,7 +223,10 @@ TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 useApi<sessi
     return findUser;
   }
 ```
+로그인시 Email로 유저를 검색하고 암호화한 password 와 dto에 담겨진 password를 대조하여 일치하는지 판단하였습니다.
 
-로그인 성공시 JWT 토큰을 발급하였으며 이후에 유저 권한이 필요한 API 호출시 쿠키에 저장된 토큰과 ID 값을 대조해 일치하지 않거나 위조된 토큰의 경우 에러를 발생시키도록 하였습니다. 
+JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참조하지 못하도록 하였습니다. 그리고 유저 권한이 필요한 API를 호출 할때 해당 쿠키를 읽어와 JWT 검사를 통해 사인한 쿠키가 맞는지 확인하는 절차를 거쳤습니다.
+
+
 
 
