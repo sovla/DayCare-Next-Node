@@ -9,6 +9,9 @@ export interface InputTextProps
   type: 'text' | 'password' | 'email' | 'number';
 }
 
+export interface InputFileProps
+  extends StyledComponentProps<'input', any, {}, never> {}
+
 export interface SearchProps {
   inputProps: StyledComponentProps<'input', any, {}, never>;
   width?: string;

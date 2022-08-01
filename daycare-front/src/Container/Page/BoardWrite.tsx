@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Head from 'next/head';
 import React, {
   useCallback,
@@ -22,6 +23,7 @@ import { reviewWriteType } from '@src/Type/API/review';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
 import { changeError } from '@src/Store/errorState';
+import InputFile from '@src/Components/Atom/Input/InputFile';
 
 const StyledWriteContainer = styled.div`
   background-color: ${Theme.color.yellow_FFE};
@@ -58,6 +60,17 @@ const StyledWriteContainer = styled.div`
       }
     }
   }
+  form {
+    position: relative;
+    .files {
+      position: absolute;
+      right: -120px;
+      top: 60px;
+      & > div {
+        margin-bottom: 10px;
+      }
+    }
+  }
   @media (max-width: 768px) {
     margin-bottom: 85px;
     height: 100vh;
@@ -78,9 +91,10 @@ const StyledWriteContainer = styled.div`
     form {
       max-width: 100vw;
       height: 100vh;
-
       & > div:nth-of-type(2) {
         height: 300px !important;
+      }
+      .files {
       }
     }
   }
@@ -93,6 +107,13 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
 
   const [selectCategory, setSelectCategory] = useState(0);
   const [title, setTitle] = useState('');
+  const [images, setImages] = useState({
+    image1: '',
+    image2: '',
+    image3: '',
+    image4: '',
+    image5: '',
+  });
 
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -133,12 +154,29 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
     };
 
   const onChangeCategory: React.ChangeEventHandler<HTMLSelectElement> =
-    useCallback((e) => {
-      const findCategory = category.find((v) => v.title === e.target.value);
-      if (findCategory) {
-        setSelectCategory(findCategory.id);
+    useCallback(
+      (e) => {
+        const findCategory = category.find((v) => v.title === e.target.value);
+        if (findCategory) {
+          setSelectCategory(findCategory.id);
+        }
+      },
+      [category]
+    );
+
+  const onChangeFile =
+    (index: number) => async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const reader = new FileReader();
+      if (e.target.files?.length && e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+        reader.onload = () => {
+          setImages((prev) => ({
+            ...prev,
+            [`image${index + 1}`]: reader.result,
+          }));
+        };
       }
-    }, []);
+    };
   useEffect(() => {
     if (selectCategory === 0 && category && Array.isArray(category)) {
       setSelectCategory(category[0].id);
@@ -157,7 +195,7 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
       window.alert('로그인 후 이용 가능합니다.');
     }
   }, []);
-
+  console.log(images.image1);
   if (!user.auth) {
     return null;
   }
@@ -196,7 +234,7 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
             ['heading', 'bold', 'italic', 'strike'],
             ['hr', 'quote'],
             ['ul', 'ol', 'task', 'indent', 'outdent'],
-            ['table', 'image', 'link'],
+            ['table', 'link'],
             ['code', 'codeblock'],
           ]}
           language="ko-kr"
@@ -219,6 +257,13 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
             }}
           />
         </div>
+        {/* <div className="files">
+          <InputFile value={images.image1} onChange={onChangeFile(0)} />
+          <InputFile value={images.image2} onChange={onChangeFile(1)} />
+          <InputFile value={images.image3} onChange={onChangeFile(2)} />
+          <InputFile value={images.image4} onChange={onChangeFile(3)} />
+          <InputFile value={images.image5} onChange={onChangeFile(4)} />
+        </div> */}
       </form>
     </StyledWriteContainer>
   );
