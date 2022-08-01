@@ -1,214 +1,181 @@
- 
-# DayCare-Center (<a href="https://daycare-center.shop">daycare-center.shop</a>)
 
-> 간편한 어린이집 찾기 플랫폼
+<div align=center><h1> DayCare-Center - 개인프로젝트</h1></div>
 
-복잡한 어린이집 찾기 서비스를 <span style="color:green">간편화</span> 하기 위해 진행한 프로젝트 입니다.
+안녕하세요 웹 개발자를 지망하는 김준한입니다. 제 포트폴리오를 보러 와주셔서 감사드립니다. 제가 만든 포트폴리오는 게시판 기반 포트폴리오 입니다. 게시판 기반 포트폴리오를 만든 이유는 모든 기능이 CRUD 응용이라는 점과 기본 소양이 게시판이라고 생각하기 때문입니다. 게시판 기반 포트폴리오를 제작해보면서 기본기에 충실하고 싶었기 때문에 게시판 기반 포트폴리오를 제작하게 되었습니다.
 
--   어린이집 카테고리의 세분화 필터링 기능을 지원하고 있습니다.
+포트폴리오 소개는 기능 별로 묶어서 설명 드리려고 합니다.
 
--   어린이집 검색시 1순위인 거리를 기준으로 볼 수 있습니다.
+그럼 지금부터 포트폴리오 소개를 시작 하겠습니다.
 
--   어린이집 관련 리뷰를 남길 수 있는 게시판을 별도로 운영하고 있습니다.
+## 주요 구현 기능
+- 네이버 지도
+- 네이버 지도 마커
+- 지도 기준 어린이집 찾기
+- 필터링 기능
+- 내 위치 찾기
+- 어린이집 선택
+- 로그인
+- 회원가입
+- 회원정보수정
+- 게시판 CRUD
+- 게시글 좋아요 기능
+- 댓글 CRUD
+- 유저 게시글 리스트
+- 페이징
+- 검색기능
 
--  댓글을 통해 사용자간에 소통이 원활하도록 하고 있습니다.
+<div align=center><h2>개발 환경</h2></div>
 
-# 사용방법
+| 개발 환경 분류 | 사용 기술 | 비고 |
+| --- | --- | --- |
+| Develop Tools | Visual Studio Code v1.69.2 MySQLWorkbench v8.0 | - |
+| Front End | HTML5 React v18.2.0 Next v12.2.0 TypeScript v4.7.4 | - |
+| Back End | NodeJS v14.17.3 NestJs v8.0.0  TypeORM v0.3.7 TypeScript v4.7.4 | - |
+| Data Base | MySQL v8.0 | - |
+| Server | Nginx v1.22.0 Node.JS v14.17.3 | - |
 
-## 1. 홈
+<div align=center><h2>프로젝트 구조</h2>
 
-> 어린이집 찾기 전 읽기 좋은 글들을 소개하고 있습니다.
+<img src="https://user-images.githubusercontent.com/41351496/182100371-308f8f6a-aafb-4b57-94aa-dae80097f82c.png" alt="프론트엔드구조" align="center" />
+<img src="https://user-images.githubusercontent.com/41351496/182099907-51a5aa7d-97fa-4c09-bc09-98bec95778cf.png" alt="백엔드구조" align="center" />
 
-<img src="https://user-images.githubusercontent.com/41351496/180743508-318d2f64-91f5-4d06-906a-dcdb5ab08e5b.png" alt="daycare-center shop_map(1)" style="width:90%;height:350px;margin-left:5%;" />
+</div>
 
-## 2. 지도
+<div align="center" style="margin:0 10%;"><h2>ERD</h2>
 
-> 현재 위치로 검색 버튼을 통해 거리순으로 어린이집을 찾을 수 있습니다.
+![](https://velog.velcdn.com/images/gavri/post/bc28bcf1-88be-4503-8e11-0aa18d3fd46a/image.png)
+</div>
+<div align="center" ><h2>네이버 지도 마커 표시</h2></div>
+<div align="center" ><p>네이버 지도 마커 표시의 경우 API 통신하는 함수와 마커 찍는 함수를 별도로 구성해 1함수 1액션원칙을 지켰습니다.<p></div>
 
-![daycare-center shop_map (2)](https://user-images.githubusercontent.com/41351496/180743512-4b3c74f3-da75-4867-b01a-689e10ec8363.png)
+```
+const onClickSearch = useCallback(() => {
+    // 지도에서 이 위치에서 검색 버튼을 눌럿을때
+    if (!naverMap) {
+      // 네이버 지도가 없는 상태로 전달시 return null;
+      return null;
+    }
 
-## 3. 지도 - 어린이집 클릭시
-
-> 클릭한 어린이집에 관련된 정보를 볼 수 있습니다.
-
-![daycare-center shop_map (3)](https://user-images.githubusercontent.com/41351496/180743515-31ea1ef9-ce1c-423c-a621-0e559e5e025f.png)
-
-## 4. 검색
-
-> 어린이집 이름, 주소로 적용된 데이터가 있을 경우 해당 데이터로 나타냅니다.
-
-![daycare-center shop_board_261 (1)](https://user-images.githubusercontent.com/41351496/180743493-c56e4e19-dd57-4d1b-86ad-c8c0b427a80a.png)
-
-## 5. 필터링
-
-> 기존 서비스를 보며 필요한 필터링 기능을 추가했습니다.
-
-![daycare-center shop_map (4)](https://user-images.githubusercontent.com/41351496/180743519-d8240663-2231-48bd-af5d-1aa21130282a.png)
-
-## 5. 게시판
-
-> 어린이집 관련 내용 공유 및 자유 게시판으로 활용하고 있습니다.
-
-![daycare-center shop_map (5)](https://user-images.githubusercontent.com/41351496/180743523-e5bdcb34-647a-4b20-ab20-2b65ffc2d9aa.png)
-
-## 6. 게시판 상세보기
-
-> 댓글을 통해 사용자들 간에 소통이 가능하도록 했습니다.
-
-![daycare-center shop_board_261](https://user-images.githubusercontent.com/41351496/180743506-8463ebe2-b9e8-48ca-9dca-cc64133f298d.png)
-
-# Project Structure
-
-> Next(SSR) + Nest(Express) 구조로 개발하였으며, 개인 프로젝트로 진행했습니다.
-
-## 사용한 기술 스택
-
-### BackEnd
-
--   Nest
--   TypeORM
--   MySQL
--   JWT
--   TypeScript
-
-### Front
-
--   Next
--   TypeScript
--   StoryBook
--   Styled-Component
-
-### Coding Convention Tool
-
--   EsLint
--   Prettier
--   Husky
--   Commitizen
-
-참조: 프로젝트 설계 과정 
-<a href="https://velog.io/@gavri/ToyProject-%EC%84%A4%EA%B3%84">https://velog.io/@gavri/ToyProject-%EC%84%A4%EA%B3%84</a>
-
-## Next
-
-> 구조는 다음과 같습니다.
-
-src
-
--   API : Axios API 폴더
-- assets : image,font,global 테마 파일 폴더
--   Components
-    -   Atom : 버튼 등 작은 단위의 컴포넌트
-    -   Template : 버튼 모음 등 Atom 컴포넌트 조립을 통해 만들어진 컴포넌트
--   Container
-    -   Page : Page 단위의 Container
--   CustomHook : 커스텀 훅 폴더
--   Type : [타입]/[관련기능] 기준의 타입지정
--   Util : 각종 Util
--   Store : Redux 폴더
--   stories : StoryBook 폴더
--   pages : 실제 페이지 폴더 (Next에서는 해당 폴더 기준으로 라우팅 설정)
-
-**getServerSideProps , 동적 경로**
-
-Next 동적 경로를 이용해 게시판 id 값으로 상세보기 페이지를 구성할때 해당 값을 전달하고 받을 수 있도록 했습니다.
-
-getServerSideProps을 이용해 페이지 로딩전 서버에서 해당 게시물을 미리 가져와 로딩하도록 했습니다.
-
-## StoryBook
-
-> 컴포넌트 시각화 툴로 컴포넌트 설계에 도움을 줍니다.
-
-사용한 Addon
-
--   a11y - 웹 표준 접근성 테스트
--   interactions - 상호작용 및 테스트의 시각적 디버깅
--   actions - 이벤트 핸들러 캐치
--   controls - 동적으로 Props 변화를 위한 툴
--   viewport - 반응형 요소를 위한 툴
-<img src="https://velog.velcdn.com/images/gavri/post/14307b2d-36d6-4672-9f30-0174012fbbcd/image.png" alt="storybook" style="width:70% !important;height:400px !important;margin-left:0px;">
-
-## Nest (API Server)
-
-> 구조는 다음과 같습니다.
-
-domain : TypeORM entity 모음
-config : .yaml 파일을 이용해 배포, 개발 환경을 적용
-
-각 API 별로 폴더 구분
-center,reply,review,session,category,user
-
--   controller : API EndPoint 관리
--   service : Business Logic
--   module : 해당 폴더 관련 module 관리
--   dto : 해당 폴더 관련 dto
--   guard : JWTGuard jwt 검증 관련 소스
-
-## JWT , Nest/UseGuards
-
-> @UseGuards(JWTGuard) 를 이용해 JWT를 사용하는 컨트롤러에 검증된 요청만 허용되도록 적용했습니다.
-
-```@Injectable()
-export class JWTGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const req: Request<
-      any,
-      {
-        id?: number;
+    API.get<getCentersType['response']>('center', {
+      params: {
+        // 필터링 기능 및 지도 가운데 위치 파라미터
+        lon: naverMap.getCenter().x,
+        lat: naverMap.getCenter().y,
+        type: filter?.type?.join(','),
+        city: filter?.city,
+        city_detail: filter?.cityDetail,
+        max: filter?.personnel,
+        employee: filter.employee.map(changeFilterData).join(','),
+        empty_class: filter.classType.map(changeFilterData).join(','),
+        property: filter.characteristic.map(changeFilterData).join(','),
+        employee_count: filter.employeeCount,
+        radius: 500,
+      },
+    })
+      .then((response) => {
+        // 성공시
+        // 어린이집 검색시 해당 주소를 기입해 url 공유시 바로 같은 화면이 보이도록 설정
+        router.replace(
+          `map?${objectToQueryString({
+            ...router.query,
+            lat: naverMap.getCenter().y,
+            lon: naverMap.getCenter().x,
+          })}`
+        );
+        // 센터 리스트
+        setCenterList(response.data.center);
+        // 마커 만드는 함수에 센터 리스트 파라미터 넘겨주기.
+        createMarkers(response.data.center);
+      })
+      .catch((error) => {
+        if (error instanceof TypeError) {
+          return;
+        }
+        // 타입 에러가 아닌 경우 에러 표시
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
+      });
+  }, [naverMap, onClickCenter, filter, router.query]);
+```
+마커 표시용 함수
+```
+ const createMarkers = useCallback(
+    (centers: centerType[]) => {
+      // 마커를 만드는 함수
+      if (!naverMap) {
+        return;
       }
-    > = context.switchToHttp().getRequest();
-    if (req?.cookies?.jwt == null) {
-      throw new HttpException('로그인 후 이용가능합니다.', 401);
-    }
-    const jwtUser = this.jwtService.verify<jwtUserDTO>(req.cookies['jwt']);
+      // 현재 마커를 담을 변수
+      const markers: naver.maps.Marker[] = [];
 
-    if (req.body.id == null) {
-      throw new HttpException('id 값이 존재하지 않습니다.', 403);
-    }
+      for (let index = 0; index < centers.length; index += 1) {
+        const center = centers[index];
 
-    if (+req.body.id !== +jwtUser.id) {
-      throw new HttpException('본인의 글이 아닙니다.', 403);
-    }
+        const marker = new naver.maps.Marker({
+          map: naverMap,
+          // 포지션은 center 위도 경도 기준으로
+          position: new naver.maps.LatLng(+center.lat, +center.lon),
+          // 제목은 센터 이름으로
+          title: center.name,
+          // 선택가능
+          clickable: true,
+        });
 
-    return true;
-  }
-}
+        // 마커 선택시 나오는 html
+        const infowindow = new naver.maps.InfoWindow({
+          content: [
+            '<div id="marker" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> ',
+            `<span class="ico _icon">${center.name}</span>`,
+            '<span class="shd"></span>',
+            '</div>',
+          ].join(''),
+        });
+        // 마커에 이벤트 속성 걸어주기
+        // 표시 - 마우스다운, 마우스 위로 올렸을때, 모바일 환경에서 선택시(click)
+        // 삭제 - 마우스 벗어난 경우
+        marker.addListener('mousedown', () => {
+          infowindow.open(naverMap, marker);
+        });
+        marker.addListener('mouseover', () => {
+          infowindow.open(naverMap, marker);
+        });
+        marker.addListener('mouseout', () => {
+          infowindow.close();
+        });
+        marker.addListener('click', () => {
+          // 선택시 상세 정보 표시
+          onClickCenter(center.id);
+          if (infowindow.getMap()) {
+            infowindow.open(naverMap, marker);
+          }
+        });
+        markers.push(marker);
+      }
+      setMapMarkers((prev) => {
+        prev.forEach((v) => {
+          // 이전 마커들 이벤트 해제
+          v.clearListeners('click');
+          v.clearListeners('mouseout');
+          v.clearListeners('mouseover');
+          v.clearListeners('mousedown');
+          // 많은 마커가 생길경우 성능 이슈로 인한 마커 해제
+          v.setMap(null);
+        });
+        // 새로운 마커들로 상태 바꿔주기
+        return markers;
+      });
+      // 현재 위치 설정
+      setLocation({
+        lat: naverMap.getCenter().y,
+        lon: naverMap.getCenter().x,
+      });
+    },
+    [naverMap, onClickCenter]
+  );
+
 ```
-
-## TypeORM
-
-> ORM을 이용해 데이터베이스 및 객체 변형에 유연하게 대처하며 반복적인 CRUD 작업을 대체했습니다.
-
-TypeORM에서는 Active Record패턴과 Data Mapper패턴을 지원했습니다.
-
-Active Record의 경우 규모가 작은 애플리케이션에 적합하고 간단히 사용할 수 있다는 장점이 있어 해당 패턴을 채택했습니다.
-
--   Entity : 데이터베이스 테이블에 매핑 되는 클래스 입니다.
--   Repository : 일반 저장소, 해당 저장소를 이용해 삭제,추가,수정을 합니다.
-
-## Nest/Pipe , class-validator
-
-> vaildation check 및 Pipe를 이용해 올바르지 않은 값 또는 숫자인데 문자열로 올경우 ParsePipe를 이용해 변경하여 내부 로직에서는 올바른 값만 받을 수 있도록 했습니다.
-
-```
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
-
-export class LoginDTO {
-  @IsEmail({}, { message: '이메일 형식이 아닙니다.' })
-  email: string;
-
-  @IsNotEmpty({ message: '비밀번호를 확인해주세요.' })
-  @Length(6, 20, { message: '비밀번호는 6 ~ 20자 사이 입니다.' })
-  password: string;
-}
-```
-
-## Coding Convention
-
-> Husky 라이브러리를 이용해 pre-commit 커밋 이전 es-lint 검사를 진행하도록 했습니다.
-
-커밋 메시지 또한 일관화 하기 위해 Commitizen 라이브러리를 이용했습니다.
-<img src="https://velog.velcdn.com/images/gavri/post/ec49ccfe-2e47-43a9-a262-ccc3ae48565b/image.png" alt="commitizen" style="width:100% !important;height:auto !important;margin-left:0px;">
 
