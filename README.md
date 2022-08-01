@@ -427,5 +427,244 @@ async verifyEmail(email: string) {
 Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드를 저장하여 사용했습니다.
 
 
+<div align="center" ><h2>네이버 지도 마커 표시</h2></div>
+네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.
+
+
+```TypeScript
+const onClickSearch = useCallback(() => {
+    // 지도에서 이 위치에서 검색 버튼을 눌럿을때
+    if (!naverMap) {
+      // 네이버 지도가 없는 상태로 전달시 return null;
+      return null;
+    }
+
+    API.get<getCentersType['response']>('center', {
+      params: {
+        // 필터링 기능 및 지도 가운데 위치 파라미터
+        lon: naverMap.getCenter().x,
+        lat: naverMap.getCenter().y,
+        type: filter?.type?.join(','),
+        city: filter?.city,
+        city_detail: filter?.cityDetail,
+        max: filter?.personnel,
+        employee: filter.employee.map(changeFilterData).join(','),
+        empty_class: filter.classType.map(changeFilterData).join(','),
+        property: filter.characteristic.map(changeFilterData).join(','),
+        employee_count: filter.employeeCount,
+        radius: 500,
+      },
+    })
+      .then((response) => {
+        // 성공시
+        // 어린이집 검색시 해당 주소를 기입해 url 공유시 바로 같은 화면이 보이도록 설정
+        router.replace(
+          `map?${objectToQueryString({
+            ...router.query,
+            lat: naverMap.getCenter().y,
+            lon: naverMap.getCenter().x,
+          })}`
+        );
+        // 센터 리스트
+        setCenterList(response.data.center);
+        // 마커 만드는 함수에 센터 리스트 파라미터 넘겨주기.
+        createMarkers(response.data.center);
+      })
+      .catch((error) => {
+        if (error instanceof TypeError) {
+          return;
+        }
+        // 타입 에러가 아닌 경우 에러 표시
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
+      });
+  }, [naverMap, onClickCenter, filter, router.query]);
+```
+API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현재 위치에 맞게 변경 해줍니다. 
+
+(ex: daycare-center.shop?lat=37&lon=127) 해당 URL 의 경우 공유 목적으로 변경 해주었습니다.
+
+그리고 어린이집 배열을 상태에 저장해주고 네이버 지도 마커를 그리는 함수에 파라미터로 전달합니다.
+
+```TypeScript
+ const createMarkers = useCallback(
+    (centers: centerType[]) => {
+      // 마커를 만드는 함수
+      if (!naverMap) {
+        return;
+      }
+      // 현재 마커를 담을 변수
+      const markers: naver.maps.Marker[] = [];
+
+      for (let index = 0; index < centers.length; index += 1) {
+        const center = centers[index];
+
+        const marker = new naver.maps.Marker({
+          map: naverMap,
+          // 포지션은 center 위도 경도 기준으로
+          position: new naver.maps.LatLng(+center.lat, +center.lon),
+          // 제목은 센터 이름으로
+          title: center.name,
+          // 선택가능
+          clickable: true,
+        });
+
+        // 마커 선택시 나오는 html
+        const infowindow = new naver.maps.InfoWindow({
+          content: [
+            '<div id="marker" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> ',
+            `<span class="ico _icon">${center.name}</span>`,
+            '<span class="shd"></span>',
+            '</div>',
+          ].join(''),
+        });
+        // 마커에 이벤트 속성 걸어주기
+        // 표시 - 마우스다운, 마우스 위로 올렸을때, 모바일 환경에서 선택시(click)
+        // 삭제 - 마우스 벗어난 경우
+        marker.addListener('mousedown', () => {
+          infowindow.open(naverMap, marker);
+        });
+        marker.addListener('mouseover', () => {
+          infowindow.open(naverMap, marker);
+        });
+        marker.addListener('mouseout', () => {
+          infowindow.close();
+        });
+        marker.addListener('click', () => {
+          // 선택시 상세 정보 표시
+          onClickCenter(center.id);
+          if (infowindow.getMap()) {
+            infowindow.open(naverMap, marker);
+          }
+        });
+        markers.push(marker);
+      }
+      setMapMarkers((prev) => {
+        prev.forEach((v) => {
+          // 이전 마커들 이벤트 해제
+          v.clearListeners('click');
+          v.clearListeners('mouseout');
+          v.clearListeners('mouseover');
+          v.clearListeners('mousedown');
+          // 많은 마커가 생길경우 성능 이슈로 인한 마커 해제
+          v.setMap(null);
+        });
+        // 새로운 마커들로 상태 바꿔주기
+        return markers;
+      });
+      // 현재 위치 설정
+      setLocation({
+        lat: naverMap.getCenter().y,
+        lon: naverMap.getCenter().x,
+      });
+    },
+    [naverMap, onClickCenter]
+  );
+```
+마커를 생성하고 해당 마커에 이벤트를 걸어 원하는 html 태그 혹은 함수를 실행하도록 하고 있습니다.
+
+그리고 많은 마커가 지도에 생길 경우 성능상의 이슈가 생겨 이전 마커는 제거 및 이벤트를 해제 해주었습니다.
+
+```ts
+ @Get()
+  async findCentersByLocation(
+    @Query() findFilterDto: FindFilterDTO,
+    @Res() res: Response,
+  ) {
+    const findCenters = await this.centerService.findCentersByLocation(
+      findFilterDto,
+    );
+
+    res.statusCode = 200;
+
+    return res.send({
+      statusCode: res.statusCode,
+      message: '정보 받아오기 완료',
+      center: findCenters,
+    });
+  }
+```
+컨트롤러 부분은 @Query를 이용해 쿼리스트링으로 넘어온 값들을 받았으며 해당 값을 service로 넘겨주었습니다.
+
+```ts
+ async findCentersByLocation(dto: FindFilterDTO) {
+    // type property employee empty_class 의 경우 "a,b,c" 이런식으로 값을 전달
+    const type = dto?.type?.length && dto.type.split(',');
+    const property = dto?.property?.length && dto.property.split(',');
+    const employee = dto?.employee?.length && dto.employee.split(',');
+    const empty_class = dto?.empty_class?.length && dto.empty_class.split(',');
+    // 빈 문자열에 .split(",") 메소드를 하여도 []배열로 들어와 해당 방식으로 코딩 하였습니다.
+
+    const findCenterList = this.centerRepository
+      .createQueryBuilder('center')
+      // 필요한 값만 select
+      .select('homepage,address,tel,name,lat,lng,school_vehicle,type,id')
+      // 현재 위치 기준으로 전체 거리 값을 계산해 distance로 select
+      .addSelect(
+        `6371 * acos(cos(radians(${dto.lat})) * cos(radians(lat)) * cos(radians(lon) - radians(${dto.lon})) + sin(radians(${dto.lat})) * sin(radians(lat)))`,
+        'distance',
+      )
+      .where('operation_status != "폐지"') // 폐지가 아닌경우
+      .andWhere(`city Like '%${dto?.city ?? ''}%'`) // city 값이 없을경우 전체 검색
+      .andWhere(`city_detail Like '%${dto?.city_detail ?? ''}%'`) // city_detail 값이 없을경우 전체 검색
+      .andWhere(
+        new Brackets(async (qb) => {
+          Array.isArray(type)
+            ? type.forEach((v, i) => {
+                // 여러 타입이 있을 경우 or 조건으로 검색 type = "공립" ||  type = "사립"
+                qb.orWhere(`type = :type${i}`, {
+                  [`type${i}`]: `${v}`,
+                });
+              })
+            : qb.where("type Like '%%'");
+        }),
+      )
+      .andWhere(
+        new Brackets(async (qb) => {
+          Array.isArray(property) &&
+            // 여러 특성이 있을 경우 or 조건으로 검색 property 값의 경우 DB 컬럼명과 동일한 값이 들어옴 "Y" 인지 체크
+            property.forEach((v) => {
+              qb.orWhere(`${v} = 'Y'`);
+            });
+        }),
+      )
+      .andWhere(
+        new Brackets(async (qb) => {
+          // 여러 직원이 있을 경우 or 조건으로 검색 employee 값의 경우 DB 컬럼명과 동일한 값이 들어옴 0이상 인지 체크
+          Array.isArray(employee) &&
+            employee.forEach((v) => {
+              qb.orWhere(`${v} > 0`);
+            });
+        }),
+      )
+      .andWhere(
+        new Brackets(async (qb) => {
+          // 비어있는 교실 수가 있을 경우 or 조건으로 검색 empty_class 값의 경우 DB 컬럼명과 동일한 값이 들어옴 0이상 인지 체크
+          Array.isArray(empty_class) &&
+            empty_class.forEach((v) => {
+              qb.orWhere(`${v} > 0`);
+            });
+        }),
+      )
+      .andWhere(
+        // 직원 수 n 이상인 경우
+        `employee_count >= ${
+          // length 는 string의 기본 메소드중 하나로 undefined 값이 들어올 경우 0으로 검색하도록
+          dto?.employee_count?.length ? +dto.employee_count : 0
+        }`,
+      )
+      .having(`distance <= ${dto?.radius ?? 50}`) // radius 반경 값이 있을경우
+      .orderBy('distance', 'ASC') // 거리 기준으로 값 받아오기
+      .limit(50)
+      .getMany();
+
+    return findCenterList;
+  }
+```
+여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
 
 
