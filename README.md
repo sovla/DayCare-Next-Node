@@ -666,5 +666,118 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
   }
 ```
 여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
+<div align="center" ><h2>센터 상세히 보기</h2></div>
+지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.
 
+
+```TypeScript
+const onClickCenter = useCallback(
+    async (id: number) => {
+      // 지도위에서 센터를 선택하거나 왼쪽 센터리스트에서 선택한 경우
+      try {
+        API.get(`center/${id}`).then((res) => {
+          setSelectCenter(res.data.center);
+          // selectCenter를 이용해 상세 페이지 데이터 출력
+
+          router.replace(
+            `map?${objectToQueryString({ ...router.query, center: id })}`
+          );
+          // url 변경 center=해당 어린이집 id 값으로
+          if (!naverMap) {
+            return null;
+          }
+
+          naverMap.setCenter(
+            new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
+          );
+          naverMap.setZoom(naverMap.getZoom() < 15 ? naverMap.getZoom() : 15);
+          // 맵 가운데로 이동 및 줌 레벨이 15 밑 일 경우 자세한 위치를 위해 15로 고정
+        });
+      } catch (error) {
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
+      }
+    },
+    [naverMap, router]
+  );
+``` 
+
+```TypeScript
+@Get(':id')
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    const findCenter = await this.centerService.findOne(id);
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '정보 받아오기 완료',
+      center: findCenter,
+    });
+  }
+```
+컨트롤러 부분 @Get(':id') 을 통해 cetner/10 이라는 요청을 하였을때 캐치 할 수 있도록 하였습니다
+
+@Param("id") 를 통해 파라미터 "id" 로 전달된 값을 받을 수 있도록 하였습니다.
+
+
+```ts
+async findOne(id: string) {
+    let findCenter = await this.centerRepository.findOne({
+      where: {
+        id: +id,
+      },
+    });
+    if (!findCenter) {
+      throw new HttpException('존재하지 않는 센터입니다', 400);
+    }
+    if (findCenter.code.length === 0) {
+      // 찾은 센터명에서 코드가 없을 경우
+      const formData = new FormData();
+
+      formData.append('latitude', `${findCenter.lat}`);
+      formData.append('longitude', `${findCenter.lon}`);
+      formData.append('distance', '1');
+      // 폼데이터 생성 및 위도 경도 거리 필수 데이터 추가후
+
+      const response = await axios.post(
+        'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+        },
+      );
+
+      if (Array.isArray(response.data)) {
+        // 배열인지 여부 확인
+        const apiFindCenter = response.data.find(
+          (v) =>
+            (+v.latitude == +findCenter.lat &&
+              +v.longitude == +findCenter.lon) ||
+            v.name === findCenter.name,
+          // 위도 경도가 같거나 이름이 같은 경우
+        );
+
+        await this.centerRepository.update(
+          {
+            id: findCenter.id,
+          },
+          {
+            code: apiFindCenter.id,
+          }, // code 명을 변경 해준뒤
+        );
+        findCenter.code = apiFindCenter.id;
+        // 기존에 찾은 findCenter의 code값을 변경
+      }
+    }
+    return findCenter;
+  }
+```
+테이블 id 기준으로 어린이집을 찾고 어린이집이 없을 경우 에러를 발생시킵니다.
+
+찾은 어린이집이 code명이 없을경우 별도의 API를 호출하여 해당하는 값을 찾아 업데이트 후 code 값을 변경하여 리턴 해주도록 하였습니다. 
 
