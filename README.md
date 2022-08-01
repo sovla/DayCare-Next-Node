@@ -45,137 +45,178 @@
 
 ![](https://velog.velcdn.com/images/gavri/post/bc28bcf1-88be-4503-8e11-0aa18d3fd46a/image.png)
 </div>
-<div align="center" ><h2>네이버 지도 마커 표시</h2></div>
-<div align="center" ><p>네이버 지도 마커 표시의 경우 API 통신하는 함수와 마커 찍는 함수를 별도로 구성해 1함수 1액션원칙을 지켰습니다.<p></div>
+<div align="center" ><h2>로그인</h2></div>
+로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.
 
-```
-const onClickSearch = useCallback(() => {
-    // 지도에서 이 위치에서 검색 버튼을 눌럿을때
-    if (!naverMap) {
-      // 네이버 지도가 없는 상태로 전달시 return null;
-      return null;
-    }
-
-    API.get<getCentersType['response']>('center', {
-      params: {
-        // 필터링 기능 및 지도 가운데 위치 파라미터
-        lon: naverMap.getCenter().x,
-        lat: naverMap.getCenter().y,
-        type: filter?.type?.join(','),
-        city: filter?.city,
-        city_detail: filter?.cityDetail,
-        max: filter?.personnel,
-        employee: filter.employee.map(changeFilterData).join(','),
-        empty_class: filter.classType.map(changeFilterData).join(','),
-        property: filter.characteristic.map(changeFilterData).join(','),
-        employee_count: filter.employeeCount,
-        radius: 500,
-      },
-    })
-      .then((response) => {
-        // 성공시
-        // 어린이집 검색시 해당 주소를 기입해 url 공유시 바로 같은 화면이 보이도록 설정
-        router.replace(
-          `map?${objectToQueryString({
-            ...router.query,
-            lat: naverMap.getCenter().y,
-            lon: naverMap.getCenter().x,
-          })}`
-        );
-        // 센터 리스트
-        setCenterList(response.data.center);
-        // 마커 만드는 함수에 센터 리스트 파라미터 넘겨주기.
-        createMarkers(response.data.center);
-      })
-      .catch((error) => {
-        if (error instanceof TypeError) {
-          return;
-        }
-        // 타입 에러가 아닌 경우 에러 표시
-        dispatch(
-          changeError({
-            errorStatus: error,
-            isShow: true,
-          })
-        );
-      });
-  }, [naverMap, onClickCenter, filter, router.query]);
-```
-마커 표시용 함수
-```
- const createMarkers = useCallback(
-    (centers: centerType[]) => {
-      // 마커를 만드는 함수
-      if (!naverMap) {
-        return;
-      }
-      // 현재 마커를 담을 변수
-      const markers: naver.maps.Marker[] = [];
-
-      for (let index = 0; index < centers.length; index += 1) {
-        const center = centers[index];
-
-        const marker = new naver.maps.Marker({
-          map: naverMap,
-          // 포지션은 center 위도 경도 기준으로
-          position: new naver.maps.LatLng(+center.lat, +center.lon),
-          // 제목은 센터 이름으로
-          title: center.name,
-          // 선택가능
-          clickable: true,
-        });
-
-        // 마커 선택시 나오는 html
-        const infowindow = new naver.maps.InfoWindow({
-          content: [
-            '<div id="marker" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> ',
-            `<span class="ico _icon">${center.name}</span>`,
-            '<span class="shd"></span>',
-            '</div>',
-          ].join(''),
-        });
-        // 마커에 이벤트 속성 걸어주기
-        // 표시 - 마우스다운, 마우스 위로 올렸을때, 모바일 환경에서 선택시(click)
-        // 삭제 - 마우스 벗어난 경우
-        marker.addListener('mousedown', () => {
-          infowindow.open(naverMap, marker);
-        });
-        marker.addListener('mouseover', () => {
-          infowindow.open(naverMap, marker);
-        });
-        marker.addListener('mouseout', () => {
-          infowindow.close();
-        });
-        marker.addListener('click', () => {
-          // 선택시 상세 정보 표시
-          onClickCenter(center.id);
-          if (infowindow.getMap()) {
-            infowindow.open(naverMap, marker);
-          }
-        });
-        markers.push(marker);
-      }
-      setMapMarkers((prev) => {
-        prev.forEach((v) => {
-          // 이전 마커들 이벤트 해제
-          v.clearListeners('click');
-          v.clearListeners('mouseout');
-          v.clearListeners('mouseover');
-          v.clearListeners('mousedown');
-          // 많은 마커가 생길경우 성능 이슈로 인한 마커 해제
-          v.setMap(null);
-        });
-        // 새로운 마커들로 상태 바꿔주기
-        return markers;
-      });
-      // 현재 위치 설정
-      setLocation({
-        lat: naverMap.getCenter().y,
-        lon: naverMap.getCenter().x,
-      });
+```TypeScript
+const { api: loginApi } = useApi<sessionLoginType>({
+    url: '/session',
+    data: {
+      email,
+      password,
     },
-    [naverMap, onClickCenter]
+    method: 'post',
+  });
+
+  const loginApiHandle = useCallback(async () => {
+    try {
+      if (!RegExp.isEmail(email)) {
+        // RegExp 클래스 : 정규식 또는 문자열 수 등을 테스트해 결과에 맞으면 true 틀리면 false를 리턴
+        throw new Error('이메일 형식이 아닙니다.');
+      }
+      if (!RegExp.stringLength(password, 6, 20)) {
+        throw new Error('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
+      }
+      const response = await loginApi();
+      if (response.data.statusCode === 200) {
+        //  로그인성공
+
+        dispatch(changeUser(response.data.user));
+      }
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
+    }
+  }, [email, password]);
+```
+useApi Custom Hook & Type
+
+```TypeScript
+const useApi = <T extends APIType>({
+  url,
+  data,
+  method,
+}: {
+  url: T['url'];
+  data: T['request'];
+  method: T['method'];
+}) => {
+  //  공통적인 api를 핸들링하기 위한 훅
+  const [isLoading, setIsLoading] = useState(false);
+
+  const api = useCallback(
+    async (optionalData?: Partial<T['request']>) => {
+      // Partial 유틸타입의 경우 기존 T["request"] 타입 전체를 옵셔널로 받게 됩니다.
+      // optionalData 를 통해 별도의 데이터를 합쳐 API 요청을 합니다.
+      setIsLoading(true);
+      const requestData = {
+        ...data,
+        ...optionalData,
+      };
+      const response = (await API({
+        //  method = "Post" | "Get" ...
+        method,
+        //  Data의 경우 get이 아닌 경우에만 추가하도록 하였습니다.
+        data: method !== 'get' ? requestData : null,
+        url,
+        //  파라미터의 경우 get 메소드인 경우 추가하도록 하였습니다.
+        params: method === 'get' ? requestData : null,
+      })) as AxiosResponse<T['response'], T['request']>;
+      setIsLoading(false);
+      return response;
+    },
+    [data, method, url]
   );
 
+  return { isLoading, api };
+};
+
+interface sessionLoginType extends APIType {
+  url: '/session';
+  method: 'post';
+  request: {
+    email: string;
+    password: string;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    user: {
+      id: number;
+      email: string;
+      name: string;
+    };
+  };
+}
+
 ```
+
+공통적인 기능인 API 호출에 대해 커스텀 훅을 통해 관리하여 중복되던 기존 소스량을 줄였습니다.
+
+TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 useApi<sessionLoginType>에 선언할 경우 리턴 되는 값 또는 필수 값이 제대로 들어오지 않을 경우 타입에러를 일으켜 잘못된 데이터가 들어오는 것을 방지하였습니다.
+
+```TypeScript
+// Controller
+@Post()
+  async login(
+    @Res() res: Response,
+    @Body() loginDto: LoginDTO,
+  ) {
+ const findUser = await this.sessionService.login(loginDto);
+
+    const accessToken = this.jwtService.sign({
+      // 필요한 정보만 sign하여 보내기
+      id: findUser.id,
+      name: findUser.name,
+      email: findUser.email,
+    });
+
+    res.statusCode = 200;
+    res.setHeader('access-control-expose-headers', 'Set-Cookie');
+    // JWT Token 을 cookie 저장하기 위해
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // credentials 옵션
+    // - same-origin: 같은 출처간 요청에만 인증정보를 담을 수 있다
+    // - include : 모든 요청에 인증정보를 담을 수 있다.
+    // - omit : 모든 요청에 인증 정보를 담지 않는다
+    // 자격 증명 모드 include에 해당 하며 Access-Control-Allow-Credentials = true
+    // Access-Control-Allow-Origin !== "*" 와일드 카드가 아니여야 서버에서 보내는 쿠키를 저장할 수 있다.
+
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      // httpOnly 속성의 경우 자바스크립트 속성에서 접근이 불가하다.
+      maxAge: 24 * 60 * 60 * 1000,
+      // 24hours
+    });
+    return res.send({
+      statusCode: res.statusCode,
+      message: `${findUser.name}님 로그인 성공하셨습니다.`,
+      user: {
+        id: findUser.id,
+        name: findUser.name,
+        email: findUser.email,
+      },
+    });
+  }
+
+// Service
+ async login(loginDto: LoginDTO) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        email: loginDto.email,
+      },
+    });
+    if (!findUser) {
+      throw new HttpException('아이디와 비밀번호를 확인해주세요.', 401);
+    }
+    const validatePassword = await bcrypt.compare(
+      // 암호화한 비밀번호와 대조
+      loginDto.password,
+      findUser.password,
+    );
+
+    if (!validatePassword) {
+      throw new HttpException('비밀번호가 틀립니다.', 401);
+    }
+
+    return findUser;
+  }
+```
+
+로그인 성공시 JWT 토큰을 발급하였으며 이후에 유저 권한이 필요한 API 호출시 쿠키에 저장된 토큰과 ID 값을 대조해 일치하지 않거나 위조된 토큰의 경우 에러를 발생시키도록 하였습니다. 
+
 
