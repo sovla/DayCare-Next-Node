@@ -486,7 +486,7 @@ const onClickSearch = useCallback(() => {
 ```
 API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현재 위치에 맞게 변경 해줍니다. 
 
-(ex: daycare-center.shop?lat=37&lon=127) 해당 URL 의 경우 공유 목적으로 변경 해주었습니다.
+(ex: daycare-center.shop?lat=37&lon=127) 해당 URL의 경우 공유시 선택한 위치를 기준으로 바로 보이게끔 작업 했습니다.
 
 그리고 어린이집 배열을 상태에 저장해주고 네이버 지도 마커를 그리는 함수에 파라미터로 전달합니다.
 
@@ -752,8 +752,8 @@ async findOne(id: string) {
         },
       );
 
-      if (Array.isArray(response.data)) {
-        // 배열인지 여부 확인
+      if (response.data &&Array.isArray(response.data)) {
+        // 데이터가 존재하고 배열인지 확인 
         const apiFindCenter = response.data.find(
           (v) =>
             (+v.latitude == +findCenter.lat &&
