@@ -227,6 +227,205 @@ TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 넣게 만�
 
 JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참조하지 못하도록 하였습니다. 그리고 유저 권한이 필요한 API를 호출 할때 해당 쿠키를 읽어와 JWT 검사를 통해 사인한 쿠키가 맞는지 확인하는 절차를 거쳤습니다.
 
+<div align="center" ><h2>회원가입</h2></div>
+회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).
+
+
+```TypeScript
+const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      async (e) => {
+        //  회원가입 API 핸들러
+        e.preventDefault();
+
+        try {
+          if (!RegExp.stringLength(name, 2, 20)) {
+            throw new Error('이름은 2 ~ 20자 이내로 입력해주세요.');
+          }
+          if (!RegExp.stringLength(password, 6, 20)) {
+            throw new Error('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
+          }
+
+          if (!RegExp.isEmail(email)) {
+            throw new Error('이메일 형식이 아닙니다.');
+          }
+
+          if (verificationCode.length !== 6) {
+            throw new Error('인증코드는 6자리입니다.');
+          }
+
+          const response = await signUpApi();
+          if (response.data.statusCode === 200) {
+            //  회원가입 성공시 바로 로그인 되도록 전역 user 상태 변경
+            dispatch(changeUser(response.data.user));
+          }
+        } catch (error) {
+          // 에러 발생 시 전역 error 상태를 변경
+          dispatch(
+            changeError({
+              errorStatus: error,
+              isShow: true,
+            })
+          );
+        }
+      },
+      [email, name, password, verificationCode]
+    );
+
+ const { api: signUpApi } = useApi<userSignUpType>({
+    url: '/user',
+    data: {
+      email,
+      name,
+      password,
+      verificationCode,
+    },
+    method: 'post',
+  });
+```
+
+
+```TypeScript
+@Post()
+  @UsePipes(ValidationPipe)
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    // 회원가입
+    const insertData = await this.userService.create(createUserDto);
+
+    if (!insertData) {
+      throw new HttpException('회원가입에 실패하셨습니다', 400);
+    }
+    const accessToken = this.jwtService.sign({
+      // JWT 토큰 사인
+      id: insertData.id,
+      name: insertData.name,
+      email: insertData.email,
+    });
+
+    res.statusCode = 200;
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24hours
+    });
+    return res.send({
+      statusCode: res.statusCode,
+      message: `${insertData.name}님의 회원가입에 성공하였습니다.`,
+      user: {
+        id: insertData.id,
+        name: insertData.name,
+        email: insertData.email,
+      },
+    });
+  }
+```
+로그인 과 마찬가지로 회원가입에 성공하였을 경우 사인한 JWT토큰은 httpOnly 쿠키에 저장해 보낸다.
+
+```ts
+async create(createUserDto: CreateUserDto) {
+    const userFind: User = await this.userRepository.findOne({
+      where: {
+        email: createUserDto.email,
+      },
+    });
+    if (userFind) {
+      throw new HttpException(
+        '이미 사용중인 Email입니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const privateUser = await this.transformPassword(createUserDto);
+
+    const verificationCode = await this.cacheManager.get(createUserDto.email);
+    if (!verificationCode) {
+      throw new HttpException(
+        '이메일 중복체크 및 인증코드가 발급되지 않았습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (verificationCode !== createUserDto.verificationCode) {
+      throw new HttpException(
+        '이메일 인증코드가 맞지 않습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const insertData = await this.userRepository.save({
+      email: privateUser.email,
+      name: privateUser.name,
+      password: privateUser.password,
+    });
+
+    return insertData;
+  }
+
+  async transformPassword(user: CreateUserDto): Promise<CreateUserDto> {
+    user.password = await bcrypt.hash(user.password, 10);
+    // 해싱이란 특정 알고리즘을 통해 인간이 해독하지 못하는 문자열로 변형
+    // 해싱 특징
+    // 1. 단방향이다. 되돌릴 수 없다
+    // 2. 동일한 입력값 동일한 출력 값을 갖는다
+    // 3. 입력값의 일부만 변경되어도 전혀 다른 출력값을 갖는다
+    // ++ 이러한 특징에 Salt라는 랜덤한 값을 추가해 보안을 강화한다
+    // bcrypt.hash(문자열,Salt문자열 길이)
+    return user;
+  }
+```
+회원 가입시 이미 사용중인 이메일, 이메일 인증 코드가 맞지 않을경우, 이메일 중복체크 및 인증코드 발송을 하지 않은 경우 에러를 발생시켰습니다.
+
+비밀번호의 경우 해싱을 통해 보안을 강화 하였습니다.
+
+```ts
+async verifyEmail(email: string) {
+    // 이메일 중복 확인 및 인증코드 발송 
+    const findUser = await this.userRepository.findOne({
+      where: { email: email },
+    });
+
+    if (findUser) {
+      throw new HttpException(
+        '이미 사용중인 email입니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const transporter = nodemailer.createTransport({
+      // 사용하고자 하는 서비스, gmail계정으로 전송할 예정이기에 'gmail'
+      service: 'gmail',
+      // host를 gmail로 설정
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        // Gmail 주소 입력,
+        user: process.env.NODEMAILER_USER,
+        // Gmail 패스워드 입력
+        pass: process.env.NODEMAILER_PASS,
+      },
+    });
+    const random: string = (Math.random() * 900000 + 100000).toFixed();
+    // 6자리 임의의 값
+    await transporter.sendMail({
+      from: `"DayCare " <${process.env.NODEMAILER_USER}>`,
+      // 보내는 곳의 이름과, 메일 주소를 입력
+      to: email,
+      // 받는 곳의 메일 주소를 입력
+      subject: 'DayCare 메일 인증 요청입니다.',
+      // 보내는 메일의 제목을 입력
+      html: `<p>인증번호 : [<b>${random}</b>]</p>`,
+      // html: html로 작성된 내용
+    });
+
+    this.cacheManager.set(email, random, { ttl: 300 });
+    // 이메일 인증코드 캐시에 저장 300초 default 의 경우 5초
+
+    return random;
+  }
+```
+이메일 중복 체크시 이메일이 DB에서 조회 될 경우 에러를 발생 시켰습니다.
+
+Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드를 저장하여 사용했습니다.
+
 
 
 
