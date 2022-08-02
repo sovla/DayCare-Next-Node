@@ -38,7 +38,10 @@
 ![](https://velog.velcdn.com/images/gavri/post/bc28bcf1-88be-4503-8e11-0aa18d3fd46a/image.png)
 </div>
 <div align="center" id="로그인" ><h2>로그인</h2></div>
-로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.
+<div align="center">로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.</div>
+<br/>
+<br/>
+
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300568-2dd2f41b-13ca-45d6-91db-de54922da65e.gif" alt="로그인" align="center" style="width:100%;minWidth:800px;" /> 
@@ -224,7 +227,10 @@ TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 넣게 만�
 JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참조하지 못하도록 하였습니다. 그리고 유저 권한이 필요한 API를 호출 할때 해당 쿠키를 읽어와 JWT 검사를 통해 사인한 쿠키가 맞는지 확인하는 절차를 거쳤습니다.
 
 <div align="center" id="회원가입" ><h2>회원가입</h2></div>
-회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).
+<div align="center">회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).</div>
+<br/>
+<br/>
+
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182303235-ef5d9083-bf37-4f1d-b32b-1b54067a2a7e.gif" alt="회원가입" align="center" style="width:100%;minWidth:800px;" /> 
@@ -428,19 +434,26 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 
 
 <div align="center" id="네이버지도마커표시" ><h2>네이버 지도 마커 표시</h2></div>
-네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.
 
+<div align="center">네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.</div>
+<br/>
+<br/>
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182303654-c89716e5-1099-4cd1-a400-1de440c34b8b.gif" alt="필터링" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
+<div align="center">
 
 > 지도 필터링 기능 
 
+</div>
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300578-ff98e4e0-23a5-4160-ba80-4f159ff841cf.gif" alt="지도 위치 선택" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
+<div align="center">
 
 > 현재 위치 아이콘 누를시 
+
+</div>
 ```TypeScript
 const onClickSearch = useCallback(() => {
     // 지도에서 이 위치에서 검색 버튼을 눌럿을때
@@ -677,8 +690,10 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
 ```
 여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
 <div align="center" id="센터상세히보기" ><h2>센터 상세히 보기</h2></div>
-지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.
 
+<div align="center">지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.</div>
+<br/>
+<br/>
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300577-f3408054-2e63-47d1-9826-2d2660e07364.gif" alt="지도 마커선택" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
