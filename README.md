@@ -238,6 +238,18 @@ JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참
 
 
 ```TypeScript
+
+const { api: signUpApi } = useApi<userSignUpType>({
+    url: '/user',
+    data: {
+      email,
+      name,
+      password,
+      verificationCode,
+    },
+    method: 'post',
+  });
+
 const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       async (e) => {
@@ -278,17 +290,11 @@ const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
       [email, name, password, verificationCode]
     );
 
- const { api: signUpApi } = useApi<userSignUpType>({
-    url: '/user',
-    data: {
-      email,
-      name,
-      password,
-      verificationCode,
-    },
-    method: 'post',
-  });
+ 
 ```
+회원 가입시 정규식 검사를 프론트엔드, 백엔드에서 각각 검증하였습니다.
+
+성공시 바로 로그인처리가 되도록 구현 하였고, 실패시 전역 상태 error 를 통해 에러 메시지를 나타나게끔 하였습니다.
 
 
 ```TypeScript
@@ -324,7 +330,7 @@ const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
     });
   }
 ```
-로그인 과 마찬가지로 회원가입에 성공하였을 경우 사인한 JWT토큰은 httpOnly 쿠키에 저장해 보낸다.
+로그인 과 마찬가지로 회원가입에 성공하였을 경우 사인한 JWT토큰은 httpOnly 쿠키에 저장해 보냅니다
 
 ```ts
 async create(createUserDto: CreateUserDto) {
@@ -443,7 +449,7 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 </div>
 <div align="center">
 
-> 지도 필터링 기능 
+지도 필터링 기능 
 
 </div>
 <div align="center">
@@ -451,7 +457,7 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 </div>
 <div align="center">
 
-> 현재 위치 아이콘 누를시 
+현재 위치 아이콘 누를시 
 
 </div>
 ```TypeScript
