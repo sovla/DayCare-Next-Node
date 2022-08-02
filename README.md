@@ -460,6 +460,7 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 현재 위치 아이콘 누를시 
 
 </div>
+
 ```TypeScript
 const onClickSearch = useCallback(() => {
     // 지도에서 이 위치에서 검색 버튼을 눌럿을때
@@ -513,6 +514,7 @@ const onClickSearch = useCallback(() => {
       });
   }, [naverMap, onClickCenter, filter, router.query]);
 ```
+
 API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현재 위치에 맞게 변경 해줍니다. 
 
 (ex: daycare-center.shop?lat=37&lon=127) 해당 URL의 경우 공유시 선택한 위치를 기준으로 바로 보이게끔 작업 했습니다.
