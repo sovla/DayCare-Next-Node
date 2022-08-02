@@ -1091,3 +1091,129 @@ async updateReview(updateReviewDto: UpdateReviewDto) {
 리뷰 업데이트 서비스의 경우 먼저 해당 리뷰가 정상적인 리뷰인지 확인을 하고 올바르지 않은 리뷰의 경우 에러를 발생 시켰습니다.
 
 업데이트시 업데이트 날짜를 DateTime 형식에 맞게 변경해주었습니다. 
+
+<div align="center" ><h2>게시판 삭제</h2></div>
+
+```TypeScript
+export interface reviewDeleteType extends APIType {
+  url: '/review';
+  method: 'delete';
+  request: {
+    review_id: number;
+    id: number;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+  };
+}
+
+  const { api: reviewDeleteApi } = useApi<reviewDeleteType>({
+    url: '/review',
+    data: {
+      id: user.auth.id,
+      review_id: review.id,
+    },
+    method: 'delete',
+  });
+
+  const reviewDeleteApiHandle = useCallback(async () => {
+    // 리뷰 삭제 API 핸들 함수
+    try {
+      if (!user.auth) {
+        // 로그인 여부 확인
+        throw new Error('로그인 후 이용 가능 합니다.');
+      }
+
+      const response = await reviewDeleteApi();
+      if (response.data.statusCode === 200) {
+        router.replace('/board');
+        // 삭제된 리뷰로 돌아오지 못하도록 설정
+      }
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
+      // 에러 핸들
+    }
+  }, [reviewDeleteApi, router, user.auth]);
+```
+삭제의 경우 유저의 id 와 review_id값을 통해 글쓴이 본인만 삭제가 가능하도록 하였습니다.
+
+로그인 하지 않은 유저가 임의로 해당 메소드를 실행시키면 에러를 발생하도록 하였습니다.
+
+리뷰 삭제 성공시 삭제된 리뷰에는 접근이 불가하여 replace를 통해 해당 화면으로 돌아오지 못하도록 하였습니다.
+
+
+
+
+```ts
+  @Delete()
+  // review Method Delete 요청에 대한 캐치
+  @UsePipes(ValidationPipe)
+  @UseGuards(JWTGuard)
+  // 정규식 및 JWT 체크
+  async removeReview(
+    @Body() deleteReviewDto: DeleteReviewDTO,
+    @Res() res: Response,
+  ) {
+    await this.reviewService.removeReview(deleteReviewDto);
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: '리뷰 삭제 완료',
+    });
+  }
+
+
+export class DeleteReviewDTO {
+  @IsNotEmpty()
+  id: number;
+
+  @IsNotEmpty()
+  review_id: number;
+}
+
+
+```
+리뷰 삭제의 경우 DELETE 메소드를 활용해 진행하였고, 데이터 정규식 체크 및 JWT 체크를 하였습니다.
+
+
+
+
+
+
+```ts
+    async removeReview(deleteReviewDto: DeleteReviewDTO) {
+    // 리뷰 삭제 서비스
+    const findReview = await this.reviewRepository.findOne({
+      where: {
+        id: deleteReviewDto.review_id,
+        delete_date: IsNull(),
+        // 삭제된 리뷰의 경우 두번 삭제가 불가하므로 체크
+      },
+      select: {
+        id: true,
+        // 필요한 데이터만 받아오기
+      },
+    });
+
+    if (!findReview) {
+      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    }
+
+    const saveReview = this.reviewRepository.save({
+      id: findReview.id,
+      delete_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+      // DateTime 형식에 맞게 변경
+    });
+
+    return saveReview;
+  }
+```
+이미 삭제된 리뷰에 대해서 에러를 발생시키도록 하였고, 
+
+delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 삭제된 리뷰에 대해 분별할 수 있는 값을 넣었습니다.
