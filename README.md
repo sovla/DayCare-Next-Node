@@ -1,4 +1,3 @@
-
 <div align=center><h1> DayCare-Center - 개인프로젝트</h1></div>
 
 안녕하세요 웹 개발자를 지망하는 김준한입니다. 먼저 제 포트폴리오를 보러 와주셔서 감사드립니다. 제가 만든 포트폴리오는 네이버 지도 기반 어린이집 찾기 서비스 입니다. 제가 이 서비스를  만든 이유는 공공 데이터 API에서 어린이집 관련 API가 잘 되어 있엇고, 기존 서비스 어린이집 찾기 서비스에서 개선하면 좋을것 같은 점이 많아 프로젝트를 진행하였습니다.
@@ -41,7 +40,7 @@
 <div align="center" id="로그인" ><h2>로그인</h2></div>
 로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.
 
-![로그인](https://user-images.githubusercontent.com/41351496/182300568-2dd2f41b-13ca-45d6-91db-de54922da65e.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300568-2dd2f41b-13ca-45d6-91db-de54922da65e.gif" alt="로그인" align="center" style="width:70%;margin-left:15%" /> 
 
 ```TypeScript
 
@@ -225,7 +224,8 @@ JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참
 <div align="center" id="회원가입" ><h2>회원가입</h2></div>
 회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).
 
-![회원가입](https://user-images.githubusercontent.com/41351496/182300573-36af5bba-a4f5-4979-9465-141a480c0b9b.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300573-36af5bba-a4f5-4979-9465-141a480c0b9b.gif" alt="회원가입" align="center" style="width:70%;margin-left:15%" /> 
+
 
 ```TypeScript
 const onClickSignUpHandle: React.MouseEventHandler<HTMLButtonElement> =
@@ -426,9 +426,9 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 <div align="center" id="네이버지도마커표시" ><h2>네이버 지도 마커 표시</h2></div>
 네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.
 
-![필터링](https://user-images.githubusercontent.com/41351496/182300571-211c4345-ce5c-49e6-807f-0372092c9a62.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300571-211c4345-ce5c-49e6-807f-0372092c9a62.gif" alt="필터링" align="center" style="width:70%;margin-left:15%" /> 
 
-![지도 위치 선택 (2)](https://user-images.githubusercontent.com/41351496/182300578-ff98e4e0-23a5-4160-ba80-4f159ff841cf.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300578-ff98e4e0-23a5-4160-ba80-4f159ff841cf.gif" alt="지도 위치 선택" align="center" style="width:70%;margin-left:15%" /> 
 ```TypeScript
 const onClickSearch = useCallback(() => {
     // 지도에서 이 위치에서 검색 버튼을 눌럿을때
@@ -667,7 +667,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
 <div align="center" id="센터상세히보기" ><h2>센터 상세히 보기</h2></div>
 지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.
 
-![지도 마커선택](https://user-images.githubusercontent.com/41351496/182300577-f3408054-2e63-47d1-9826-2d2660e07364.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300577-f3408054-2e63-47d1-9826-2d2660e07364.gif" alt="지도 마커선택" align="center" style="width:70%;margin-left:15%" /> 
 
 ```TypeScript
 const onClickCenter = useCallback(
@@ -782,7 +782,8 @@ async findOne(id: string) {
 
 <div align="center" id="게시판작성" ><h2>게시판 작성</h2></div>
 
-![게시글 작성](https://user-images.githubusercontent.com/41351496/182300564-ab9a84cd-7fab-480c-9be3-50e152d41889.gif)
+
+<img src="https://user-images.githubusercontent.com/41351496/182300564-ab9a84cd-7fab-480c-9be3-50e152d41889.gif" alt="게시글 작성" align="center" style="width:70%;margin-left:15%" /> 
 ```TypeScript
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
@@ -960,7 +961,8 @@ async writeReview(createReviewDto: CreateReviewDto) {
 
 <div align="center" id="게시판수정" ><h2>게시판 수정</h2></div>
 
-![게시글 수정](https://user-images.githubusercontent.com/41351496/182300561-dbe05e57-91ef-4c9c-ad8a-86cdf42547ff.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300561-dbe05e57-91ef-4c9c-ad8a-86cdf42547ff.gif" alt="게시글 수정" align="center" style="width:70%;margin-left:15%" /> 
+
 ```TypeScript
  {user.auth && review.user.id === user.auth.id && (
             <>
@@ -1089,7 +1091,8 @@ async updateReview(updateReviewDto: UpdateReviewDto) {
 
 <div align="center" id="게시판삭제" ><h2>게시판 삭제</h2></div>
 
-![게시글 삭제](https://user-images.githubusercontent.com/41351496/182300555-4032248b-47fd-4f6a-9db6-26a50bb1835b.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300555-4032248b-47fd-4f6a-9db6-26a50bb1835b.gif" alt="게시글 삭제" align="center" style="width:70%;margin-left:15%" /> 
+
 ```TypeScript
 export interface reviewDeleteType extends APIType {
   url: '/review';
@@ -1210,7 +1213,7 @@ delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 �
 
 <div align="center" id="게시판좋아요" ><h2>게시판 좋아요</h2></div>
 
-![게시글 좋아요 및 댓글 좋아요](https://user-images.githubusercontent.com/41351496/182300566-ce978e05-6ba8-43a7-8513-a6dc82b3e47b.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300566-ce978e05-6ba8-43a7-8513-a6dc82b3e47b.gif" alt="게시글 삭제" align="center" style="width:70%;margin-left:15%" /> 
 ```TypeScript
 
 export interface reviewLikeType extends APIType {
@@ -1356,7 +1359,8 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
 
 <div align="center" id="게시판리스트" ><h2>게시판 리스트</h2></div>
 
-![페이징](https://user-images.githubusercontent.com/41351496/182300570-d98c484c-dad6-4327-8fbb-c19fb9acce20.gif)
+<img src="https://user-images.githubusercontent.com/41351496/182300570-d98c484c-dad6-4327-8fbb-c19fb9acce20.gif" alt="게시글 삭제" align="center" style="width:70%;margin-left:15%" /> 
+
 ```TypeScript
 
 export interface reviewGetListTypeWithCategoryId extends APIType {
