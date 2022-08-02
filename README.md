@@ -88,7 +88,7 @@
 참조: 프로젝트 설계 과정 
 <a href="https://velog.io/@gavri/ToyProject-%EC%84%A4%EA%B3%84">https://velog.io/@gavri/ToyProject-%EC%84%A4%EA%B3%84</a>
 
-참조: <a href="https://github.com/sovla/DayCare-Next-Node/blob/master/Source.md">개발 소스 정리본</a>
+참조: 기능별 소스 정리 <a href="https://github.com/sovla/DayCare-Next-Node/blob/master/Source.md">https://github.com/sovla/DayCare-Next-Node/blob/master/Source.md</a>
 
 ## Next
 
