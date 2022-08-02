@@ -434,6 +434,7 @@ async verifyEmail(email: string) {
     return random;
   }
 ```
+
 이메일 중복 체크시 이메일이 DB에서 조회 될 경우 에러를 발생 시켰습니다.
 
 Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드를 저장하여 사용했습니다.
@@ -596,6 +597,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
     [naverMap, onClickCenter]
   );
 ```
+
 마커를 생성하고 해당 마커에 이벤트를 걸어 원하는 html 태그 혹은 함수를 실행하도록 하고 있습니다.
 
 그리고 많은 마커가 지도에 생길 경우 성능상의 이슈가 생겨 이전 마커는 제거 및 이벤트를 해제 해주었습니다.
@@ -619,6 +621,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
     });
   }
 ```
+
 컨트롤러 부분은 @Query를 이용해 쿼리스트링으로 넘어온 값들을 받았으며 해당 값을 service로 넘겨주었습니다.
 
 ```ts
@@ -696,6 +699,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
     return findCenterList;
   }
 ```
+
 여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
 <div align="center" id="센터상세히보기" ><h2>센터 상세히 보기</h2></div>
 
@@ -741,6 +745,7 @@ const onClickCenter = useCallback(
     [naverMap, router]
   );
 ``` 
+
 
 ```TypeScript
 @Get(':id')
@@ -823,6 +828,7 @@ async findOne(id: string) {
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300564-ab9a84cd-7fab-480c-9be3-50e152d41889.gif" alt="게시글 작성" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
+
 ```TypeScript
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
@@ -848,6 +854,7 @@ async findOne(id: string) {
       }
     };
 ``` 
+
 @toast-ui/react-editor 라이브러리를 이용해 글작성 페이지를 구성하였습니다. 
 
 해당 라이브러리의 경우 상태를 이용한 방식은 불가능하여 ref를 통해 값을 전달 받거나 보내도록 되어있습니다.
@@ -945,6 +952,7 @@ export class JWTGuard implements CanActivate {
   }
 }
 ```
+
 @Controller("review") 를 활용해 review로 들어오는 모든 요청을 컨트롤 했으며 
 
 @Post() 를 활용해  /review Method Post 요청에 대한 캐치를 하였습니다.
@@ -994,6 +1002,7 @@ async writeReview(createReviewDto: CreateReviewDto) {
       });
       return saveReview;
 ```
+
 리뷰 작성 서비스의 경우 유저가 정상적인 권한을 가진 유저인지 확인하는 과정을 거치고, 
 
 리뷰 테이블 형식에 맞도록 데이터를 삽입 했습니다.
@@ -1024,11 +1033,10 @@ async writeReview(createReviewDto: CreateReviewDto) {
             </>
           )}
 ``` 
+
 게시글 수정 기능, 삭제 기능은 작성자 본인만 수정,삭제가 가능하고
 
 로그인시 전역 상태에 저장된 유저 아이디(userId)와 작성자(writer)가 일치해야만 게시글 수정, 삭제 버튼이 보이게 구현하였습니다. 
-
-
 
 ```TypeScript
 export async function getServerSideProps(context: NextPageContext) {
@@ -1038,6 +1046,7 @@ export async function getServerSideProps(context: NextPageContext) {
   return { props: { review: response.data.review } };
 }
 ```
+
 수정 페이지의 경우 board/update/[id]로 이동하여 아이디 값을 동적으로 받을 수 있도록 하였습니다.
 
 Next의 getServerSideProps을 이용하여 서버단에서 API 호출 후 페이지를 만들어서 완성된 페이지가 바로 보이도록 하였습니다.
@@ -1072,7 +1081,9 @@ const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
       }
     };
 ```
+
 리뷰 수정의 경우 작성과 동일하게 코딩하였습니다.
+
 ```ts
   @Patch()
   // Patch: 리소스의 일부를 업데이트 한다
@@ -1097,6 +1108,7 @@ const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
 Put 과 Patch Http메소드중 Patch의 개념이 리뷰 수정과 비슷하다 생각하여 해당 메소드로 진행하였습니다.
 
 정규식 체크및 JWT 체크를 해주었습니다.
+
 ```ts
 async updateReview(updateReviewDto: UpdateReviewDto) {
     // 리뷰 업데이트 서비스
@@ -1126,6 +1138,7 @@ async updateReview(updateReviewDto: UpdateReviewDto) {
     return updateReview;
   }
 ```
+
 리뷰 업데이트 서비스의 경우 먼저 해당 리뷰가 정상적인 리뷰인지 확인을 하고 올바르지 않은 리뷰의 경우 에러를 발생 시켰습니다.
 
 업데이트시 업데이트 날짜를 DateTime 형식에 맞게 변경해주었습니다. 
@@ -1183,6 +1196,7 @@ export interface reviewDeleteType extends APIType {
     }
   }, [reviewDeleteApi, router, user.auth]);
 ```
+
 삭제의 경우 유저의 id 와 review_id값을 통해 글쓴이 본인만 삭제가 가능하도록 하였습니다.
 
 로그인 하지 않은 유저가 임의로 해당 메소드를 실행시키면 에러를 발생하도록 하였습니다.
@@ -1221,7 +1235,9 @@ export class DeleteReviewDTO {
 
 
 ```
+
 리뷰 삭제의 경우 DELETE 메소드를 활용해 진행하였고, 데이터 정규식 체크 및 JWT 체크를 하였습니다.
+
 ```ts
     async removeReview(deleteReviewDto: DeleteReviewDTO) {
     // 리뷰 삭제 서비스
@@ -1250,6 +1266,7 @@ export class DeleteReviewDTO {
     return saveReview;
   }
 ```
+
 이미 삭제된 리뷰에 대해서 에러를 발생시키도록 하였고, 
 
 delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 삭제된 리뷰에 대해 분별할 수 있는 값을 넣었습니다.
@@ -1259,6 +1276,7 @@ delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 �
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300566-ce978e05-6ba8-43a7-8513-a6dc82b3e47b.gif" alt="게시글 삭제" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
+
 ```TypeScript
 
 export interface reviewLikeType extends APIType {
@@ -1310,12 +1328,14 @@ const { api: reviewLikeApi } = useApi<reviewLikeType>({
     }
   }, [user.auth, review.id]);
 ```
+
 리뷰 좋아요의 경우 로그인한 유저에게만 보이도록 하였고, 로그인을 안한 유저가 임의로 함수를 실행 시키면
 에러를 발생시키도록 하였습니다.
 
 좋아요를 구현하면서 API 호출뒤 좋아요 상태가 바뀌면 사용자 입장에서는 렉으로 인식하게 됩니다.
 
 API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 값과 연동하는 과정을 거쳐 개선된 UX를 경험하게 하였습니다.
+
 ```ts
  @Get('/like/:review_id')
   // review/like/[review_id] 로 컨트롤
@@ -1338,9 +1358,11 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
   }
 
 ```
+
 리뷰 좋아요의 경우 review/like/["review_id"] 로 값을 전달 받았습니다. 
 
 그리고 좋아요를 누른 회원 id의 경우 쿼리스트링을 통해 전달받아 서비스 함수 파라미터로 전달 하였습니다.
+
 ```ts
    async likeReview(review_id: number, user_id: number) {
     // 리뷰 좋아요 서비스
@@ -1396,6 +1418,7 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
     // 좋아요 테이블에 데이터가 없다면? 삽입후 true 반환
   }
 ```
+
 받아온 리뷰 아이디 값과 유저 아이디 값을 통해 정상적인 리뷰,유저인지 확인을 거쳤고,
 
 리뷰 좋아요 테이블에 해당 데이터가 존재한다면 데이터를 삭제한 뒤 false를 반환
@@ -1407,6 +1430,7 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
 <div align="center">
 <img src="https://user-images.githubusercontent.com/41351496/182300570-d98c484c-dad6-4327-8fbb-c19fb9acce20.gif" alt="게시글 삭제" align="center" style="width:100%;minWidth:800px;" /> 
 </div>
+
 
 ```TypeScript
 
@@ -1461,6 +1485,7 @@ const { api: getReviewListApi, isLoading } =
   }, [getReviewListApi, isLoading]);
 
 ```
+
 게시판 리스트 또한 커스텀 훅과 APIType을 상속받은 인터페이스 타입을 이용해 공통적으로 작성하였습니다.
 
 페이징 기능을 위한 totalCount 값을 활용해 한 페이지당 10개씩 게시물을 나타내도록 작업 했습니다.
@@ -1485,6 +1510,7 @@ const { api: getReviewListApi, isLoading } =
         />
 
 ```
+
 해당 데이터를 뿌려주는 부분에서는 Table 컴포넌트를 활용했습니다. 
 
 boardList 배열을 통해 한줄 한줄 표시하도록 하였는데, 형식에 맞도록 map 함수를 활용해 변환시켜주었습니다.
@@ -1575,6 +1601,7 @@ async findList(id: number, page: number) {
     };
   }
 ```
+
 게시물 리스트의 경우 API 호출시 카테고리 번호와 페이지 번호를 받아와 10개의 게시물씩 출력하도록 하였습니다.
 
 잘못된 카테고리 번호를 가져올 경우 에러를 발생시켰고,
