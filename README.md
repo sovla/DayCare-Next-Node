@@ -1344,3 +1344,179 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
 리뷰 좋아요 테이블에 해당 데이터가 존재한다면 데이터를 삭제한 뒤 false를 반환
 
 리뷰 좋아요 테이블에 해당 데이터가 없다면 데이터를 삽입한 뒤 true를 반환하도록 하였습니다.
+
+<div align="center" id="게시판리스트" ><h2>게시판 리스트</h2></div>
+
+```TypeScript
+
+export interface reviewGetListTypeWithCategoryId extends APIType {
+  url: `/review/category/${number}`;
+  method: 'get';
+  request: {
+    page: number;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    review: reviewListType[];
+    totalCount: number;
+  };
+}
+
+
+const { api: getReviewListApi, isLoading } =
+    useApi<reviewGetListTypeWithCategoryId>({
+      url: `/review/category/${selectCategory}`,
+      data: {
+        page: selectPage,
+      },
+      method: 'get',
+    });
+
+  const getReviewListApiHandle = useCallback(async () => {
+    // category_id 기준 리뷰 받아오기
+    if (isLoading) {
+      // 다중 API 호출 방지
+      return;
+    }
+    try {
+      const response = await getReviewListApi();
+
+      if (response.data.statusCode === 200) {
+        setReviewList(response.data.review);
+        // 리뷰 리스트 상태에 넣어주기
+
+        setTotalCount(response.data.totalCount);
+      }
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
+      // error 핸들링
+    }
+  }, [getReviewListApi, isLoading]);
+
+```
+게시판 리스트 또한 커스텀 훅과 APIType을 상속받은 인터페이스 타입을 이용해 공통적으로 작성하였습니다.
+
+페이징 기능을 위한 totalCount 값을 활용해 한 페이지당 10개씩 게시물을 나타내도록 작업 했습니다.
+
+
+```ts
+<Table
+          selectPage={selectPage}
+          boardList={reviewList.map((v) => ({
+            category: `${v.id}`,
+            title: v.title,
+            likeCount: `${v.likes}`,
+            viewCount: `${v.view_count}`,
+            write: `${v.user.name}`,
+            writeDate: `${new Date(v.write_date)
+              .toISOString()
+              .substring(0, 10)
+              .replaceAll('-', '.')}`, // 2022. 07. 31 이런식으로 나타내기 위함
+            reviewCount: v.reply,
+            id: v.id,
+          }))}
+        />
+
+```
+해당 데이터를 뿌려주는 부분에서는 Table 컴포넌트를 활용했습니다. 
+
+boardList 배열을 통해 한줄 한줄 표시하도록 하였는데, 형식에 맞도록 map 함수를 활용해 변환시켜주었습니다.
+
+```ts
+@Get('/category/:id')
+  async findList(
+    @Param('id') id: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    // category_id 를 param 으로 받아옵니다.
+    // 페이징 기능을 위한 page 변수를 쿼리스트링으로 받아옵니다
+
+    const result = await this.reviewService.findList(+id, +page);
+
+    if (result.findReviews) {
+      res.statusCode = 200;
+      return res.send({
+        statusCode: res.statusCode,
+        message: '리뷰 받아오기 완료',
+        review: result.findReviews,
+        totalCount: result.totalCount,
+      });
+    }
+  }
+
+async findList(id: number, page: number) {
+    // 게시물 리스트 서비스
+    const findCategory = await this.categoryRepository.findOne({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!findCategory) {
+      // 잘못된 카테고리일 경우
+      throw new HttpException('존재하지 않는 카테고리입니다.', 400);
+    }
+
+    const [findReviews, totalCount] = await this.reviewRepository.findAndCount({
+      select: {
+        // API에 필요한 데이터만 true를 통해 가져가기
+        category_id: true,
+        center_id: true,
+        content: true,
+        delete_date: true,
+        id: true,
+        likes: true,
+        reply: true,
+        title: true,
+        update_date: true,
+        view_count: true,
+        write_date: true,
+        user: {
+          id: true,
+          name: true,
+        },
+      },
+      where: {
+        category_id: id,
+        // 전달 받은 id 값 기준으로
+        delete_date: IsNull(),
+        // 삭제된 데이터는 불러오지 않기
+      },
+      order: {
+        id: 'desc',
+        // id desc 기준으로
+      },
+      relations: ['user'],
+      // user 외래키 연결
+      take: 10 * page,
+      // take 끝 인덱스
+      skip: 10 * (page - 1) ? 10 * (page - 1) : 0,
+      // skip 첫 시작 인덱스 10 *(page - 1)이 1 이상이면 그값을 아니면 0을 
+    });
+
+    return {
+      findReviews: findReviews.map((v) => ({
+        ...v,
+        likes: v.likes.length, 
+        reply: v.reply.filter((v) => v.delete_date == null).length,
+      })),
+      totalCount,
+    };
+  }
+```
+게시물 리스트의 경우 API 호출시 카테고리 번호와 페이지 번호를 받아와 10개의 게시물씩 출력하도록 하였습니다.
+
+잘못된 카테고리 번호를 가져올 경우 에러를 발생시켰고,
+
+페이징 기능을 위해 page 변수를 받아와 첫 인덱스 끝 인덱스 값을 넣어 해당 되는 게시글만 출력할 수 있도록 
+하였습니다.
