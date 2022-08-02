@@ -1199,3 +1199,148 @@ export class DeleteReviewDTO {
 이미 삭제된 리뷰에 대해서 에러를 발생시키도록 하였고, 
 
 delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 삭제된 리뷰에 대해 분별할 수 있는 값을 넣었습니다.
+
+<div align="center" id="게시판좋아요" ><h2>게시판 좋아요</h2></div>
+
+```TypeScript
+
+export interface reviewLikeType extends APIType {
+  url: `/review/like/${number}`;
+  method: 'get';
+  request: {
+    id: number;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    like: boolean;
+  };
+}
+
+
+const { api: reviewLikeApi } = useApi<reviewLikeType>({
+    method: 'get',
+    url: `/review/like/${review.id}`,
+    data: {
+      id: user.auth.id,
+    },
+  });
+
+ const onClickReviewLike = useCallback(async () => {
+    // 리뷰 좋아요를 눌럿을때
+    try {
+      if (!user.auth) {
+        // 로그인 정보 확인
+        throw new Error('로그인 후 이용 가능 합니다.');
+      }
+      setIsLike((prev) => !prev);
+      // 좋은 사용자 경험을 위해 좋아요는 미리 값을 변경하고 API 호출 이후 서버 값과 연동
+
+      const response = await reviewLikeApi();
+
+      if (response.data.statusCode === 200) {
+        setIsLike(response.data.like);
+        // 좋아요 완료시 true 리턴 좋아요 해제시 false 리턴
+      }
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
+      // 에러 핸들
+    }
+  }, [user.auth, review.id]);
+```
+리뷰 좋아요의 경우 로그인한 유저에게만 보이도록 하였고, 로그인을 안한 유저가 임의로 함수를 실행 시키면
+에러를 발생시키도록 하였습니다.
+
+좋아요를 구현하면서 API 호출뒤 좋아요 상태가 바뀌면 사용자 입장에서는 렉으로 인식하게 됩니다.
+
+API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 값과 연동하는 과정을 거쳐 개선된 UX를 경험하게 하였습니다.
+```ts
+ @Get('/like/:review_id')
+  // review/like/[review_id] 로 컨트롤
+  async likeReview(
+    @Param('review_id') review_id: number,
+    // 파라미터로 전달되는 리뷰 아이디
+    @Query('id') id: number,
+    // 쿼리스트링으로 전달되는 유저 아이디 값
+    @Res() res: Response,
+  ) {
+    const result = await this.reviewService.likeReview(+review_id, +id);
+
+    res.statusCode = 200;
+
+    return res.send({
+      message: '좋아요 완료',
+      statusCode: res.statusCode,
+      like: result,
+    });
+  }
+
+```
+리뷰 좋아요의 경우 review/like/["review_id"] 로 값을 전달 받았습니다. 
+
+그리고 좋아요를 누른 회원 id의 경우 쿼리스트링을 통해 전달받아 서비스 함수 파라미터로 전달 하였습니다.
+```ts
+   async likeReview(review_id: number, user_id: number) {
+    // 리뷰 좋아요 서비스
+    const findReview = await this.reviewRepository.findOne({
+      where: {
+        id: review_id,
+        delete_date: IsNull(),
+        // 삭제된 리뷰가 아닌경우
+      },
+      select: {
+        id: true,
+        // 필요한 값만 셀렉트
+      },
+    });
+    if (!findReview) {
+      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    }
+
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user_id,
+        delete_account: IsNull(),
+        // 탈퇴한 유저가 아닌경우
+      },
+      select: {
+        id: true,
+        // 필요한 값만 셀렉트
+      },
+    });
+
+    if (!findUser) {
+      throw new HttpException('존재하지 않는 회원입니다.', 400);
+    }
+
+    const findLike = await this.reviewLikeRepository.findOne({
+      where: {
+        review: findReview,
+        user: findUser,
+      },
+    });
+
+    if (findLike) {
+      await this.reviewLikeRepository.delete(findLike);
+      return false;
+    } else {
+      await this.reviewLikeRepository.save({
+        user: findUser,
+        review: findReview,
+      });
+      return true;
+    }
+    // 좋아요 테이블에 해당 데이터가 존재한다면 ? 삭제후 false 반환
+    // 좋아요 테이블에 데이터가 없다면? 삽입후 true 반환
+  }
+```
+받아온 리뷰 아이디 값과 유저 아이디 값을 통해 정상적인 리뷰,유저인지 확인을 거쳤고,
+
+리뷰 좋아요 테이블에 해당 데이터가 존재한다면 데이터를 삭제한 뒤 false를 반환
+
+리뷰 좋아요 테이블에 해당 데이터가 없다면 데이터를 삽입한 뒤 true를 반환하도록 하였습니다.
