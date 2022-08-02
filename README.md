@@ -40,6 +40,7 @@
 </div>
 <div align="center" id="로그인" ><h2>로그인</h2></div>
 로그인 기능에선 유효성 검사와 아이디 패스워드가 일치하지 않을시 별도의 문구를 출력하였습니다.
+
 ![로그인](https://user-images.githubusercontent.com/41351496/182300568-2dd2f41b-13ca-45d6-91db-de54922da65e.gif)
 
 ```TypeScript
@@ -223,6 +224,7 @@ JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참
 
 <div align="center" id="회원가입" ><h2>회원가입</h2></div>
 회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).
+
 ![회원가입](https://user-images.githubusercontent.com/41351496/182300573-36af5bba-a4f5-4979-9465-141a480c0b9b.gif)
 
 ```TypeScript
@@ -423,7 +425,9 @@ Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드�
 
 <div align="center" id="네이버지도마커표시" ><h2>네이버 지도 마커 표시</h2></div>
 네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.
+
 ![필터링](https://user-images.githubusercontent.com/41351496/182300571-211c4345-ce5c-49e6-807f-0372092c9a62.gif)
+
 ![지도 위치 선택 (2)](https://user-images.githubusercontent.com/41351496/182300578-ff98e4e0-23a5-4160-ba80-4f159ff841cf.gif)
 ```TypeScript
 const onClickSearch = useCallback(() => {
@@ -662,6 +666,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
 여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
 <div align="center" id="센터상세히보기" ><h2>센터 상세히 보기</h2></div>
 지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.
+
 ![지도 마커선택](https://user-images.githubusercontent.com/41351496/182300577-f3408054-2e63-47d1-9826-2d2660e07364.gif)
 
 ```TypeScript
@@ -776,6 +781,7 @@ async findOne(id: string) {
 찾은 어린이집이 code명이 없을경우 별도의 API를 호출하여 해당하는 값을 찾아 업데이트 후 code 값을 변경하여 리턴 해주도록 하였습니다. 
 
 <div align="center" id="게시판작성" ><h2>게시판 작성</h2></div>
+
 ![게시글 작성](https://user-images.githubusercontent.com/41351496/182300564-ab9a84cd-7fab-480c-9be3-50e152d41889.gif)
 ```TypeScript
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
@@ -953,6 +959,7 @@ async writeReview(createReviewDto: CreateReviewDto) {
 리뷰 테이블 형식에 맞도록 데이터를 삽입 했습니다.
 
 <div align="center" id="게시판수정" ><h2>게시판 수정</h2></div>
+
 ![게시글 수정](https://user-images.githubusercontent.com/41351496/182300561-dbe05e57-91ef-4c9c-ad8a-86cdf42547ff.gif)
 ```TypeScript
  {user.auth && review.user.id === user.auth.id && (
@@ -1081,6 +1088,7 @@ async updateReview(updateReviewDto: UpdateReviewDto) {
 업데이트시 업데이트 날짜를 DateTime 형식에 맞게 변경해주었습니다. 
 
 <div align="center" id="게시판삭제" ><h2>게시판 삭제</h2></div>
+
 ![게시글 삭제](https://user-images.githubusercontent.com/41351496/182300555-4032248b-47fd-4f6a-9db6-26a50bb1835b.gif)
 ```TypeScript
 export interface reviewDeleteType extends APIType {
@@ -1201,6 +1209,7 @@ export class DeleteReviewDTO {
 delete_date 삭제 날짜 값을 DateTime 형식에 맞게 업데이트 시켜 삭제된 리뷰에 대해 분별할 수 있는 값을 넣었습니다.
 
 <div align="center" id="게시판좋아요" ><h2>게시판 좋아요</h2></div>
+
 ![게시글 좋아요 및 댓글 좋아요](https://user-images.githubusercontent.com/41351496/182300566-ce978e05-6ba8-43a7-8513-a6dc82b3e47b.gif)
 ```TypeScript
 
@@ -1346,6 +1355,7 @@ API 호출전 상태를 반대로 바꿔놓고 API 호출후 서버에 있는 �
 리뷰 좋아요 테이블에 해당 데이터가 없다면 데이터를 삽입한 뒤 true를 반환하도록 하였습니다.
 
 <div align="center" id="게시판리스트" ><h2>게시판 리스트</h2></div>
+
 ![페이징](https://user-images.githubusercontent.com/41351496/182300570-d98c484c-dad6-4327-8fbb-c19fb9acce20.gif)
 ```TypeScript
 
