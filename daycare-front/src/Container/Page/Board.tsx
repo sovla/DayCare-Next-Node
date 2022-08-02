@@ -9,13 +9,15 @@ import Head from 'next/head';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { category as categoryType } from '@src/Type/API/category';
-import { reviewWriteType, reviewListType } from '@src/Type/API/review';
-import API from '@src/API';
-import { AxiosResponse } from 'axios';
+import {
+  reviewListType,
+  reviewGetListTypeWithCategoryId,
+} from '@src/Type/API/review';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
 import { changeError } from '@src/Store/errorState';
+import useApi from '@src/CustomHook/useApi';
 
 const ContainerDiv = styled.div`
   width: 100vw;
@@ -118,24 +120,39 @@ const Board: React.FC<{
   category: categoryType[];
 }> = (props) => {
   const { category } = props;
-  const [selectCategory, setSelectCategory] = useState(0);
+  const [selectCategory, setSelectCategory] = useState(category[0].id);
   const [reviewList, setReviewList] = useState<reviewListType[]>([]);
   const [selectPage, setSelectPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(10);
 
   const router = useRouter();
   const user = useSelector(selectUser);
 
   const dispatch = useDispatch();
 
-  const getReviewListApi = useCallback(async () => {
+  const { api: getReviewListApi, isLoading } =
+    useApi<reviewGetListTypeWithCategoryId>({
+      url: `/review/category/${selectCategory}`,
+      data: {
+        page: selectPage,
+      },
+      method: 'get',
+    });
+
+  const getReviewListApiHandle = useCallback(async () => {
     // category_id 기준 리뷰 받아오기
+    if (isLoading) {
+      // 다중 API 호출 방지
+      return;
+    }
     try {
-      const response = (await API.get(
-        `/review/category_id=${selectCategory}`
-      )) as AxiosResponse<reviewWriteType['response'], any>;
+      const response = await getReviewListApi();
 
       if (response.data.statusCode === 200) {
         setReviewList(response.data.review);
+        // 리뷰 리스트 상태에 넣어주기
+
+        setTotalCount(response.data.totalCount);
       }
     } catch (error) {
       dispatch(
@@ -144,15 +161,19 @@ const Board: React.FC<{
           isShow: true,
         })
       );
+      // error 핸들링
     }
-  }, [dispatch, selectCategory]);
+  }, [getReviewListApi, isLoading]);
 
   const onClickWrite = useCallback(() => {
     try {
       if (!user.auth) {
+        // 유저 정보가 없을 경우
         throw new Error('로그인 후 이용 가능합니다.');
       }
+
       router.push('/board/write');
+      // 유저 정보가 있을경우 해당 페이지로 이동
     } catch (error) {
       dispatch(
         changeError({
@@ -160,21 +181,28 @@ const Board: React.FC<{
           isShow: true,
         })
       );
+      // error 핸들링
     }
-  }, [dispatch, router, user.auth]);
+  }, [router, user.auth]);
+
+  const onClickCategory = useCallback((categoryId: number) => {
+    // 카테고리 선택시 호출 되는 함수
+    setSelectCategory(categoryId);
+    // 카테고리 아이디 변경
+    setSelectPage(1);
+    // 선택한 페이지 1로 변경
+  }, []);
 
   useEffect(() => {
     if (selectCategory) {
-      getReviewListApi();
+      getReviewListApiHandle();
+      // 카테고리 번호가 변경 될 경우 API 호출
     }
-    setSelectPage(1);
   }, [selectCategory]);
-
   useEffect(() => {
-    if (category) {
-      setSelectCategory(category[0].id);
-    }
-  }, []);
+    getReviewListApiHandle();
+    // 선택한 페이지 변경시 API 호출
+  }, [selectPage]);
 
   return (
     <ContainerDiv>
@@ -188,7 +216,7 @@ const Board: React.FC<{
         <div>
           <Categories
             categoryList={category}
-            onClickCategory={setSelectCategory}
+            onClickCategory={onClickCategory}
             selectCategory={selectCategory}
           />
           {/* <Search inputProps={{}} onClick={() => {}} /> */}
@@ -199,28 +227,24 @@ const Board: React.FC<{
       </div>
       <div className="table">
         <Table
-          selectPage={selectPage}
-          boardList={reviewList.map((v) => {
-            const writeDate = new Date(v.write_date);
-            return {
-              category: `${v.id}`,
-              title: v.title,
-              likeCount: `${v.likes}`,
-              viewCount: `${v.view_count}`,
-              write: `${v.user.name}`,
-              writeDate: `${writeDate
-                .toISOString()
-                .substring(0, 10)
-                .replaceAll('-', '.')}`,
-              reviewCount: v.reply,
-              id: v.id,
-            };
-          })}
+          boardList={reviewList.map((v) => ({
+            category: `${v.id}`,
+            title: v.title,
+            likeCount: `${v.likes}`,
+            viewCount: `${v.view_count}`,
+            write: `${v.user.name}`,
+            writeDate: `${new Date(v.write_date)
+              .toISOString()
+              .substring(0, 10)
+              .replaceAll('-', '.')}`, // 2022. 07. 31 이런식으로 나타내기 위함
+            reviewCount: v.reply,
+            id: v.id,
+          }))}
         />
         <div className="pagination">
           <Pagination
             selectPage={selectPage}
-            maxPage={Math.floor(reviewList.length / 10) + 1}
+            maxPage={Math.floor((totalCount - 1) / 10) + 1}
             onClickPage={setSelectPage}
           />
         </div>

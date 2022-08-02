@@ -100,17 +100,22 @@ export class CenterService {
   }
 
   async findOne(id: string) {
-    let findCenter = await this.centerRepository.findOne({
+    const findCenter = await this.centerRepository.findOne({
       where: {
         id: +id,
       },
     });
+    if (!findCenter) {
+      throw new HttpException('존재하지 않는 센터입니다', 400);
+    }
     if (findCenter.code.length === 0) {
+      // 찾은 센터명에서 코드가 없을 경우
       const formData = new FormData();
 
       formData.append('latitude', `${findCenter.lat}`);
       formData.append('longitude', `${findCenter.lon}`);
       formData.append('distance', '1');
+      // 폼데이터 생성 및 위도 경도 거리 필수 데이터 추가후
 
       const response = await axios.post(
         'https://e-childschoolinfo.moe.go.kr/kinderMt/kinderLocalFind.do',
@@ -121,58 +126,56 @@ export class CenterService {
           },
         },
       );
+
       if (Array.isArray(response.data)) {
-        for (const v of response.data) {
-          if (
+        // 배열인지 여부 확인
+        const apiFindCenter = response.data.find(
+          (v) =>
             (+v.latitude == +findCenter.lat &&
               +v.longitude == +findCenter.lon) ||
-            v.name === findCenter.name
-          ) {
-            await this.centerRepository.update(
-              {
-                id: findCenter.id,
-              },
-              {
-                code: v.id,
-              },
-            );
-            findCenter = await this.centerRepository.findOne({
-              where: {
-                id: findCenter.id,
-              },
-            });
-          }
-        }
+            v.name === findCenter.name,
+          // 위도 경도가 같거나 이름이 같은 경우
+        );
+
+        await this.centerRepository.update(
+          {
+            id: findCenter.id,
+          },
+          {
+            code: apiFindCenter.id,
+          }, // code 명을 변경 해준뒤
+        );
+        findCenter.code = apiFindCenter.id;
+        // 기존에 찾은 findCenter의 code값을 변경
       }
     }
     return findCenter;
   }
 
-  async findFilter(dto: FindFilterDTO) {
-    const type = dto?.type && dto.type.length && dto.type.split(',');
-    const property =
-      dto?.property && dto.property.length && dto.property.split(',');
-    const employee =
-      dto?.employee && dto.employee.length && dto.employee.split(',');
-    const empty_class =
-      dto?.empty_class && dto.empty_class.length && dto.empty_class.split(',');
+  async findCentersByLocation(dto: FindFilterDTO) {
+    // type property employee empty_class 의 경우 "a,b,c" 이런식으로 값을 전달
+    const type = dto?.type?.length && dto.type.split(',');
+    const property = dto?.property?.length && dto.property.split(',');
+    const employee = dto?.employee?.length && dto.employee.split(',');
+    const empty_class = dto?.empty_class?.length && dto.empty_class.split(',');
+
     const findCenterList = this.centerRepository
       .createQueryBuilder('center')
+      // 필요한 값만 select
+      // .select('homepage,address,tel,name,lat,lng,school_vehicle,type,id')
+      // 현재 위치 기준으로 전체 거리 값을 계산해 distance로 select
       .addSelect(
         `6371 * acos(cos(radians(${dto.lat})) * cos(radians(lat)) * cos(radians(lon) - radians(${dto.lon})) + sin(radians(${dto.lat})) * sin(radians(lat)))`,
         'distance',
       )
-      .where('operation_status != "폐지"')
-      .andWhere(`city Like '%${dto?.city?.length ? dto.city : ''}%'`)
-      .andWhere(
-        `city_detail Like '%${
-          dto?.city_detail?.length ? dto.city_detail : ''
-        }%'`,
-      )
+      .where('operation_status != "폐지"') // 폐지가 아닌경우
+      .andWhere(`city Like '%${dto?.city ?? ''}%'`) // city 값이 없을경우 전체 검색
+      .andWhere(`city_detail Like '%${dto?.city_detail ?? ''}%'`) // city_detail 값이 없을경우 전체 검색
       .andWhere(
         new Brackets(async (qb) => {
           Array.isArray(type)
             ? type.forEach((v, i) => {
+                // 여러 타입이 있을 경우 or 조건으로 검색 type = "공립" ||  type = "사립"
                 qb.orWhere(`type = :type${i}`, {
                   [`type${i}`]: `${v}`,
                 });
@@ -183,6 +186,7 @@ export class CenterService {
       .andWhere(
         new Brackets(async (qb) => {
           Array.isArray(property) &&
+            // 여러 특성이 있을 경우 or 조건으로 검색 property 값의 경우 DB 컬럼명과 동일한 값이 들어옴 "Y" 인지 체크
             property.forEach((v) => {
               qb.orWhere(`${v} = 'Y'`);
             });
@@ -190,6 +194,7 @@ export class CenterService {
       )
       .andWhere(
         new Brackets(async (qb) => {
+          // 여러 직원이 있을 경우 or 조건으로 검색 employee 값의 경우 DB 컬럼명과 동일한 값이 들어옴 0이상 인지 체크
           Array.isArray(employee) &&
             employee.forEach((v) => {
               qb.orWhere(`${v} > 0`);
@@ -198,6 +203,7 @@ export class CenterService {
       )
       .andWhere(
         new Brackets(async (qb) => {
+          // 비어있는 교실 수가 있을 경우 or 조건으로 검색 empty_class 값의 경우 DB 컬럼명과 동일한 값이 들어옴 0이상 인지 체크
           Array.isArray(empty_class) &&
             empty_class.forEach((v) => {
               qb.orWhere(`${v} > 0`);
@@ -205,12 +211,14 @@ export class CenterService {
         }),
       )
       .andWhere(
+        // 직원 수 n 이상인 경우
         `employee_count >= ${
+          // length 는 string의 기본 메소드중 하나로 undefined 값이 들어올 경우 0으로 검색하도록
           dto?.employee_count?.length ? +dto.employee_count : 0
         }`,
       )
-      .having(`distance <= ${dto?.radius ?? 50}`)
-      .orderBy('distance', 'ASC')
+      .having(`distance <= ${dto?.radius ?? 50}`) // radius 반경 값이 있을경우
+      .orderBy('distance', 'ASC') // 거리 기준으로 값 받아오기
       .limit(50)
       .getMany();
 

@@ -54,20 +54,27 @@ const Pagination: React.FC<PaginationProps> = (props) => {
   const pageArray = useMemo(() => {
     const array = [];
     for (let index = selectPage - 4; array.length < 9; index += 1) {
+      // 1 2 3 4 5 6 7 8 9 형태로 나타내기 위함
+      // 올라가면서 검색
       if (index > 0) {
         array.push(index);
       }
       if (index >= maxPage) {
+        // 최대 값보다 크면 break;
         break;
       }
     }
 
     if (array.length < 9) {
+      // 만약 9개의 갯수를 채우지 못했다면
       for (let index = selectPage; array.length < 9; index -= 1) {
+        // 거꾸로 내려가면서 검색
         if (index > 0 && !array.includes(index)) {
+          // 0 이상이고 현재 배열에 없을 경우 추가
           array.push(index);
         }
         if (index === 0) {
+          //
           break;
         }
       }

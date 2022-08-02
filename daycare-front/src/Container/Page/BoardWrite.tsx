@@ -136,20 +136,25 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
 
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
+      // 리뷰 작성 함수 핸들링 함수
       e.preventDefault();
       try {
         if (!editorRef.current) {
+          // 에디터 Ref current가 없다면 리턴 해줍니다
           return;
         }
 
         const response = await reviewWriteApi({
           content: editorRef.current.getInstance().getHTML(),
+          // 에디터에서 getHtml을 통해 html값을 전달 받아 API에 보내주기
         });
         if (response.data.statusCode === 200) {
-          router.push('/board');
+          router.replace(`/board/${response.data.review.id}`);
+          // 해당 글로 이동 replace를 사용한 이유는 뒤로가기를 눌럿을때 작성 페이지가 아닌 board 메인 페이지로 이동하도록 하기위함
         }
       } catch (error) {
         dispatch(changeError({ errorStatus: error, isShow: true }));
+        // 에러 핸들링
       }
     };
 

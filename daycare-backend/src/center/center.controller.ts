@@ -53,30 +53,22 @@ export class CenterController {
     });
   }
 
+  // 거리 기준으로 센터 받아오기
   @Get()
-  async findFilter(
+  async findCentersByLocation(
     @Query() findFilterDto: FindFilterDTO,
     @Res() res: Response,
   ) {
-    const findCenters = await this.centerService.findFilter(findFilterDto);
+    const findCenters = await this.centerService.findCentersByLocation(
+      findFilterDto,
+    );
 
     res.statusCode = 200;
 
     return res.send({
       statusCode: res.statusCode,
       message: '정보 받아오기 완료',
-      center: findCenters.map((v) => ({
-        homepage: v.homepage,
-        address_detail: v.address_detail,
-        tel: v.tel,
-        name: v.name,
-        image: '일단없음',
-        lat: v.lat,
-        lng: v.lon,
-        school_vehicle: v.school_vehicle,
-        type: v.type,
-        id: v.id,
-      })),
+      center: findCenters,
     });
   }
 

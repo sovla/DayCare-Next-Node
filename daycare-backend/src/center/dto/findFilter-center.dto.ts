@@ -3,9 +3,9 @@ export class FindFilterDTO {
   lat: string;
   lon: string;
   type: string | undefined;
-  city: string | null;
-  city_detail: string | null;
-  max: string | null;
+  city: string | undefined;
+  city_detail: string | undefined;
+  max: string | undefined;
   property:
     | 'property_after'
     | 'property_after_combine'
@@ -25,7 +25,7 @@ export class FindFilterDTO {
     | 'child_count_age4'
     | 'child_count_age5'
     | undefined;
-  employee_count: string | null;
+  employee_count: string | undefined;
   employee:
     | 'employee_count_cook'
     | 'employee_count_director'
@@ -38,5 +38,5 @@ export class FindFilterDTO {
     | 'employee_count_nursery'
     | 'employee_count_nurse'
     | undefined;
-  radius: string | null;
+  radius: string | undefined;
 }

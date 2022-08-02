@@ -35,32 +35,31 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     // 회원가입
     const insertData = await this.userService.create(createUserDto);
-    const result = {
-      accessToken: this.jwtService.sign({
+
+    if (!insertData) {
+      throw new HttpException('회원가입에 실패하셨습니다', 400);
+    }
+    const accessToken = this.jwtService.sign({
+      // JWT 토큰 사인
+      id: insertData.id,
+      name: insertData.name,
+      email: insertData.email,
+    });
+
+    res.statusCode = 200;
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1hours
+    });
+    return res.send({
+      statusCode: res.statusCode,
+      message: `${insertData.name}님의 회원가입에 성공하였습니다.`,
+      user: {
         id: insertData.id,
         name: insertData.name,
         email: insertData.email,
-      }),
-    };
-
-    if (insertData) {
-      res.statusCode = 200;
-      res.cookie('jwt', result.accessToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1hours
-      });
-      return res.send({
-        statusCode: res.statusCode,
-        message: `${insertData.name}님의 회원가입에 성공하였습니다.`,
-        user: {
-          id: insertData.id,
-          name: insertData.name,
-          email: insertData.email,
-        },
-      });
-    } else {
-      throw new HttpException('회원가입에 실패하셨습니다', 400);
-    }
+      },
+    });
   }
 
   @Post('/email')

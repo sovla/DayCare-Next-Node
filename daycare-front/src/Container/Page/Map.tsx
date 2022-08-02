@@ -9,7 +9,7 @@ import useScript from '@src/CustomHook/useScript';
 import Head from 'next/head';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import NoImage from '@src/assets/image/NoImage.png';
+import DetailCenterHeaderImage from '@src/assets/image/NoImage.png';
 import Search from '@src/Components/Atom/Input/Search';
 import Image from 'next/image';
 import LogoIcon from '@src/assets/image/LogoIcon.png';
@@ -33,7 +33,7 @@ import {
 } from '@src/Type/API/center';
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import { queryToString } from '@src/Util';
+import { objectToQueryString } from '@src/Util';
 
 const ContainerDiv = styled.div`
   display: flex;
@@ -276,19 +276,12 @@ const Map: React.FC = () => {
   const formRef = useRef<any>();
   // popup 열기 위한 폼
 
-  const initMap = () => {
+  const initMap = () =>
     // 네이버 맵 만들기
-    const map = new naver.maps.Map('map', {
+    new naver.maps.Map('map', {
       center: new naver.maps.LatLng(location.lat, location.lon),
       zoom: naverMap?.getZoom() ?? 10,
     });
-
-    // naver.maps.Event.addListener(map, 'zoom_changed', (zoom) => {
-    //   // console.log(zoom);
-    //       });
-
-    return map;
-  };
 
   const onClickCenter = useCallback(
     async (id: number) => {
@@ -296,23 +289,21 @@ const Map: React.FC = () => {
       try {
         API.get(`center/${id}`).then((res) => {
           setSelectCenter(res.data.center);
-          const currentMap = naverMap;
-          // 파라미터로 맵을 받거나 현재 맵인 경우 센터 가운데로 지정
+          // selectCenter를 이용해 상세 페이지 데이터 출력
 
           router.replace(
-            `map?${queryToString({ ...router.query, center: id })}`
+            `map?${objectToQueryString({ ...router.query, center: id })}`
           );
-
-          if (!currentMap) {
+          // url 변경 center=해당 어린이집 id 값으로
+          if (!naverMap) {
             return null;
           }
 
-          currentMap.setCenter(
+          naverMap.setCenter(
             new naver.maps.LatLng(+res.data.center.lat, +res.data.center.lon)
           );
-          currentMap.setZoom(
-            currentMap.getZoom() > 15 ? currentMap.getZoom() : 15
-          );
+          naverMap.setZoom(naverMap.getZoom() < 15 ? naverMap.getZoom() : 15);
+          // 맵 가운데로 이동 및 줌 레벨이 15 밑 일 경우 자세한 위치를 위해 15로 고정
         });
       } catch (error) {
         dispatch(
@@ -323,35 +314,43 @@ const Map: React.FC = () => {
         );
       }
     },
-    [dispatch, naverMap, router]
+    [naverMap, router]
   );
 
   const createMarkers = useCallback(
-    (res: { data: { center: any[] } }) => {
+    (centers: centerType[]) => {
+      // 마커를 만드는 함수
       if (!naverMap) {
         return;
       }
-      const markers = [] as naver.maps.Marker[];
+      // 현재 마커를 담을 변수
+      const markers: naver.maps.Marker[] = [];
 
-      for (let index = 0; index < res.data.center.length; index += 1) {
-        const v = res.data.center[index];
+      for (let index = 0; index < centers.length; index += 1) {
+        const center = centers[index];
 
         const marker = new naver.maps.Marker({
           map: naverMap,
-          position: new naver.maps.LatLng(+v.lat, +v.lng),
-          title: v.name,
+          // 포지션은 center 위도 경도 기준으로
+          position: new naver.maps.LatLng(+center.lat, +center.lon),
+          // 제목은 센터 이름으로
+          title: center.name,
+          // 선택가능
           clickable: true,
         });
 
+        // 마커 선택시 나오는 html
         const infowindow = new naver.maps.InfoWindow({
           content: [
-            `<div id="marker" defaultValue="${v.id}" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> `,
-            `<span class="ico _icon">${v.name}</span>`,
+            '<div id="marker" style="width:fit-content;padding:10px;background-color:#fff;border:1px solid black"> ',
+            `<span class="ico _icon">${center.name}</span>`,
             '<span class="shd"></span>',
             '</div>',
           ].join(''),
         });
-
+        // 마커에 이벤트 속성 걸어주기
+        // 표시 - 마우스다운, 마우스 위로 올렸을때, 모바일 환경에서 선택시(click)
+        // 삭제 - 마우스 벗어난 경우
         marker.addListener('mousedown', () => {
           infowindow.open(naverMap, marker);
         });
@@ -362,7 +361,8 @@ const Map: React.FC = () => {
           infowindow.close();
         });
         marker.addListener('click', () => {
-          onClickCenter(v.id);
+          // 선택시 상세 정보 표시
+          onClickCenter(center.id);
           if (infowindow.getMap()) {
             infowindow.open(naverMap, marker);
           }
@@ -371,14 +371,18 @@ const Map: React.FC = () => {
       }
       setMapMarkers((prev) => {
         prev.forEach((v) => {
+          // 이전 마커들 이벤트 해제
           v.clearListeners('click');
           v.clearListeners('mouseout');
           v.clearListeners('mouseover');
           v.clearListeners('mousedown');
+          // 많은 마커가 생길경우 성능 이슈로 인한 마커 해제
           v.setMap(null);
         });
+        // 새로운 마커들로 상태 바꿔주기
         return markers;
       });
+      // 현재 위치 설정
       setLocation({
         lat: naverMap.getCenter().y,
         lon: naverMap.getCenter().x,
@@ -389,13 +393,14 @@ const Map: React.FC = () => {
 
   const onClickSearch = useCallback(() => {
     // 지도에서 이 위치에서 검색 버튼을 눌럿을때
-
     if (!naverMap) {
+      // 네이버 지도가 없는 상태로 전달시 return null;
       return null;
     }
 
     API.get<getCentersType['response']>('center', {
       params: {
+        // 필터링 기능 및 지도 가운데 위치 파라미터
         lon: naverMap.getCenter().x,
         lat: naverMap.getCenter().y,
         type: filter?.type?.join(','),
@@ -409,25 +414,26 @@ const Map: React.FC = () => {
         radius: 500,
       },
     })
-      .then((res) => {
+      .then((response) => {
         // 성공시
-        // 1. 센터리스트 넣어주기
-        // 2. 새로운 네이버 맵에 마커 찍어서 넣어주기
-        // 3. 그 마커에 이벤트 걸어주기
+        // 어린이집 검색시 해당 주소를 기입해 url 공유시 바로 같은 화면이 보이도록 설정
         router.replace(
-          `map?${queryToString({
+          `map?${objectToQueryString({
             ...router.query,
             lat: naverMap.getCenter().y,
             lon: naverMap.getCenter().x,
           })}`
         );
-        setCenterList(res.data.center);
-        createMarkers(res);
+        // 센터 리스트
+        setCenterList(response.data.center);
+        // 마커 만드는 함수에 센터 리스트 파라미터 넘겨주기.
+        createMarkers(response.data.center);
       })
       .catch((error) => {
         if (error instanceof TypeError) {
           return;
         }
+        // 타입 에러가 아닌 경우 에러 표시
         dispatch(
           changeError({
             errorStatus: error,
@@ -538,7 +544,7 @@ const Map: React.FC = () => {
     const response = await findCentersApi();
     if (response.data.statusCode === 200) {
       setCenterList(response.data.center);
-      createMarkers(response);
+      createMarkers(response.data.center);
     }
   }, [findCentersApi]);
 
@@ -628,7 +634,7 @@ const Map: React.FC = () => {
           <div className="map-select-center">
             <DetailCenter
               onClickDetailInformation={onClickDetailInformation}
-              image={NoImage}
+              image={DetailCenterHeaderImage}
               center={{
                 name: selectCenter.name,
                 city: selectCenter.city_dong,

@@ -18,5 +18,4 @@ export interface PaginationProps {
 
 export interface TableProps {
   boardList: RowProps[];
-  selectPage: number;
 }

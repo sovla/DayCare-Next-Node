@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable operator-linebreak */
+
 export default class RegExp {
   static min(str: string, length: number) {
     return str.length >= length;

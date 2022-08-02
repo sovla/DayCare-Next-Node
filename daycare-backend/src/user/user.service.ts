@@ -68,6 +68,13 @@ export class UserService {
 
   async transformPassword(user: CreateUserDto): Promise<CreateUserDto> {
     user.password = await bcrypt.hash(user.password, 10);
+    // 해싱이란 특정 알고리즘을 통해 인간이 해독하지 못하는 문자열로 변형
+    // 해싱 특징
+    // 1. 단방향이다. 되돌릴 수 없다
+    // 2. 동일한 입력값 동일한 출력 값을 갖는다
+    // 3. 입력값의 일부만 변경되어도 전혀 다른 출력값을 갖는다
+    // ++ 이러한 특징에 Salt라는 랜덤한 값을 추가해 보안을 강화한다
+    // bcrypt.hash(문자열,Salt문자열 길이)
     return user;
   }
 
@@ -109,7 +116,7 @@ export class UserService {
       html: `<p>인증번호 : [<b>${random}</b>]</p>`,
     });
 
-    this.cacheManager.set(email, random, { ttl: 3000 });
+    this.cacheManager.set(email, random, { ttl: 300 });
     // 이메일 인증코드 캐시에 저장
 
     return random;

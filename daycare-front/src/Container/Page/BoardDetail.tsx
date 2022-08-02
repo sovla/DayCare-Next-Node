@@ -197,7 +197,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
 
   const [replyComment, setReplyComment] = useState('');
   const [isLike, setIsLike] = useState(
-    !!review.likes.find((v) => v.id === user.auth?.id)
+    !!review.likes.find((v) => v.user_id === user.auth?.id)
   );
 
   const { api: replyWriteApi } = useApi<replyWriteType>({
@@ -225,6 +225,14 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     data: {
       id: user.auth?.id as number,
       reply_id: 0,
+    },
+  });
+
+  const { api: reviewLikeApi } = useApi<reviewLikeType>({
+    method: 'get',
+    url: `/review/like/${review.id}`,
+    data: {
+      id: user.auth?.id as number,
     },
   });
 
@@ -260,14 +268,19 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
   }, [user.auth, replyWriteApi, review.reply]);
 
   const reviewDeleteApiHandle = useCallback(async () => {
+    // 리뷰 삭제 API 핸들 함수
     try {
       if (!user.auth) {
+        // 로그인 여부 확인
         throw new Error('로그인 후 이용 가능 합니다.');
       }
-
+      if (!window.confirm('정말로 삭제 하시겠습니까?')) {
+        return;
+      }
       const response = await reviewDeleteApi();
       if (response.data.statusCode === 200) {
-        router.push('/board');
+        router.replace('/board');
+        // 삭제된 리뷰로 돌아오지 못하도록 설정
       }
     } catch (error) {
       dispatch(
@@ -276,22 +289,25 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
           isShow: true,
         })
       );
+      // 에러 핸들
     }
   }, [reviewDeleteApi, router, user.auth]);
 
-  const onClickLike = useCallback(async () => {
+  const onClickReviewLike = useCallback(async () => {
+    // 리뷰 좋아요를 눌럿을때
     try {
       if (!user.auth) {
+        // 로그인 정보 확인
         throw new Error('로그인 후 이용 가능 합니다.');
       }
-      const response = (await API.get(`review/like/${review.id}`, {
-        params: {
-          id: user.auth?.id,
-        },
-      })) as AxiosResponse<reviewLikeType['response']>;
+      setIsLike((prev) => !prev);
+      // 좋은 사용자 경험을 위해 좋아요는 미리 값을 변경하고 API 호출 이후 서버 값과 연동
+
+      const response = await reviewLikeApi();
 
       if (response.data.statusCode === 200) {
         setIsLike(response.data.like);
+        // 좋아요 완료시 true 리턴 좋아요 해제시 false 리턴
       }
     } catch (error) {
       dispatch(
@@ -300,6 +316,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
           isShow: true,
         })
       );
+      // 에러 핸들
     }
   }, [user.auth, review.id]);
 
@@ -390,7 +407,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         <div id="viewer" />
         <hr />
         <div className="buttons">
-          <button type="button" className="heart" onClick={onClickLike}>
+          <button type="button" className="heart" onClick={onClickReviewLike}>
             <Image
               src={isLike ? HeartIcon : HeartEmptyIcon}
               width={25}
@@ -404,6 +421,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
                 content="수정"
                 buttonProps={{
                   onClick: () => router.push(`/board/update/${review.id}`),
+                  // 수정의 경우 /board/update/[id].tsx 파일로 이동
                   style: {
                     width: '50px',
                     height: '40px',
@@ -414,6 +432,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
                 content="삭제"
                 buttonProps={{
                   onClick: reviewDeleteApiHandle,
+                  // 리뷰 삭제 API 핸들 함수 호출
                   style: {
                     width: '50px',
                     height: '40px',
@@ -437,7 +456,9 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
               const isReplyLike = !!v.likes.find(
                 (fv) => fv.user_id === user.auth?.id
               );
+              // 내가 누른 좋아요가 있을경우 true 아닌경우 false
               const isMyReply = v.user.id === user.auth?.id;
+              // 내 리플인 경우 true 아닌경우 false
               return (
                 <StyledReply key={`reply${v.id}`} isLike={isReplyLike}>
                   <div className="row-center">

@@ -21,10 +21,17 @@ export class JWTGuard implements CanActivate {
         id?: number;
       }
     > = context.switchToHttp().getRequest();
+    let jwtUser;
+
     if (req?.cookies?.jwt == null) {
       throw new HttpException('로그인 후 이용가능합니다.', 401);
     }
-    const jwtUser = this.jwtService.verify<jwtUserDTO>(req.cookies['jwt']);
+
+    try {
+      jwtUser = this.jwtService.verify<jwtUserDTO>(req.cookies['jwt']);
+    } catch (error) {
+      throw new HttpException('JWT 토큰이 만료되었습니다.', 400);
+    }
 
     if (req.body.id == null) {
       throw new HttpException('id 값이 존재하지 않습니다.', 403);

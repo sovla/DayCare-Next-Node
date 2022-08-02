@@ -45,8 +45,9 @@ export class Reply {
 
   @ManyToOne(() => Review, (review) => review.reply, {
     eager: false,
+    lazy: true,
   })
-  @JoinColumn({ name: 'review_id' })
+  @JoinColumn({ name: 'reply_review_id' })
   review: Review;
 
   @ManyToOne(() => User, (user) => user.reply, { eager: true })

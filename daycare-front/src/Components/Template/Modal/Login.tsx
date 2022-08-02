@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { changeUser } from '@src/Store/userState';
 import { LoginProps } from '@src/Type/Template/Modal';
 import { changeError } from '@src/Store/errorState';
+import RegExp from '@src/Util/RegExp';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -69,13 +70,20 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
 
   const loginApiHandle = useCallback(async () => {
     try {
+      if (!RegExp.isEmail(email)) {
+        // RegExp 클래스 : 정규식 또는 문자열 수 등을 테스트해 결과에 맞으면 true 틀리면 false를 리턴
+        throw new Error('이메일 형식이 아닙니다.');
+      }
+      if (!RegExp.stringLength(password, 6, 20)) {
+        throw new Error('비밀번호는 6 ~ 20자 이내로 입력해주세요.');
+      }
       const response = await loginApi();
       if (response.data.statusCode === 200) {
-        //  로그인성공
-
+        //  로그인성공  성공시 전역 user 상태를 변경
         dispatch(changeUser(response.data.user));
       }
     } catch (error) {
+      // 에러 발생 시 전역 error 상태를 변경
       dispatch(
         changeError({
           errorStatus: error,
@@ -83,7 +91,7 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
         })
       );
     }
-  }, [dispatch, loginApi]);
+  }, [email, password]);
 
   return (
     <ContainerDiv>

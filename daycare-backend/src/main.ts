@@ -26,6 +26,7 @@ async function bootstrap() {
   app.use(cookieParser());
   const allowedOrigins = [
     'https://daycare-center.shop',
+    'http://localhost:3001',
     'http://localhost:3000',
   ];
   app.enableCors({

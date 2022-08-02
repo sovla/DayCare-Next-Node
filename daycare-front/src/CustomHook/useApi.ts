@@ -17,15 +17,20 @@ const useApi = <T extends APIType>({
 
   const api = useCallback(
     async (optionalData?: Partial<T['request']>) => {
+      // Partial 유틸타입의 경우 기존 T["request"] 타입 전체를 옵셔널로 받게 됩니다.
+      // optionalData 를 통해 별도의 데이터를 합쳐 API 요청을 합니다.
       setIsLoading(true);
       const requestData = {
         ...data,
         ...optionalData,
       };
       const response = (await API({
+        //  method = "Post" | "Get" ...
         method,
+        //  Data의 경우 get이 아닌 경우에만 추가하도록 하였습니다.
         data: method !== 'get' ? requestData : null,
         url,
+        //  파라미터의 경우 get 메소드인 경우 추가하도록 하였습니다.
         params: method === 'get' ? requestData : null,
       })) as AxiosResponse<T['response'], T['request']>;
       setIsLoading(false);

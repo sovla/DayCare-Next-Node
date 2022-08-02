@@ -59,29 +59,26 @@ export interface reviewDetailType {
   };
   view_count: number;
   write_date: string;
-  likes: { id: number }[];
+  likes: { user_id: number }[];
   reply: replyType[];
 }
 
-export interface reviewGetListType extends APIType {
-  url: '/review';
+export interface reviewGetListTypeWithCategoryId extends APIType {
+  url: `/review/category/${number}`;
   method: 'get';
-  request:
-    | {
-        center_id: number;
-      }
-    | {
-        category_id: number;
-      };
+  request: {
+    page: number;
+  };
   response: {
     statusCode: 200 | 400 | 401 | 403;
     message: string;
     review: reviewListType[];
+    totalCount: number;
   };
 }
 
 export interface reviewGetType extends APIType {
-  url: `/review/review_id=${string}`;
+  url: `/review/${string}`;
   method: 'get';
   request: {};
 
@@ -121,7 +118,20 @@ export interface reviewWriteType extends APIType {
   response: {
     statusCode: 200 | 400 | 401 | 403;
     message: string;
-    review: reviewListType[];
+    review: {
+      title: string;
+      category_id: string;
+      content: string;
+      user: {
+        id: number;
+      };
+      write_date: string;
+      update_date: null | string;
+      delete_date: null | string;
+      center_id: null | string;
+      id: number;
+      view_count: number;
+    };
   };
 }
 
@@ -161,13 +171,11 @@ export interface reviewUpdateType extends APIType {
 }
 
 export interface reviewLikeType extends APIType {
-  url: '/review/like';
+  url: `/review/like/${number}`;
   method: 'get';
   request: {
     id: number;
-    review_id: number;
   };
-
   response: {
     statusCode: 200 | 400 | 401 | 403;
     message: string;

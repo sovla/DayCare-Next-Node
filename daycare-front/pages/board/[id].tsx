@@ -15,9 +15,8 @@ const BoardDetailPage: NextPage<{
 
 export async function getServerSideProps(context: NextPageContext) {
   const response = (await API.get(
-    `/review/review_id=${context.query.id}`
+    `/review/${context.query.id}`
   )) as AxiosResponse<reviewGetType['response'], reviewGetType['request']>;
-
   return { props: { review: response.data.review } };
 }
 

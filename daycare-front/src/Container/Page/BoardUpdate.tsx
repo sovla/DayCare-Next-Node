@@ -12,8 +12,9 @@ import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import { useRouter } from 'next/router';
 import useApi from '@src/CustomHook/useApi';
 import { reviewUpdateType } from '@src/Type/API/review';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
+import { changeError } from '@src/Store/errorState';
 
 const StyledWriteContainer = styled.div`
   background-color: ${Theme.color.yellow_FFE};
@@ -81,6 +82,7 @@ const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {
   const [title, setTitle] = useState(review.title);
 
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   const { api: reviewUpdateApi } = useApi<reviewUpdateType>({
     url: '/review',
@@ -101,18 +103,31 @@ const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {
 
   const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
+      // 리뷰 업데이트 함수 핸들링 함수
       e.preventDefault();
-      if (!editorRef.current) {
-        return null;
-      }
+      try {
+        if (!editorRef.current) {
+          // 에디터 Ref current가 없다면 리턴 해줍니다
+          return;
+        }
 
-      const response = await reviewUpdateApi({
-        content: editorRef.current.getInstance().getHTML(),
-      });
-      if (response.data.statusCode === 200) {
-        router.push('/board');
+        const response = await reviewUpdateApi({
+          content: editorRef.current.getInstance().getHTML(),
+          // 에디터에서 getHtml을 통해 html값을 전달 받아 API에 보내주기
+        });
+        if (response.data.statusCode === 200) {
+          router.replace(`/board/${response.data.review.id}`);
+          // 업데이트한 리뷰 페이지로 이동
+        }
+      } catch (error) {
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
+        // 에러 핸들링
       }
-      return true;
     };
 
   useEffect(() => {

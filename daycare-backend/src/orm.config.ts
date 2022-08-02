@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 function ormConfig(): TypeOrmModuleOptions {
   const commonConf = {
@@ -20,9 +21,10 @@ function ormConfig(): TypeOrmModuleOptions {
     database: 'daycare',
     entities: commonConf.ENTITIES, // entity 추가후 넣어주기
     synchronize: commonConf.SYNCRONIZE,
-    logging: false,
+    logging: true,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
+    namingStrategy: new SnakeNamingStrategy(),
   };
 
   return _ormConfing;
