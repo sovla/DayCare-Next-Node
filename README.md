@@ -957,3 +957,137 @@ async writeReview(createReviewDto: CreateReviewDto) {
 리뷰 작성 서비스의 경우 유저가 정상적인 권한을 가진 유저인지 확인하는 과정을 거치고, 
 
 리뷰 테이블 형식에 맞도록 데이터를 삽입 했습니다.
+
+<div align="center" ><h2>게시판 수정</h2></div>
+
+```TypeScript
+ {user.auth && review.user.id === user.auth.id && (
+            <>
+              <BlueButton
+                content="수정"
+                buttonProps={{
+                  onClick: () => router.push(`/board/update/${review.id}`),
+                  // 수정의 경우 /board/update/[id].tsx 파일로 이동
+                }}
+              />
+              <BlueButton
+                content="삭제"
+                buttonProps={{
+                  onClick: reviewDeleteApiHandle,
+                  // 리뷰 삭제 API 핸들 함수 호출
+                }}
+              />
+            </>
+          )}
+``` 
+게시글 수정 기능, 삭제 기능은 작성자 본인만 수정,삭제가 가능하고
+
+로그인시 전역 상태에 저장된 유저 아이디(userId)와 작성자(writer)가 일치해야만 게시글 수정, 삭제 버튼이 보이게 구현하였습니다. 
+
+
+
+```TypeScript
+export async function getServerSideProps(context: NextPageContext) {
+  const response = (await API.get(
+    `/review/review_id=${context.query.id}`
+  )) as AxiosResponse<reviewGetType['response'], reviewGetType['request']>;
+  return { props: { review: response.data.review } };
+}
+```
+수정 페이지의 경우 board/update/[id]로 이동하여 아이디 값을 동적으로 받을 수 있도록 하였습니다.
+
+Next의 getServerSideProps을 이용하여 서버단에서 API 호출 후 페이지를 만들어서 완성된 페이지가 바로 보이도록 하였습니다.
+
+```ts
+const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
+    async (e) => {
+      // 리뷰 업데이트 함수 핸들링 함수
+      e.preventDefault();
+      try {
+        if (!editorRef.current) {
+          // 에디터 Ref current가 없다면 리턴 해줍니다
+          return;
+        }
+
+        const response = await reviewUpdateApi({
+          content: editorRef.current.getInstance().getHTML(),
+          // 에디터에서 getHtml을 통해 html값을 전달 받아 API에 보내주기
+        });
+        if (response.data.statusCode === 200) {
+          router.replace(`/board/${response.data.review.id}`);
+          // 업데이트한 리뷰 페이지로 이동
+        }
+      } catch (error) {
+        dispatch(
+          changeError({
+            errorStatus: error,
+            isShow: true,
+          })
+        );
+        // 에러 핸들링
+      }
+    };
+```
+리뷰 수정의 경우 작성과 동일하게 코딩하였습니다.
+
+
+
+
+
+
+```ts
+  @Patch()
+  // Patch: 리소스의 일부를 업데이트 한다
+  @UsePipes(ValidationPipe)
+  @UseGuards(JWTGuard)
+  // 정규식 및 JWT 확인 과정
+  async updateReview(
+    @Body() updateReviewDto: UpdateReviewDto,
+    @Res() res: Response,
+  ) {
+    const updateReview = await this.reviewService.updateReview(updateReviewDto);
+
+    res.statusCode = 200;
+
+    return res.send({
+      statusCode: res.statusCode,
+      message: '리뷰 변경 완료',
+      review: updateReview,
+    });
+  }
+```
+Put 과 Patch Http메소드중 Patch의 개념이 리뷰 수정과 비슷하다 생각하여 해당 메소드로 진행하였습니다.
+
+정규식 체크및 JWT 체크를 해주었습니다.
+```ts
+async updateReview(updateReviewDto: UpdateReviewDto) {
+    // 리뷰 업데이트 서비스
+    const findReview = await this.reviewRepository.findOne({
+      where: {
+        id: updateReviewDto.review_id,
+        delete_date: IsNull(),
+        // 삭제 날짜가 Null이 아닌 경우 삭제된 리뷰
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (!findReview) {
+      // 올바르지 않은 리뷰의 경우 에러 발생
+      throw new HttpException('존재하지 않는 리뷰입니다.', 400);
+    }
+
+    const updateReview = await this.reviewRepository.save({
+      id: findReview.id,
+      update_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+      // 업데이트 날짜 변경 해주기
+      title: updateReviewDto.title,
+      content: updateReviewDto.content,
+    });
+
+    return updateReview;
+  }
+```
+리뷰 업데이트 서비스의 경우 먼저 해당 리뷰가 정상적인 리뷰인지 확인을 하고 올바르지 않은 리뷰의 경우 에러를 발생 시켰습니다.
+
+업데이트시 업데이트 날짜를 DateTime 형식에 맞게 변경해주었습니다. 
