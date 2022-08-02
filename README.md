@@ -781,3 +781,179 @@ async findOne(id: string) {
 
 찾은 어린이집이 code명이 없을경우 별도의 API를 호출하여 해당하는 값을 찾아 업데이트 후 code 값을 변경하여 리턴 해주도록 하였습니다. 
 
+<div align="center" ><h2>게시판 작성</h2></div>
+
+```TypeScript
+  const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
+    async (e) => {
+      // 리뷰 작성 함수 핸들링 함수
+      e.preventDefault();
+      try {
+        if (!editorRef.current) {
+          // 에디터 Ref current가 없다면 리턴 해줍니다
+          return;
+        }
+
+        const response = await reviewWriteApi({
+          content: editorRef.current.getInstance().getHTML(),
+          // 에디터에서 getHtml을 통해 html값을 전달 받아 API에 보내주기
+        });
+        if (response.data.statusCode === 200) {
+          router.replace(`/board/${response.data.review.id}`);
+          // 해당 글로 이동 replace를 사용한 이유는 뒤로가기를 눌럿을때 작성 페이지가 아닌 board 메인 페이지로 이동하도록 하기위함
+        }
+      } catch (error) {
+        dispatch(changeError({ errorStatus: error, isShow: true }));
+        // 에러 핸들링
+      }
+    };
+``` 
+@toast-ui/react-editor 라이브러리를 이용해 글작성 페이지를 구성하였습니다. 
+
+해당 라이브러리의 경우 상태를 이용한 방식은 불가능하여 ref를 통해 값을 전달 받거나 보내도록 되어있습니다.
+
+일단 API 핸들링 함수에서 먼저 ref.current 값이 제대로 할당되었는지 확인하는 과정을 거쳐 에러를 잡았습니다. 
+
+그리고 API에 파라미터 값으로 에디터내에 HTML 값을 보내도록 하였습니다. 
+
+성공시 review id 를 통해 해당 게시글 상세보기 페이지로 이동하도록 하였으며 
+
+에러 발생시 전역 상태 error를 통해 모달창이 뜨도록 하였습니다.
+
+
+```TypeScript
+@Controller('review')
+export class ReviewController {
+  @Post()
+  @UsePipes(ValidationPipe)
+  // usePipes 를 통해 아래에 만든 Dto 클래스에 지정한 정규식에 맞는지 확인후 맞지 않을경우 에러
+  @UseGuards(JWTGuard)
+  // 리뷰 작성의 경우 유저 권한이 있어야만 가능해 JWT Guard를 통해 JWT토큰 여부를 확인하였습니다.
+  async writeReview(
+    @Body() createReviewDto: CreateReviewDto,
+    @Res() res: Response,
+  ) {
+    const saveReview = await this.reviewService.writeReview(createReviewDto);
+    if (!saveReview) {
+      throw new HttpException('리뷰 저장에 실패했습니다', 400);
+    }
+    res.statusCode = 200;
+
+    return res.send({
+      message: '리뷰 작성 완료',
+      statusCode: res.statusCode,
+      review: saveReview,
+    });
+  }
+  ... more function
+}
+
+// CreateReviewDto
+export class CreateReviewDto {
+  @IsNotEmpty() // 비어있지 않은 경우
+  id: number;
+
+  category_id?: number;
+
+  center_id?: number;
+
+  @IsNotEmpty() // 비어있지 않은 경우
+  title: string;
+
+  @IsNotEmpty() // 비어있지 않은 경우
+  content: string;
+}
+
+@Injectable()
+// 의존 주입
+export class JWTGuard implements CanActivate {
+  // @nestjs/common CanActivate를 구현
+  constructor(private jwtService: JwtService) {}
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const req: Request<
+      any,
+      {
+        id?: number;
+      }
+    > = context.switchToHttp().getRequest();
+
+    try {
+      if (req?.cookies?.jwt == null) {
+        throw new HttpException('로그인 후 이용가능합니다.', 401);
+      }
+
+      const jwtUser = this.jwtService.verify<jwtUserDTO>(req.cookies['jwt']);
+
+      if (req.body.id == null) {
+        throw new HttpException('id 값이 존재하지 않습니다.', 403);
+      }
+
+      if (+req.body.id !== +jwtUser.id) {
+        throw new HttpException('본인의 글이 아닙니다.', 403);
+      }
+    } catch (error) {
+      if (error.message === 'jwt expiry') {
+        throw new HttpException('JWT 토큰이 만료되었습니다.', 400);
+      } else {
+        throw new HttpException(error.message, error.code);
+      }
+    }
+
+    return true;
+  }
+}
+```
+@Controller("review") 를 활용해 review로 들어오는 모든 요청을 컨트롤 했으며 
+
+@Post() 를 활용해  /review Method Post 요청에 대한 캐치를 하였습니다.
+
+Nest에서 활용되는 Pipe, Guard를 이용해 정규식 체크 및 JWT에 대한 체크를 하였으며 Pipe의 경우 @Body() 
+
+createReviewDto: CreateReviewDto 해당 Dto에 선언해 놓은 데코레이터에 의해 정규식 체크를 하였습니다.
+
+JWT Guard의 경우 4가지 경우에 대해 에러를 발생 시켰습니다.
+
+- request cookie jwt 토큰이 없는 경우 / 비로그인 상태
+- request body id 값이 없는 경우 / 필수 데이터인 user_id 값이 없는 경우
+- request body id 값과 jwt 토큰에 id값이 틀린 경우 / 두 값이 틀린 경우는 임의로 조작을 한 경우
+- jwt 토큰이 만료 된 경우 
+
+
+
+
+
+
+```ts
+async writeReview(createReviewDto: CreateReviewDto) {
+    // 리뷰 작성 서비스
+      const findUser = await this.userRepository.findOne({
+        select: {
+          id: true,
+          // 필요한 id 값만 셀렉트
+        },
+        where: {
+          id: createReviewDto.id,
+          delete_account: IsNull(),
+          // 탈퇴한 회원인지 조회
+        },
+      });
+      if (!findUser ) {
+        // 정상적인 유저인가 확인 하는 과정
+        throw new HttpException('찾을 수 없는 회원입니다.', 401);
+      }
+
+      const saveReview = await this.reviewRepository.save({
+        title: createReviewDto.title,
+        category_id: createReviewDto.category_id,
+        content: createReviewDto.content,
+        user: findUser,
+        write_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+        // 타이틀, 내용, id값, user_id 값을 저장 해주고 날짜를 TimeStamp 에 맞는 형식으로 변경 2022-07-31 10:00:00.000
+      });
+      return saveReview;
+```
+리뷰 작성 서비스의 경우 유저가 정상적인 권한을 가진 유저인지 확인하는 과정을 거치고, 
+
+리뷰 테이블 형식에 맞도록 데이터를 삽입 했습니다.
