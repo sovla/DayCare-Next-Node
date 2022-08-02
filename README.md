@@ -9,15 +9,15 @@
 
 ## 주요 구현 기능
 - <a href="#로그인">로그인</a>
-- 네이버 지도 마커
-- 지도 기준 어린이집 찾기
-- 필터링 기능
-- 내 위치 찾기
-- 어린이집 선택
-- 로그인
-- 회원가입
-- 회원정보수정
-- 게시판 CRUD
+- <a href="#회원가입">회원가입</a>
+- <a href="#네이버지도마커표시">네이버 지도 마커 표시</a>
+- <a href="#센터상세히보기">센터 상세히 보기</a>
+- <a href="#게시판작성">게시판 작성</a>
+- <a href="#게시판수정">게시판 수정</a>
+- <a href="#게시판삭제">게시판 삭제</a>
+- <a href="#게시판좋아요">게시판 좋아요</a>
+- <a href="#게시판리스트">게시판 리스트</a>
+- 
 <div align=center><h2>개발 환경</h2></div>
 
 | 개발 환경 분류 | 사용 기술 | 비고 |
@@ -221,7 +221,7 @@ TypeScript 제네릭을 이용하여 APIType을 상속한 타입을 넣게 만�
 
 JWT 토큰 발급의 경우 httpOnly 쿠키에 저장하여 JavaScript에서 참조하지 못하도록 하였습니다. 그리고 유저 권한이 필요한 API를 호출 할때 해당 쿠키를 읽어와 JWT 검사를 통해 사인한 쿠키가 맞는지 확인하는 절차를 거쳤습니다.
 
-<div align="center" ><h2>회원가입</h2></div>
+<div align="center" id="회원가입" ><h2>회원가입</h2></div>
 회원가입은 기본적인 사용자 정보(이름, 이메일, 패스워드)로 가입이 이루어지며 이메일 중복 체크 및 이메일 인증코드를 활용해 본인 메일만 가입 가능하도록 설정하였습니다(SMTP활용).
 
 
@@ -421,7 +421,7 @@ async verifyEmail(email: string) {
 Nest 자체에서 지원하는 CacheManager을 활용해 이메일 인증코드를 저장하여 사용했습니다.
 
 
-<div align="center" ><h2>네이버 지도 마커 표시</h2></div>
+<div align="center" id="네이버지도마커표시" ><h2>네이버 지도 마커 표시</h2></div>
 네이버 지도 가운데 기준으로 위도 경도를 받아와 필터링을 거쳐 거리순으로 어린이집이 나타나도록 하였습니다.
 
 
@@ -660,7 +660,7 @@ API를 통해 위치 기준으로 어린이집 배열을 받아온뒤 url을 현
   }
 ```
 여러 andWhere 값을 거쳐 나온 값중 거리를 기준으로 데이터를 받아왔습니다.
-<div align="center" ><h2>센터 상세히 보기</h2></div>
+<div align="center" id="센터상세히보기" ><h2>센터 상세히 보기</h2></div>
 지도 위에서 마커를 클릭하거나 왼쪽 센터 리스트에서 선택한 경우 API를 통해 상세한 정보를 받아와 해당 정보를 나타내었습니다.
 
 
@@ -775,7 +775,7 @@ async findOne(id: string) {
 
 찾은 어린이집이 code명이 없을경우 별도의 API를 호출하여 해당하는 값을 찾아 업데이트 후 code 값을 변경하여 리턴 해주도록 하였습니다. 
 
-<div align="center" ><h2>게시판 작성</h2></div>
+<div align="center" id="게시판작성" ><h2>게시판 작성</h2></div>
 
 ```TypeScript
   const reviewWriteApiHandle: React.MouseEventHandler<HTMLButtonElement> =
@@ -952,7 +952,7 @@ async writeReview(createReviewDto: CreateReviewDto) {
 
 리뷰 테이블 형식에 맞도록 데이터를 삽입 했습니다.
 
-<div align="center" ><h2>게시판 수정</h2></div>
+<div align="center" id="게시판수정" ><h2>게시판 수정</h2></div>
 
 ```TypeScript
  {user.auth && review.user.id === user.auth.id && (
@@ -1023,12 +1023,6 @@ const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     };
 ```
 리뷰 수정의 경우 작성과 동일하게 코딩하였습니다.
-
-
-
-
-
-
 ```ts
   @Patch()
   // Patch: 리소스의 일부를 업데이트 한다
@@ -1086,7 +1080,7 @@ async updateReview(updateReviewDto: UpdateReviewDto) {
 
 업데이트시 업데이트 날짜를 DateTime 형식에 맞게 변경해주었습니다. 
 
-<div align="center" ><h2>게시판 삭제</h2></div>
+<div align="center" id="게시판삭제" ><h2>게시판 삭제</h2></div>
 
 ```TypeScript
 export interface reviewDeleteType extends APIType {
@@ -1174,12 +1168,6 @@ export class DeleteReviewDTO {
 
 ```
 리뷰 삭제의 경우 DELETE 메소드를 활용해 진행하였고, 데이터 정규식 체크 및 JWT 체크를 하였습니다.
-
-
-
-
-
-
 ```ts
     async removeReview(deleteReviewDto: DeleteReviewDTO) {
     // 리뷰 삭제 서비스
