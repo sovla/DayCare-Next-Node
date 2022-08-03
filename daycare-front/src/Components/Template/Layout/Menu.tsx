@@ -113,7 +113,7 @@ const Menu: React.FC = () => {
             <a>리뷰</a>
           </Link>
         </StyledMenuLi>
-        <StyledMenuLi isActive={false}>
+        <StyledMenuLi isActive={router?.asPath?.includes('/user')}>
           <button onClick={onClickProfile} type="button">
             <i>
               <Image

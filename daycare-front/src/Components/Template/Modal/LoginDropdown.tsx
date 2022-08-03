@@ -1,12 +1,12 @@
 import Button from '@src/Components/Atom/Button/Button';
 import useApi from '@src/CustomHook/useApi';
 import { changeUser, selectUser } from '@src/Store/userState';
-import Link from 'next/link';
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 import { sessionLoginOutType } from '@src/Type/API/session';
 import { changeError } from '@src/Store/errorState';
+import { useRouter } from 'next/router';
 
 const slide = keyframes`
   0% {
@@ -30,6 +30,7 @@ const StyledDiv = styled.div`
 `;
 
 const LoginDropdown = () => {
+  const router = useRouter();
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const { api: LogoutApi } = useApi<sessionLoginOutType>({
@@ -64,15 +65,17 @@ const LoginDropdown = () => {
     }
   }, [user.auth]);
 
-  if (!user.auth) {
+  if (user.auth === null) {
     return null;
   }
 
   return (
     <StyledDiv>
-      <Link href="/user">
-        <Button content="내 정보 수정" buttonProps={{}} />
-      </Link>
+      <Button
+        content="내 정보 수정"
+        buttonProps={{ onClick: () => router.push(`/user/${user.auth?.id}`) }}
+      />
+
       <Button
         content="로그아웃"
         color="red"
