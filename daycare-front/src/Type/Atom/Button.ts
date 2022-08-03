@@ -19,6 +19,12 @@ export interface BlueButtonProps {
   buttonProps: StyledComponentProps<'button', any, {}, never>;
 }
 
+export interface ButtonProps {
+  content: string;
+  color?: string;
+  buttonProps: StyledComponentProps<'button', any, {}, never>;
+}
+
 export interface IconButtonProps {
   image: NextImageSrc;
   buttonProps: StyledComponentProps<'button', any, {}, never>;

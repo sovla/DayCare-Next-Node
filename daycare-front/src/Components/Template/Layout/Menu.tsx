@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import AccountIcon from '@src/assets/image/AccountIcon.png';
 import BellIcon from '@src/assets/image/BellIcon.png';
@@ -11,6 +11,7 @@ import useAuth from '@src/CustomHook/useAuth';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@src/Store/userState';
 import { useRouter } from 'next/router';
+import LoginDropdown from '../Modal/LoginDropdown';
 
 const Nav = styled.nav`
   & > ul {
@@ -59,6 +60,7 @@ const Nav = styled.nav`
 
 const StyledMenuLi = styled.li<{ isActive: boolean }>`
   height: 44px;
+  position: relative;
   & * {
     color: ${(p) => (p.isActive ? Theme.color.darkGray_60 : '#ffffff')};
     text-decoration: none;
@@ -82,8 +84,17 @@ const StyledMenuLi = styled.li<{ isActive: boolean }>`
 
 const Menu: React.FC = () => {
   const { LoginModal, setIsShow } = useAuth();
+  const [isLoginMenu, setIsLoginMenu] = useState(false);
   const user = useSelector(selectUser);
   const router = useRouter();
+
+  const onClickProfile = useCallback(() => {
+    if (!user.auth) {
+      setIsShow(true);
+      return;
+    }
+    setIsLoginMenu((prev) => !prev);
+  }, [user.auth]);
   return (
     <Nav>
       <ul>
@@ -102,13 +113,8 @@ const Menu: React.FC = () => {
             <a>리뷰</a>
           </Link>
         </StyledMenuLi>
-        <StyledMenuLi isActive={false}>
-          <button
-            onClick={() => {
-              if (!user.auth) setIsShow(true);
-            }}
-            type="button"
-          >
+        <StyledMenuLi isActive={router?.asPath?.includes('/user')}>
+          <button onClick={onClickProfile} type="button">
             <i>
               <Image
                 src={AccountIcon}
@@ -131,6 +137,7 @@ const Menu: React.FC = () => {
             </i>
           </button>
         </StyledMenuLi>
+        {isLoginMenu && <LoginDropdown />}
       </ul>
       <LoginModal />
     </Nav>
