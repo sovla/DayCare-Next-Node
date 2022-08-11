@@ -35,13 +35,26 @@ module.exports = {
       'node_modules',
       'styles',
     ];
-
+    // config.resolve.alias.https = 'https-browserify';
+    // config.resolve.alias.http = 'http-browserify';
     // 절대 경로 설정
     config.resolve.alias = {
       ...config.resolve.alias,
       '@src': path.resolve(__dirname, '../src'),
+      'https-browserify': path.resolve(
+        __dirname,
+        '../node_modules/https-browserify'
+      ),
+      'http-browserify': path.resolve(
+        __dirname,
+        '../node_modules/http-browserify'
+      ),
     };
-
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      https: require.resolve('https-browserify'),
+      http: require.resolve('stream-http'),
+    };
     return config;
   },
 };
