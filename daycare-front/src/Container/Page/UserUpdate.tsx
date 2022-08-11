@@ -111,14 +111,7 @@ const UserUpdate: React.FC<{
         })
       );
     }
-  }, [
-    isNameUpdate,
-    updateName,
-    isPasswordUpdate,
-    updatePassword,
-    userState.auth,
-    dispatch,
-  ]);
+  }, [isNameUpdate, updateName, isPasswordUpdate, updatePassword, userState.auth, dispatch, user]);
 
   useEffect(() => {
     if (userState.auth === null || user.id !== userState.auth.id) {

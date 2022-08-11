@@ -8,6 +8,12 @@ const Button = styled.button`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    opacity: 0.7;
+  }
+
   .menu-text {
     margin-top: 5px;
   }
