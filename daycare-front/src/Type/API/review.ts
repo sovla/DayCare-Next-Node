@@ -89,6 +89,20 @@ export interface reviewGetType extends APIType {
   };
 }
 
+export interface reviewGetTypeWithCenterId extends APIType {
+  url: `/review/center/${number}`;
+  method: 'get';
+  request: {
+    page: number;
+  };
+
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    review: reviewListType[];
+  };
+}
+
 export interface reviewWriteType extends APIType {
   url: '/review';
   method: 'post';
