@@ -24,13 +24,23 @@ export class CenterController {
   constructor(private readonly centerService: CenterService) {}
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() res: Response) {
-    const findCenter = await this.centerService.findOne(id);
+  async findOne(
+    @Param('id') id: string,
+    @Query('id') userId: string | undefined,
+    @Res() res: Response,
+  ) {
+    const { findCenter, isLike } = await this.centerService.findOne(
+      +id,
+      userId != null ? +userId : undefined,
+    );
     res.statusCode = 200;
     return res.send({
       statusCode: res.statusCode,
       message: '정보 받아오기 완료',
-      center: findCenter,
+      center: {
+        ...findCenter,
+        isLike,
+      },
     });
   }
 
@@ -49,7 +59,7 @@ export class CenterController {
     return res.send({
       statusCode: res.statusCode,
       message: '정보 받아오기 완료',
-      center: isLike,
+      like: isLike,
     });
   }
 

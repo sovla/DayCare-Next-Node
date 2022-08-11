@@ -47,7 +47,7 @@ export class ReviewController {
   @Post()
   @UsePipes(ValidationPipe)
   // usePipes 를 통해 아래에 만든 Dto 클래스에 지정한 정규식에 맞는지 확인후 맞지 않을경우 에러
-  @UseGuards(JWTGuard)
+  // @UseGuards(JWTGuard)
   // 리뷰 작성의 경우 유저 권한이 있어야만 가능해 JWT Guard를 통해 JWT토큰 여부를 확인하였습니다.
   async writeReview(
     @Body() createReviewDto: CreateReviewDto,
@@ -66,15 +66,38 @@ export class ReviewController {
     });
   }
   @Get('/category/:id')
-  async findList(
+  async findListByCategoryId(
     @Param('id') id: string,
     @Query('page') page: string,
     @Res() res: Response,
   ) {
     // category_id 를 param 으로 받아옵니다.
     // 페이징 기능을 위한 page 변수를 쿼리스트링으로 받아옵니다
+    console.log('카테고리기준');
+    const result = await this.reviewService.findListByCategoryId(+id, +page);
 
-    const result = await this.reviewService.findList(+id, +page);
+    if (result.findReviews) {
+      res.statusCode = 200;
+      return res.send({
+        statusCode: res.statusCode,
+        message: '리뷰 받아오기 완료',
+        review: result.findReviews,
+        totalCount: result.totalCount,
+      });
+    }
+  }
+  @Get('/center/:id')
+  async findListByCenterId(
+    @Param('id') id: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    // 2022-08-06 준한
+    // center_id 를 param 으로 받아옵니다.
+    // 페이징 기능을 위한 page 변수를 쿼리스트링으로 받아옵니다
+
+    console.log('센터기준');
+    const result = await this.reviewService.findListByCenterId(+id, +page);
 
     if (result.findReviews) {
       res.statusCode = 200;

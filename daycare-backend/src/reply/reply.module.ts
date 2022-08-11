@@ -23,7 +23,7 @@ import { Reply } from 'src/domain/reply.entity';
     JwtModule.register({
       secret: `${process.env.JWT_SECRET_KEY}`,
       signOptions: {
-        expiresIn: '300s',
+        expiresIn: '2d',
       },
     }),
   ],

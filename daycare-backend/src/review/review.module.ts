@@ -1,3 +1,4 @@
+import { Reply } from 'src/domain/reply.entity';
 import { Module } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { ReviewController } from './review.controller';
@@ -11,11 +12,18 @@ import { User } from 'src/domain/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Review, Center, Category, ReviewLike, User]),
+    TypeOrmModule.forFeature([
+      Review,
+      Center,
+      Category,
+      ReviewLike,
+      User,
+      Reply,
+    ]),
     JwtModule.register({
       secret: `${process.env.JWT_SECRET_KEY}`,
       signOptions: {
-        expiresIn: '300s',
+        expiresIn: '2d',
       },
     }),
   ],

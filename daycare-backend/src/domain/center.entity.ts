@@ -534,6 +534,8 @@ export class Center {
   })
   certification: string; // 평가인증여부
 
-  @OneToMany(() => CenterLike, (centerLike) => centerLike.center)
+  @OneToMany(() => CenterLike, (centerLike) => centerLike.center, {
+    eager: true,
+  })
   center_likes: CenterLike[];
 }

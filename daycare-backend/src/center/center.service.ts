@@ -99,15 +99,30 @@ export class CenterService {
     return true;
   }
 
-  async findOne(id: string) {
+  async findOne(id: number, userId: number | undefined) {
     const findCenter = await this.centerRepository.findOne({
       where: {
-        id: +id,
+        id,
       },
     });
+
     if (!findCenter) {
       throw new HttpException('존재하지 않는 센터입니다', 400);
     }
+
+    let isLike = false;
+    if (userId != null && userId > 0 && id > 0)
+      isLike = !!(await this.centerLikeRepository.findOne({
+        where: {
+          center: {
+            id,
+          },
+          user: {
+            id: userId,
+          },
+        },
+      }));
+
     if (findCenter.code.length === 0) {
       // 찾은 센터명에서 코드가 없을 경우
       const formData = new FormData();
@@ -136,20 +151,25 @@ export class CenterService {
             v.name === findCenter.name,
           // 위도 경도가 같거나 이름이 같은 경우
         );
-
-        await this.centerRepository.update(
-          {
-            id: findCenter.id,
-          },
-          {
-            code: apiFindCenter.id,
-          }, // code 명을 변경 해준뒤
-        );
-        findCenter.code = apiFindCenter.id;
-        // 기존에 찾은 findCenter의 code값을 변경
+        if (apiFindCenter?.id) {
+          await this.centerRepository.update(
+            {
+              id: findCenter.id,
+            },
+            {
+              code: apiFindCenter.id,
+            }, // code 명을 변경 해준뒤
+          );
+          findCenter.code = apiFindCenter.id;
+          // 기존에 찾은 findCenter의 code값을 변경
+        }
       }
     }
-    return findCenter;
+
+    return {
+      findCenter,
+      isLike,
+    };
   }
 
   async findCentersByLocation(dto: FindFilterDTO) {

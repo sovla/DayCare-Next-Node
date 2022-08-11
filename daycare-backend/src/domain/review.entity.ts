@@ -85,8 +85,10 @@ export class Review {
   })
   center_id: number;
 
-  @ManyToOne(() => User, (user) => user.reviews)
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, (user) => user.reviews, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'review_user_id' })
   user: User;
 
   @Column({
