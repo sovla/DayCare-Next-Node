@@ -30,6 +30,17 @@ export class UserController {
     private jwtService: JwtService,
   ) {}
 
+  @Get('/:id')
+  async findOne(@Res() res: Response, @Param('id') id: string) {
+    const findUser = await this.userService.findOne(+id);
+    res.statusCode = 200;
+    return res.send({
+      statusCode: res.statusCode,
+      message: `유저 정보 불러오기 완료`,
+      user: findUser,
+    });
+  }
+
   @Post()
   @UsePipes(ValidationPipe)
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
@@ -48,8 +59,9 @@ export class UserController {
 
     res.statusCode = 200;
     res.cookie('jwt', accessToken, {
+      sameSite: 'lax',
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 1hours
+      maxAge: 48 * 60 * 60 * 1000, // 2days
     });
     return res.send({
       statusCode: res.statusCode,
@@ -106,13 +118,20 @@ export class UserController {
 
   @Patch()
   @UseGuards(JWTGuard)
-  updateUser(
+  async updateUser(
     @Req() req: Request,
     @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
   ) {
     // 유저 업데이트
+    console.log(updateUserDto);
+    const saveUser = await this.userService.updateUser(updateUserDto);
+    res.statusCode = 200;
 
-    return this.userService.updateUser(req, updateUserDto);
+    return res.send({
+      statusCode: res.statusCode,
+      message: '변경완료',
+      user: saveUser,
+    });
   }
 }
