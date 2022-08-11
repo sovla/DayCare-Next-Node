@@ -46,6 +46,7 @@ export class SessionController {
         res.setHeader('access-control-expose-headers', 'Set-Cookie');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.cookie('jwt', result.accessToken, {
+          sameSite: 'lax',
           httpOnly: true,
           maxAge: 24 * 60 * 60 * 1000, // 1hours
         });
@@ -67,12 +68,15 @@ export class SessionController {
 
     const findUser = await this.sessionService.login(loginDto);
 
-    const accessToken = this.jwtService.sign({
-      // 필요한 정보만 sign하여 보내기
-      id: findUser.id,
-      name: findUser.name,
-      email: findUser.email,
-    });
+    const accessToken = this.jwtService.sign(
+      {
+        // 필요한 정보만 sign하여 보내기
+        id: findUser.id,
+        name: findUser.name,
+        email: findUser.email,
+      },
+      {},
+    );
 
     res.statusCode = 200;
     res.setHeader('access-control-expose-headers', 'Set-Cookie');
@@ -86,9 +90,11 @@ export class SessionController {
     // Access-Control-Allow-Origin !== "*" 와일드 카드가 아니여야 서버에서 보내는 쿠키를 저장할 수 있다.
 
     res.cookie('jwt', accessToken, {
+      sameSite: 'lax',
       httpOnly: true,
       // httpOnly 속성의 경우 자바스크립트 속성에서 접근이 불가하다.
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 48 * 60 * 60 * 1000,
+
       // 24hours
     });
     return res.send({
