@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/jsx-one-expression-per-line */
 import Theme from '@src/assets/global/Theme';
@@ -11,7 +12,11 @@ import {
   replyLikeType,
   replyWriteType,
 } from '@src/Type/API/reply';
-import { reviewDeleteType, reviewLikeType } from '@src/Type/API/review';
+import {
+  reviewDeleteType,
+  reviewGetType,
+  reviewLikeType,
+} from '@src/Type/API/review';
 import { BoardDetailProps } from '@src/Type/Container/Board';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -27,6 +32,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { changeError } from '@src/Store/errorState';
 import Viewer from '@toast-ui/editor/dist/toastui-editor-viewer';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
+import { nullTypeGuard } from '@src/Util';
 
 const StyledContainer = styled.div`
   width: 100vw;
@@ -190,10 +196,12 @@ const StyledReply = styled.div<{ isLike: boolean }>`
   }
 `;
 
-const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
+const BoardDetail: React.FC<BoardDetailProps> = ({ review: reviewProps }) => {
   const user = useSelector(selectUser);
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const [review, setReview] = useState(reviewProps);
 
   const [replyComment, setReplyComment] = useState('');
   const [isLike, setIsLike] = useState(
@@ -234,6 +242,12 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     data: {
       id: user.auth?.id as number,
     },
+  });
+
+  const { api: getReviewApi } = useApi<reviewGetType>({
+    data: {},
+    method: 'get',
+    url: `/review/${router.query.id as string}`,
   });
 
   const replyWriteApiHandle = useCallback(async () => {
@@ -332,8 +346,13 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
           const response = await replyDeleteApi({
             reply_id: id,
           });
-          if (response.data.statusCode === 200) {
-            router.reload();
+          if (
+            response.data.statusCode === 200 &&
+            response.data.message === '댓글 삭제 완료'
+          ) {
+            const responseGetReview = await getReviewApi();
+            setReview(responseGetReview.data.review);
+            // 댓글 삭제 완료시 리플 배열에서 삭제
           }
         }
       } catch (error) {
@@ -347,21 +366,22 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
     },
     [replyDeleteApi, router, user.auth]
   );
-
   const onClickReplyLike = useCallback(
     async (id: number) => {
       try {
-        if (!user.auth) {
+        if (!nullTypeGuard(user.auth)) {
           throw new Error('로그인 후 이용 가능 합니다.');
         }
+
         const response = (await API.get(`reply/like/${id}`, {
           params: {
             id: user.auth?.id,
           },
         })) as AxiosResponse<replyLikeType['response']>;
 
-        if (response.data.statusCode === 200) {
-          router.reload();
+        if (response.data.statusCode === 200 && user.auth) {
+          const responseGetReview = await getReviewApi();
+          setReview(responseGetReview.data.review);
         }
       } catch (error) {
         dispatch(
@@ -383,9 +403,9 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review }) => {
         el: contentDiv,
         initialValue: review.content,
       });
-      console.log(viewer);
     }
   }, []);
+
   return (
     <StyledContainer>
       <Head>
