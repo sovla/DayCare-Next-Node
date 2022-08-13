@@ -70,6 +70,6 @@ export class User {
   })
   reply_likes: ReplyLike[];
 
-  @OneToMany(() => CenterLike, (centerLike) => centerLike.user)
+  @OneToMany(() => CenterLike, (centerLike) => centerLike.user, { eager: true })
   center_likes: CenterLike[];
 }

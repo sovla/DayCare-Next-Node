@@ -89,6 +89,22 @@ export interface reviewGetType extends APIType {
   };
 }
 
+export interface reviewGetTypeWithCenterId extends APIType {
+  url: `/review/center/${number}`;
+  method: 'get';
+  request: {
+    page: number;
+  };
+
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    review: reviewListType[];
+    totalCount: number;
+    images: string[];
+  };
+}
+
 export interface reviewWriteType extends APIType {
   url: '/review';
   method: 'post';
@@ -97,22 +113,14 @@ export interface reviewWriteType extends APIType {
         center_id: number;
         title: string;
         content: string;
-        image1?: File;
-        image2?: File;
-        image3?: File;
-        image4?: File;
-        image5?: File;
+        files?: File[];
         id: number;
       }
     | {
         category_id: number;
         title: string;
         content: string;
-        image1?: File;
-        image2?: File;
-        image3?: File;
-        image4?: File;
-        image5?: File;
+        files?: File[];
         id: number;
       };
   response: {
@@ -155,11 +163,8 @@ export interface reviewUpdateType extends APIType {
     review_id: number;
     title: string;
     content: string;
-    image1?: File;
-    image2?: File;
-    image3?: File;
-    image4?: File;
-    image5?: File;
+    files: File[];
+    files_index: number[];
     id: number;
   };
 

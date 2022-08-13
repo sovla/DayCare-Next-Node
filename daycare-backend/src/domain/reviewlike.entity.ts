@@ -17,13 +17,13 @@ export class ReviewLike {
   })
   id: number;
 
-  @ManyToOne(() => Review, (review) => review.likes, {
-    eager: false,
-  })
+  @ManyToOne(() => Review, (review) => review.likes)
   @JoinColumn({ name: 'review_id' })
   review: Review;
 
-  @ManyToOne(() => User, (user) => user.likes, { eager: true })
+  @ManyToOne(() => User, (user) => user.likes, {
+    eager: true,
+  })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

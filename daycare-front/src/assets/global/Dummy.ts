@@ -419,4 +419,5 @@ export const dummyCenter = {
   teaching_staff_count: 9,
   tel: '070-7204-2030',
   type: '국공립',
+  isLike: false,
 };

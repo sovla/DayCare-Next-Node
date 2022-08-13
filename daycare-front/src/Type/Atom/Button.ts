@@ -27,5 +27,9 @@ export interface ButtonProps {
 
 export interface IconButtonProps {
   image: NextImageSrc;
+  imageSize?: {
+    width: number;
+    height: number;
+  };
   buttonProps: StyledComponentProps<'button', any, {}, never>;
 }

@@ -42,22 +42,26 @@ export class ReplyService {
     const findReview = await this.reviewRepository.findOne({
       where: { id: createReplyDto.review_id },
     });
+    console.log(findReview);
 
     if (!findReview || findReview.delete_date != null) {
       throw new HttpException('존재하지 않는 리뷰 입니다.', 400);
     }
 
-    const saveReply = await this.replyRepository.save({
+    const insertReply = await this.replyRepository.insert({
       content: createReplyDto.content,
       user: findUser,
       review: findReview,
+      write_date: moment().format('YYYY-MM-DD HH:mm:ss'),
     });
 
+    const saveReply = insertReply.generatedMaps[0];
+
     return {
-      content: saveReply.content,
+      content: createReplyDto.content,
       id: saveReply.id,
-      delete_date: saveReply.delete_date,
-      update_date: saveReply.update_date,
+      delete_date: null,
+      update_date: null,
       write_date: saveReply.write_date,
     };
   }

@@ -10,6 +10,7 @@ import { changeUser, selectUser } from '@src/Store/userState';
 import { getUserInformationType, userPatchType } from '@src/Type/API/user';
 import RegExp from '@src/Util/RegExp';
 import { AxiosResponse } from 'axios';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -110,14 +111,7 @@ const UserUpdate: React.FC<{
         })
       );
     }
-  }, [
-    isNameUpdate,
-    updateName,
-    isPasswordUpdate,
-    updatePassword,
-    userState.auth,
-    dispatch,
-  ]);
+  }, [isNameUpdate, updateName, isPasswordUpdate, updatePassword, userState.auth, dispatch, user]);
 
   useEffect(() => {
     if (userState.auth === null || user.id !== userState.auth.id) {
@@ -131,6 +125,11 @@ const UserUpdate: React.FC<{
   }
   return (
     <StyledDiv>
+      <Head>
+        <title>DayCare</title>
+        <meta name="description" content="DayCareUser" />
+        <link rel="icon" href="/LogoIcon.png" />
+      </Head>
       <nav className="nav-menu">
         <Menu />
       </nav>

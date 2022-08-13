@@ -23,7 +23,7 @@ import Filter from '@src/Components/Template/Modal/Filter';
 import { filterType } from '@src/Type/Template/Modal';
 import { changeFilterData, dummyCenter } from '@src/assets/global/Dummy';
 import useEffectOnce from '@src/CustomHook/useEffectOnce';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { changeError } from '@src/Store/errorState';
 import useApi from '@src/CustomHook/useApi';
 import {
@@ -34,6 +34,8 @@ import {
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { objectToQueryString } from '@src/Util';
+import { selectUser } from '@src/Store/userState';
+import Loading from '@src/Components/Atom/Loading/Loading';
 
 const ContainerDiv = styled.div`
   display: flex;
@@ -262,6 +264,8 @@ const Map: React.FC = () => {
 
   const [title, setTitle] = useState('');
 
+  const [isGetCenterLoading, setIsGetCenterLoading] = useState(false);
+
   const { api: findCentersApi } = useApi<getSearchCentersType>({
     url: '/center',
     method: 'post',
@@ -269,6 +273,9 @@ const Map: React.FC = () => {
       title,
     },
   });
+
+  const user = useSelector(selectUser);
+  // 센터 상세정보 받아 올경우 id 값 추가를 위해
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -287,7 +294,11 @@ const Map: React.FC = () => {
     async (id: number) => {
       // 지도위에서 센터를 선택하거나 왼쪽 센터리스트에서 선택한 경우
       try {
-        API.get(`center/${id}`).then((res) => {
+        API.get(`center/${id}`, {
+          params: {
+            id: user.auth?.id,
+          },
+        }).then((res) => {
           setSelectCenter(res.data.center);
           // selectCenter를 이용해 상세 페이지 데이터 출력
 
@@ -314,7 +325,7 @@ const Map: React.FC = () => {
         );
       }
     },
-    [naverMap, router]
+    [naverMap, router, user.auth]
   );
 
   const createMarkers = useCallback(
@@ -397,7 +408,7 @@ const Map: React.FC = () => {
       // 네이버 지도가 없는 상태로 전달시 return null;
       return null;
     }
-
+    setIsGetCenterLoading(true);
     API.get<getCentersType['response']>('center', {
       params: {
         // 필터링 기능 및 지도 가운데 위치 파라미터
@@ -440,6 +451,9 @@ const Map: React.FC = () => {
             isShow: true,
           })
         );
+      })
+      .finally(() => {
+        setIsGetCenterLoading(false);
       });
   }, [naverMap, onClickCenter, filter, router.query]);
 
@@ -597,6 +611,7 @@ const Map: React.FC = () => {
           async
         />
       </Head>
+      {isGetCenterLoading && <Loading />}
       <div className="main-div">
         <aside className="search">
           <div className="row-center">
@@ -633,6 +648,7 @@ const Map: React.FC = () => {
         {selectCenter && (
           <div className="map-select-center">
             <DetailCenter
+              key={`DetailCenterId${selectCenter.id}`}
               onClickDetailInformation={onClickDetailInformation}
               image={DetailCenterHeaderImage}
               center={{
@@ -647,6 +663,7 @@ const Map: React.FC = () => {
                 representativeName: selectCenter.representative_name,
                 directorName: selectCenter.director_name,
                 id: selectCenter.id,
+                isSave: selectCenter.isLike,
               }}
               classList={[
                 {

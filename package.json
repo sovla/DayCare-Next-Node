@@ -4,9 +4,15 @@
     "private": true,
     "scripts": {
         "prepare": "husky install",
-        "lint": "cd daycare-front & yarn lint & cd .."
+        "lint": "cd daycare-front & yarn lint & cd ..",
+        "front": "cd daycare-front & C:/Users/jg348/AppData/Roaming/nvm/v16.16.0/yarn",
+        "build": "cd daycare-front & C:/Users/jg348/AppData/Roaming/nvm/v16.16.0/yarn build & C:/Users/jg348/AppData/Roaming/nvm/v16.16.0/yarn start",
+        "backend": "cd daycare-backend & npm run start:dev"
     },
-    "dependencies": {},
+    "dependencies": {
+        "http-browserify": "^1.7.0",
+        "https-browserify": "^1.0.0"
+    },
     "devDependencies": {
         "@commitlint/cli": "^17.0.3",
         "@commitlint/config-conventional": "^17.0.3",

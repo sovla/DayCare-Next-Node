@@ -49,6 +49,8 @@ const StyledDiv = styled.div`
     height: 100px;
     object-fit: cover;
     z-index: 5;
+    background-color: #fff;
+    border-radius: 4px;
   }
 `;
 

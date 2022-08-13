@@ -50,3 +50,16 @@ export interface getSearchCentersType extends APIType {
     center: centerType[];
   };
 }
+
+export interface centerLikeType extends APIType {
+  url: `/center/like/${number}`;
+  method: 'get';
+  request: {
+    id: number;
+  };
+  response: {
+    statusCode: 200 | 400 | 401 | 403;
+    message: string;
+    like: boolean;
+  };
+}

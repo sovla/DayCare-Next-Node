@@ -1,4 +1,3 @@
-import { JwtService } from '@nestjs/jwt';
 import {
   CACHE_MANAGER,
   HttpException,
@@ -14,9 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
-import { Request } from 'express';
 import { Cache } from 'cache-manager';
-import { find } from 'rxjs';
 import { jwtUserDTO } from './dto/jwt-user.dto';
 
 @Injectable()
@@ -27,6 +24,37 @@ export class UserService {
 
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  async findOne(id: number) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id,
+        delete_account: 0,
+      },
+      relations: {
+        reviews: true,
+        reply: true,
+      },
+      loadEagerRelations: false,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        center_likes: true,
+        reply: true,
+        reviews: true,
+        reply_likes: true,
+        likes: true,
+      },
+    });
+    if (!findUser) {
+      throw new HttpException(
+        '올바르지 않은 유저 정보입니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return findUser;
+  }
 
   async create(createUserDto: CreateUserDto) {
     const userFind: User = await this.userRepository.findOne({
@@ -41,7 +69,9 @@ export class UserService {
       );
     }
 
-    const privateUser = await this.transformPassword(createUserDto);
+    createUserDto.password = await this.transformPassword(
+      createUserDto.password,
+    );
 
     const verificationCode = await this.cacheManager.get(createUserDto.email);
     if (!verificationCode) {
@@ -58,16 +88,15 @@ export class UserService {
       );
     }
     const insertData = await this.userRepository.save({
-      email: privateUser.email,
-      name: privateUser.name,
-      password: privateUser.password,
+      email: createUserDto.email,
+      name: createUserDto.name,
+      password: createUserDto.password,
     });
 
     return insertData;
   }
 
-  async transformPassword(user: CreateUserDto): Promise<CreateUserDto> {
-    user.password = await bcrypt.hash(user.password, 10);
+  async transformPassword(password: string): Promise<string> {
     // 해싱이란 특정 알고리즘을 통해 인간이 해독하지 못하는 문자열로 변형
     // 해싱 특징
     // 1. 단방향이다. 되돌릴 수 없다
@@ -75,7 +104,7 @@ export class UserService {
     // 3. 입력값의 일부만 변경되어도 전혀 다른 출력값을 갖는다
     // ++ 이러한 특징에 Salt라는 랜덤한 값을 추가해 보안을 강화한다
     // bcrypt.hash(문자열,Salt문자열 길이)
-    return user;
+    return await bcrypt.hash(password, 10);
   }
 
   async verifyEmail(email: string) {
@@ -122,8 +151,42 @@ export class UserService {
     return random;
   }
 
-  updateUser(req: Request, updateUserDto: UpdateUserDto) {
-    return `This action updates a `;
+  async updateUser(updateUserDto: UpdateUserDto) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: updateUserDto.id,
+        delete_account: 0,
+      },
+      select: {
+        id: true,
+        name: true,
+        password: true,
+      },
+    });
+
+    if (!findUser) {
+      throw new HttpException(
+        '올바르지 않은 유저 정보입니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (updateUserDto?.password) {
+      updateUserDto.password = await this.transformPassword(
+        updateUserDto.password,
+      );
+    }
+
+    const saveUser = await this.userRepository.save({
+      id: findUser.id,
+      name: updateUserDto?.name ?? findUser.name,
+      password: updateUserDto?.password ?? findUser.password,
+    });
+
+    return await this.userRepository.findOne({
+      where: { id: findUser.id },
+      select: { id: true, name: true, email: true },
+    });
   }
 
   async removeUser(id: number) {

@@ -20,7 +20,7 @@ export class ReplyLike {
   @JoinColumn({ name: 'like_reply_id' })
   reply: Reply;
 
-  @ManyToOne(() => User, (user) => user.reply, { eager: true })
+  @ManyToOne(() => User, (user) => user.reply, { eager: false })
   @JoinColumn({ name: 'like_user_id' })
   user: User;
 }

@@ -22,6 +22,7 @@ export interface DetailCenterProps {
     representativeName: string;
     directorName: string;
     id: number;
+    isSave: boolean;
   };
   classList: {
     title: string;
