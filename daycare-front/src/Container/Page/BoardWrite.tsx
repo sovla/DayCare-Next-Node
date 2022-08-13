@@ -1,3 +1,5 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-unused-vars */
 import Head from 'next/head';
 import React, {
@@ -107,13 +109,12 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
 
   const [selectCategory, setSelectCategory] = useState(0);
   const [title, setTitle] = useState('');
-  const [images, setImages] = useState({
-    image1: '',
-    image2: '',
-    image3: '',
-    image4: '',
-    image5: '',
-  });
+  const [images, setImages] = useState<
+    {
+      file: File | null;
+      previewImage: string;
+    }[]
+  >(new Array(5).fill({ file: null, previewImage: '' }));
 
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -125,11 +126,7 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
       content: '',
       id: user.auth?.id as number,
       title,
-      // image1,
-      // image2,
-      // image3,
-      // image4,
-      // image5,
+      files: images.filter((v) => v.file !== null).map((v) => v.file) as File[],
     },
     method: 'post',
   });
@@ -168,19 +165,29 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
       },
       [category]
     );
-
   const onChangeFile =
     (index: number) => async (e: React.ChangeEvent<HTMLInputElement>) => {
       const reader = new FileReader();
-      if (e.target.files?.length && e.target.files[0]) {
-        reader.readAsDataURL(e.target.files[0]);
-        reader.onload = () => {
-          setImages((prev) => ({
-            ...prev,
-            [`image${index + 1}`]: reader.result,
-          }));
-        };
+      if (!e.target.files?.length || e.target.files == null) {
+        return;
       }
+
+      const targetFile = e.target.files[0] as File;
+
+      reader.readAsDataURL(e.target.files[0]);
+      reader.onload = () => {
+        setImages((prev) =>
+          prev.map((v, i) => {
+            if (i === index) {
+              return {
+                file: targetFile,
+                previewImage: reader.result as string,
+              };
+            }
+            return v;
+          })
+        );
+      };
     };
   useEffect(() => {
     if (selectCategory === 0 && category && Array.isArray(category)) {
@@ -200,7 +207,6 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
       window.alert('로그인 후 이용 가능합니다.');
     }
   }, []);
-  console.log(images.image1);
   if (!user.auth) {
     return null;
   }
@@ -262,13 +268,15 @@ const BoardWrite: React.FC<BoardWriteProps> = (props) => {
             }}
           />
         </div>
-        {/* <div className="files">
-          <InputFile value={images.image1} onChange={onChangeFile(0)} />
-          <InputFile value={images.image2} onChange={onChangeFile(1)} />
-          <InputFile value={images.image3} onChange={onChangeFile(2)} />
-          <InputFile value={images.image4} onChange={onChangeFile(3)} />
-          <InputFile value={images.image5} onChange={onChangeFile(4)} />
-        </div> */}
+        <div className="files">
+          {images.map((v, i) => (
+            <InputFile
+              key={i}
+              value={v.previewImage}
+              onChange={onChangeFile(i)}
+            />
+          ))}
+        </div>
       </form>
     </StyledWriteContainer>
   );

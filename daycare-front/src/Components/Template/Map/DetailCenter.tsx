@@ -1,12 +1,11 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-undef */
 import { DetailCenterProps } from '@src/Type/Template/Map';
 import Image from 'next/image';
-import React, {
-  useCallback,
-  useState,
-  useEffect,
-  useLayoutEffect,
-} from 'react';
+import React, { useCallback, useState, useLayoutEffect } from 'react';
 import styled from 'styled-components';
 import Theme from '@src/assets/global/Theme';
 import DetailMenuButton from '@src/Components/Atom/Button/DetailMenuButton';
@@ -19,12 +18,11 @@ import useApi from '@src/CustomHook/useApi';
 import { centerLikeType } from '@src/Type/API/center';
 import { changeError } from '@src/Store/errorState';
 import { useRouter } from 'next/router';
-import API from '@src/API';
 import {
-  reviewDetailType,
   reviewGetTypeWithCenterId,
   reviewListType,
 } from '@src/Type/API/review';
+import Review from '@src/Components/Template/Map/Review';
 
 const CenterAside = styled.aside`
   width: 440px;
@@ -42,10 +40,13 @@ const CenterAside = styled.aside`
     justify-content: space-around;
     margin-top: 20px;
   }
+  .gray-text {
+    color: ${Theme.color.gray_99};
+  }
   .line {
     width: 100%;
     min-height: 10px;
-    background-color: ${Theme.color.gray_C1};
+    background-color: ${Theme.color.gray_C1}50;
     margin-top: 20px;
   }
   .row-div {
@@ -97,6 +98,7 @@ const CenterAside = styled.aside`
       }
     }
   }
+
   @media (max-width: 768px) {
     width: 100vw;
     min-width: 320px;
@@ -131,13 +133,15 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
   const [isSave, setIsSave] = useState(center.isSave);
   const [isShowReview, setIsShowReview] = useState(false);
   const [reviewList, setReviewList] = useState<reviewListType[]>([]);
+  const [imageList, setImageList] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const router = useRouter();
 
   const { api: reviewGetApi } = useApi<reviewGetTypeWithCenterId>({
     data: {
-      page: 1,
+      page: page,
     },
     method: 'get',
     url: `/review/center/${center.id}`,
@@ -196,9 +200,9 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
   useLayoutEffect(() => {
     reviewGetApi().then((response) => {
       setReviewList(response.data.review);
+      setImageList(response.data.images);
     });
   }, []);
-  console.log('reviewList::', reviewList);
   return (
     <CenterAside>
       <div>
@@ -222,7 +226,7 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
         <DetailMenuButton
           image={ReviewIcon}
           alt="ReviewIcon"
-          menu="리뷰보러가기"
+          menu={isShowReview ? '센터 정보 보러가기' : '리뷰 보러가기'}
           buttonProps={{
             onClick: () => {
               setIsShowReview((prev) => !prev);
@@ -240,7 +244,7 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
       </div>
       <div className="line" />
       {isShowReview ? (
-        <></>
+        <Review imageList={imageList} reviewList={reviewList} center={center} />
       ) : (
         <>
           <div className="information">

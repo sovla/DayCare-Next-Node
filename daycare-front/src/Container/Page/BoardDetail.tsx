@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/jsx-one-expression-per-line */
@@ -21,7 +22,7 @@ import { BoardDetailProps } from '@src/Type/Container/Board';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import HeartIcon from '@src/assets/image/HeartIcon.png';
@@ -34,6 +35,12 @@ import Viewer from '@toast-ui/editor/dist/toastui-editor-viewer';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { nullTypeGuard } from '@src/Util';
 
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+
 const StyledContainer = styled.div`
   width: 100vw;
   height: 100vh;
@@ -43,6 +50,7 @@ const StyledContainer = styled.div`
   justify-content: center;
 
   .review {
+    position: relative;
     width: 40%;
     min-height: 700px;
     height: 100%;
@@ -51,6 +59,7 @@ const StyledContainer = styled.div`
     border-radius: 16px;
     border: 1px solid ${Theme.color.gray_C1};
     padding: 10px 20px;
+
     overflow-y: visible;
     & > h3 {
       max-width: 100%;
@@ -62,7 +71,7 @@ const StyledContainer = styled.div`
     }
   }
   #viewer {
-    min-height: 50%;
+    min-height: 70%;
     height: 70%;
     max-height: 70%;
     overflow-x: hidden;
@@ -71,6 +80,12 @@ const StyledContainer = styled.div`
       width: 100%;
       word-break: break-all;
     }
+  }
+
+  .min-viewer {
+    min-height: 30% !important;
+    height: 30% !important;
+    max-height: 30% !important ;
   }
   .row-center {
     display: flex;
@@ -127,6 +142,33 @@ const StyledContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .images {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 300px;
+    .swiper-slide {
+      min-width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #0003;
+      & > img {
+        background-color: #fff;
+        object-fit: contain;
+        min-height: 300px;
+        height: 300px;
+        max-height: 300px;
+        border-radius: 4px;
+        user-select: none;
+        &:hover {
+          /* opacity: 0.7;
+          cursor: pointer; */
+        }
+      }
+    }
   }
 
   @media (max-width: 768px) {
@@ -406,6 +448,22 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review: reviewProps }) => {
     }
   }, []);
 
+  const isImage = useMemo(
+    () =>
+      Object.entries(review).filter(
+        ([key, value]) => key.includes('image') && value.length > 0
+      ).length > 0,
+    [review]
+  );
+  // 이미지가 있는지 확인하는 변수
+
+  useEffect(() => {
+    const viewer = document.querySelector('#viewer');
+    if (isImage && viewer && !viewer.className.includes('min-viewer')) {
+      viewer.className += 'min-viewer';
+    }
+  }, []);
+
   return (
     <StyledContainer>
       <Head>
@@ -415,17 +473,51 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review: reviewProps }) => {
       </Head>
       <div className="review">
         <h3>{review.title}</h3>
-
         <br />
         <p>{review.user.name}</p>
-
         <small>
           {new Date(review.write_date).toISOString().substring(0, 10)} |
         </small>
         <small> 조회 {review.view_count}</small>
         <hr />
+        {isImage && (
+          <Swiper className="images mySwiper">
+            {review.image1.length > 0 && (
+              <SwiperSlide>
+                <img src={review.image1} alt="image1" />
+              </SwiperSlide>
+            )}
+
+            {review.image2.length > 0 && (
+              <SwiperSlide>
+                <img src={review.image2} alt="image2" />
+              </SwiperSlide>
+            )}
+
+            {review.image3.length > 0 && (
+              <SwiperSlide>
+                <img src={review.image3} alt="image3" />
+              </SwiperSlide>
+            )}
+
+            {review.image4.length > 0 && (
+              <SwiperSlide>
+                <img src={review.image4} alt="image4" />
+              </SwiperSlide>
+            )}
+
+            {review.image5.length > 0 && (
+              <SwiperSlide>
+                <img src={review.image5} alt="image5" />
+              </SwiperSlide>
+            )}
+          </Swiper>
+        )}
+
+        <hr />
         <div id="viewer" />
         <hr />
+
         <div className="buttons">
           <button type="button" className="heart" onClick={onClickReviewLike}>
             <Image
@@ -551,6 +643,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review: reviewProps }) => {
           />
         </div>
       </div>
+
       <div className="nav-menu">
         <Menu />
       </div>

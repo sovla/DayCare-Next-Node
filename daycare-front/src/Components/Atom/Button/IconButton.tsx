@@ -18,11 +18,23 @@ const Button = styled.button`
 `;
 
 const IconButton: React.FC<IconButtonProps> = (props) => {
-  const { buttonProps, image } = props;
+  const {
+    buttonProps,
+    image,
+    imageSize = {
+      width: 46,
+      height: 46,
+    },
+  } = props;
   return (
     <Button {...buttonProps}>
       <i>
-        <Image src={image} width={46} height={46} alt="icon" />
+        <Image
+          src={image}
+          width={imageSize.width}
+          height={imageSize.height}
+          alt="icon"
+        />
       </i>
     </Button>
   );
