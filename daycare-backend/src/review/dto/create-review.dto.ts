@@ -13,14 +13,4 @@ export class CreateReviewDto {
 
   @IsNotEmpty()
   content: string;
-
-  image1?: File;
-
-  image2?: File;
-
-  image3?: File;
-
-  image4?: File;
-
-  image5?: File;
 }

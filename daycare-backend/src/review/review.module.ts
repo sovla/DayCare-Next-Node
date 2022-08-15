@@ -9,6 +9,8 @@ import { Center } from 'src/domain/center.entity';
 import { Category } from 'src/domain/category.entity';
 import { ReviewLike } from 'src/domain/reviewlike.entity';
 import { User } from 'src/domain/user.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import { multerOptions } from 'src/lib/multerOption';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { User } from 'src/domain/user.entity';
         expiresIn: '2d',
       },
     }),
+    MulterModule.register(multerOptions),
   ],
   exports: [TypeOrmModule],
   controllers: [ReviewController],

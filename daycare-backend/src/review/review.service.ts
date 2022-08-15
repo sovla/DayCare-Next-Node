@@ -12,6 +12,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { User } from 'src/domain/user.entity';
+import { createImageURL, deleteImage } from 'src/lib/multerOption';
 
 @Injectable()
 export class ReviewService {
@@ -35,9 +36,11 @@ export class ReviewService {
     private replyRepository: Repository<Reply>,
   ) {}
 
-  async writeReview(createReviewDto: CreateReviewDto) {
+  async writeReview(
+    createReviewDto: CreateReviewDto,
+    files: Express.Multer.File[] | undefined,
+  ) {
     // 리뷰 작성 서비스
-
     const findUser = await this.userRepository.findOne({
       select: {
         id: true,
@@ -54,6 +57,15 @@ export class ReviewService {
       throw new HttpException('찾을 수 없는 회원입니다.', 401);
     }
 
+    const generatedFiles: string[] = [];
+    if (files) {
+      for (const file of files) {
+        generatedFiles.push(createImageURL(file));
+      }
+    }
+
+    const [image1, image2, image3, image4, image5] = generatedFiles;
+
     const saveReview = await this.reviewRepository.save({
       title: createReviewDto.title,
       category_id: createReviewDto?.category_id ?? null,
@@ -61,6 +73,12 @@ export class ReviewService {
       content: createReviewDto.content,
       user: findUser,
       write_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+
       // 타이틀, 내용, id값, user_id 값을 저장 해주고 날짜를 TimeStamp 에 맞는 형식으로 변경 2022-07-31 10:00:00.000
     });
     return saveReview;
@@ -170,12 +188,38 @@ export class ReviewService {
         reply: true,
         likes: true,
       },
-      // user 외래키 연결
-      take: 10 * page,
-      // take 끝 인덱스
-      skip: 10 * (page - 1) ? 10 * (page - 1) : 0,
-      // skip 첫 시작 인덱스 10 *(page - 1)이 1 이상이면 그값을 아니면 0을
     });
+
+    const findImages = await this.reviewRepository
+      .find({
+        where: {
+          center_id: id,
+          delete_date: IsNull(),
+        },
+        select: {
+          image1: true,
+          image2: true,
+          image3: true,
+          image4: true,
+          image5: true,
+        },
+        order: {
+          id: 'desc',
+        },
+      })
+      .then((res) => {
+        const images = [];
+
+        // Review[] -> image만 뽑아서 배열에 넣어주기
+        res.forEach((v) => {
+          Object.entries(v).forEach(([key, value]) => {
+            if (key.includes('image') && value != null && value !== '') {
+              images.push(value);
+            }
+          });
+        });
+        return images;
+      });
 
     return {
       findReviews: findReviews.map((v) => ({
@@ -185,6 +229,7 @@ export class ReviewService {
         likes: this.returnFormatterLikes(v.likes),
       })),
       totalCount: totalCount,
+      findImages: findImages,
     };
   }
 
@@ -193,9 +238,17 @@ export class ReviewService {
     const findReview = await this.reviewRepository.findOne({
       relations: {
         user: true,
-        reply: true,
+        reply: {
+          user: true,
+          likes: {
+            user: true,
+          },
+          review: false,
+        },
+        likes: {
+          user: true,
+        },
       },
-      loadEagerRelations: true,
       where: {
         id,
         delete_date: IsNull(),
@@ -215,33 +268,32 @@ export class ReviewService {
       },
     );
 
-    const findLikes = await this.reviewLikeRepository
-      .find({
-        where: {
-          review: {
-            id: findReview.id,
-          },
-        },
-        loadRelationIds: true,
-        relations: ['user'],
-      })
-      .then((result) => result.map((v) => ({ user_id: v.user })));
-
     const findReply = await this.replyRepository.find({
       where: {
         review: {
           id: findReview.id,
         },
       },
+      order: {
+        id: 'asc',
+      },
       loadEagerRelations: true,
-      relations: ['review'],
+      relations: {
+        user: true,
+        review: false,
+        likes: {
+          user: true,
+        },
+      },
     });
+
     return {
       ...findReview,
       view_count: findReview.view_count + 1,
       user: this.returnFormatterUser(findReview.user),
-      likes: findLikes,
+      likes: this.returnFormatterLikes(findReview.likes),
       reply: this.returnFormatterReply(findReply),
+      // reply: this.returnFormatterReply(findReply),
     };
   }
 
@@ -288,7 +340,7 @@ export class ReviewService {
         .map((v) => ({
           ...v,
           user: this.returnFormatterUser(v.user),
-          // likes: this.returnFormatterLikes(v.likes),
+          likes: this.returnFormatterLikes(v.likes),
         }));
     } catch (error) {
       throw new HttpException('reply Error', 400);
@@ -310,7 +362,10 @@ export class ReviewService {
     }
   }
 
-  async updateReview(updateReviewDto: UpdateReviewDto) {
+  async updateReview(
+    updateReviewDto: UpdateReviewDto,
+    files: Express.Multer.File[] | undefined,
+  ) {
     // 리뷰 업데이트 서비스
     const findReview = await this.reviewRepository.findOne({
       where: {
@@ -320,6 +375,11 @@ export class ReviewService {
       },
       select: {
         id: true,
+        image1: true,
+        image2: true,
+        image3: true,
+        image4: true,
+        image5: true,
       },
     });
     if (!findReview) {
@@ -327,12 +387,37 @@ export class ReviewService {
       throw new HttpException('존재하지 않는 리뷰입니다.', 400);
     }
 
+    const generatedFiles: string[] = [
+      findReview.image1,
+      findReview.image2,
+      findReview.image3,
+      findReview.image4,
+      findReview.image5,
+    ];
+    if (files?.length && updateReviewDto?.files_index?.length) {
+      for (
+        let index = 0;
+        index < updateReviewDto.files_index?.length;
+        index++
+      ) {
+        const fileIndex = updateReviewDto.files_index[index];
+        deleteImage(generatedFiles[fileIndex]);
+        generatedFiles[fileIndex] = createImageURL(files[index]);
+      }
+    }
+    const [image1, image2, image3, image4, image5] = generatedFiles;
+
     const updateReview = await this.reviewRepository.save({
       id: findReview.id,
       update_date: moment().format('YYYY-MM-DD HH:mm:ss'),
       // 업데이트 날짜 변경 해주기
       title: updateReviewDto.title,
       content: updateReviewDto.content,
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
     });
 
     return updateReview;
