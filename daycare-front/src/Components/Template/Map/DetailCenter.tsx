@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 /* eslint-disable @next/next/no-img-element */
@@ -141,7 +142,7 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
 
   const { api: reviewGetApi } = useApi<reviewGetTypeWithCenterId>({
     data: {
-      page: page,
+      page,
     },
     method: 'get',
     url: `/review/center/${center.id}`,
@@ -184,17 +185,23 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
 
   const onClickShare = useCallback(() => {
     // 공유 버튼 클릭시
-    if (!navigator.clipboard) {
-      const clipboard = navigator.clipboard as Clipboard;
-      clipboard.writeText(router.asPath);
-    } else {
-      dispatch(
-        changeError({
-          errorStatus: new Error('해당 기능이 지원되지 않는 브라우저입니다.'),
-          isShow: true,
-        })
+    navigator?.clipboard
+      ?.writeText(`https://daycare-center.shop${router.asPath}`)
+      ?.then(
+        () => {
+          alert('복사 완료');
+        },
+        () => {
+          dispatch(
+            changeError({
+              errorStatus: new Error(
+                '해당 기능이 지원되지 않는 브라우저입니다.'
+              ),
+              isShow: true,
+            })
+          );
+        }
       );
-    }
   }, []);
 
   useLayoutEffect(() => {
