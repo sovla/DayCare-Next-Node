@@ -13,6 +13,7 @@ import { DeleteReviewDTO } from './dto/delete-review.dto.ts';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { User } from 'src/domain/user.entity';
 import { createImageURL, deleteImage } from 'src/lib/multerOption';
+import { Alarm } from 'src/domain/alarm.entity';
 
 @Injectable()
 export class ReviewService {
@@ -34,6 +35,9 @@ export class ReviewService {
 
     @InjectRepository(Reply)
     private replyRepository: Repository<Reply>,
+
+    @InjectRepository(Alarm)
+    private alarmRepository: Repository<Alarm>,
   ) {}
 
   async writeReview(
@@ -81,6 +85,43 @@ export class ReviewService {
 
       // 타이틀, 내용, id값, user_id 값을 저장 해주고 날짜를 TimeStamp 에 맞는 형식으로 변경 2022-07-31 10:00:00.000
     });
+    if (createReviewDto?.center_id) {
+      // center_id 가 있는 경우 알람 추가
+      // 추후에 분리해야 될까? 고민인 부분
+      this.centerRepository
+        .findOne({
+          where: {
+            id: createReviewDto.center_id,
+          },
+          select: {
+            center_likes: true,
+            name: true,
+            id: true,
+          },
+          relations: {
+            center_likes: {
+              user: true,
+            },
+          },
+        })
+        .then((findCenterLike) => {
+          for (const like of findCenterLike.center_likes) {
+            this.alarmRepository.insert({
+              center: {
+                id: findCenterLike.id,
+              },
+              user: {
+                id: like.user.id,
+              },
+              title: '리뷰 작성',
+              content: `${findCenterLike.name}에 새로운 리뷰가 달렸습니다.`,
+              join_date: moment().format('YYYY-MM-DD HH:mm:ss'),
+              read_status: 0,
+            });
+          }
+        });
+    }
+
     return saveReview;
   }
 
@@ -460,7 +501,13 @@ export class ReviewService {
       },
       select: {
         id: true,
+        title: true,
+        center_id: true,
+
         // 필요한 값만 셀렉트
+      },
+      relations: {
+        user: true,
       },
     });
     if (!findReview) {
@@ -475,6 +522,7 @@ export class ReviewService {
       },
       select: {
         id: true,
+        name: true,
         // 필요한 값만 셀렉트
       },
     });
@@ -498,9 +546,61 @@ export class ReviewService {
         user: findUser,
         review: findReview,
       });
+
+      if (findReview.user.id !== +user_id) {
+        // 리뷰 작성자와 좋아요 누른 사람 구별용
+        this.reviewLikeAlarm(findReview);
+      }
+
       return true;
     }
     // 좋아요 테이블에 해당 데이터가 존재한다면 ? 삭제후 false 반환
     // 좋아요 테이블에 데이터가 없다면? 삽입후 true 반환
+  }
+
+  getNow(type: 'timestamp') {
+    if (type === 'timestamp') {
+      return moment().format('YYYY-MM-DD HH:mm:ss');
+    }
+  }
+
+  async reviewLikeAlarm(findReview: Review) {
+    // 리뷰 좋아요 알람서비스
+    // 기능 알람 테이블에 인서트 및 이미 리뷰 좋아요가 있을경우 중복 체크
+
+    const findAlarm = await this.alarmRepository.findOne({
+      where: {
+        user: {
+          id: findReview.user.id,
+        },
+        review: {
+          id: findReview.id,
+        },
+      },
+      relations: {
+        user: true,
+        review: true,
+        center: true,
+      },
+    });
+
+    if (findAlarm) {
+      return;
+    }
+
+    this.alarmRepository.insert({
+      title: '좋아요',
+      content: `${findReview.title}에 ${findReview.user.name}님이 좋아요를 눌렀습니다.`,
+      join_date: this.getNow('timestamp'),
+      user: {
+        id: findReview.user.id,
+      },
+      center: {
+        id: findReview.center_id,
+      },
+      review: {
+        id: findReview.id,
+      },
+    });
   }
 }

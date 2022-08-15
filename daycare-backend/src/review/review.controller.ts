@@ -51,7 +51,7 @@ export class ReviewController {
   @Post()
   @UsePipes(ValidationPipe)
   // usePipes 를 통해 아래에 만든 Dto 클래스에 지정한 정규식에 맞는지 확인후 맞지 않을경우 에러
-  @UseGuards(JWTGuard)
+  // @UseGuards(JWTGuard)
   // 리뷰 작성의 경우 유저 권한이 있어야만 가능해 JWT Guard를 통해 JWT토큰 여부를 확인하였습니다.
   @UseInterceptors(FilesInterceptor('files'))
   async writeReview(

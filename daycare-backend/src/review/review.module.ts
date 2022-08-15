@@ -11,6 +11,7 @@ import { ReviewLike } from 'src/domain/reviewlike.entity';
 import { User } from 'src/domain/user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerOptions } from 'src/lib/multerOption';
+import { Alarm } from 'src/domain/alarm.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { multerOptions } from 'src/lib/multerOption';
       ReviewLike,
       User,
       Reply,
+      Alarm,
     ]),
     JwtModule.register({
       secret: `${process.env.JWT_SECRET_KEY}`,
