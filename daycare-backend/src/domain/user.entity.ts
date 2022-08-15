@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Alarm } from './alarm.entity';
 import { CenterLike } from './centerLike.entity';
 import { Reply } from './reply.entity';
 import { ReplyLike } from './replylike.entity';
@@ -46,6 +47,12 @@ export class User {
   })
   delete_account: number;
 
+  @Column({
+    type: 'varchar',
+    default: '',
+  })
+  token: string;
+
   @OneToMany(() => Review, (review) => review.user, {
     eager: false,
     lazy: true,
@@ -72,4 +79,7 @@ export class User {
 
   @OneToMany(() => CenterLike, (centerLike) => centerLike.user, { eager: true })
   center_likes: CenterLike[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.user, { eager: true })
+  alarm: Alarm[];
 }

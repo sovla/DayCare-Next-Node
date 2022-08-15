@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ReviewLike } from './reviewlike.entity';
 import { User } from './user.entity';
+import { Alarm } from './alarm.entity';
 
 @Entity()
 export class Review {
@@ -106,4 +107,7 @@ export class Review {
     eager: true,
   })
   reply: Reply[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.review)
+  alarm: Alarm[];
 }
