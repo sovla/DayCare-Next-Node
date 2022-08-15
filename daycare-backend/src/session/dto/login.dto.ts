@@ -7,4 +7,6 @@ export class LoginDTO {
   @IsNotEmpty({ message: '비밀번호를 확인해주세요.' })
   @Length(6, 20, { message: '비밀번호는 6 ~ 20자 사이 입니다.' })
   password: string;
+
+  token: string | undefined;
 }

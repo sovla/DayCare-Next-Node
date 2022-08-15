@@ -31,10 +31,22 @@ export class SessionService {
       throw new HttpException('비밀번호가 틀립니다.', 401);
     }
 
+    if (loginDto?.token) {
+      // 토큰이 있을경우에만 업데이트
+      this.userRepository.update(
+        {
+          id: findUser.id,
+        },
+        {
+          token: loginDto.token,
+        },
+      );
+    }
+
     return findUser;
   }
 
-  async silentLogin(id: number) {
+  async silentLogin(id: number, token?: string) {
     const findUser = await this.userRepository.findOne({
       where: {
         id: id,
@@ -42,6 +54,18 @@ export class SessionService {
     });
     if (!findUser) {
       throw new HttpException('존재하지 않는 회원입니다.', 401);
+    }
+
+    if (token) {
+      // 토큰이 있을경우에만 업데이트
+      this.userRepository.update(
+        {
+          id: findUser.id,
+        },
+        {
+          token: token,
+        },
+      );
     }
 
     return findUser;
