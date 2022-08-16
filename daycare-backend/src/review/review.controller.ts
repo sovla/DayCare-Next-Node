@@ -13,12 +13,16 @@ import {
   UseGuards,
   HttpException,
   Query,
+  UseInterceptors,
+  UploadedFiles,
+  Bind,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Response } from 'express';
 import { JWTGuard } from './guard/jwt.guard';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('review')
 export class ReviewController {
@@ -49,11 +53,17 @@ export class ReviewController {
   // usePipes 를 통해 아래에 만든 Dto 클래스에 지정한 정규식에 맞는지 확인후 맞지 않을경우 에러
   // @UseGuards(JWTGuard)
   // 리뷰 작성의 경우 유저 권한이 있어야만 가능해 JWT Guard를 통해 JWT토큰 여부를 확인하였습니다.
+  @UseInterceptors(FilesInterceptor('files'))
   async writeReview(
     @Body() createReviewDto: CreateReviewDto,
     @Res() res: Response,
+    @UploadedFiles() files: Express.Multer.File[] | undefined,
   ) {
-    const saveReview = await this.reviewService.writeReview(createReviewDto);
+    console.log('파일기준 파일입니다files:::', files, createReviewDto);
+    const saveReview = await this.reviewService.writeReview(
+      createReviewDto,
+      files,
+    );
     if (!saveReview) {
       throw new HttpException('리뷰 저장에 실패했습니다', 400);
     }
@@ -96,7 +106,6 @@ export class ReviewController {
     // center_id 를 param 으로 받아옵니다.
     // 페이징 기능을 위한 page 변수를 쿼리스트링으로 받아옵니다
 
-    console.log('센터기준');
     const result = await this.reviewService.findListByCenterId(+id, +page);
 
     if (result.findReviews) {
@@ -106,6 +115,7 @@ export class ReviewController {
         message: '리뷰 받아오기 완료',
         review: result.findReviews,
         totalCount: result.totalCount,
+        images: result.findImages,
       });
     }
   }
@@ -130,12 +140,18 @@ export class ReviewController {
   // Patch: 리소스의 일부를 업데이트 한다
   @UsePipes(ValidationPipe)
   @UseGuards(JWTGuard)
+  @UseInterceptors(FilesInterceptor('files'))
   // 정규식 및 JWT 확인 과정
   async updateReview(
     @Body() updateReviewDto: UpdateReviewDto,
     @Res() res: Response,
+    @UploadedFiles() files: Express.Multer.File[] | undefined,
   ) {
-    const updateReview = await this.reviewService.updateReview(updateReviewDto);
+    console.log(files, updateReviewDto.files_index);
+    const updateReview = await this.reviewService.updateReview(
+      updateReviewDto,
+      files,
+    );
 
     res.statusCode = 200;
 

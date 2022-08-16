@@ -33,7 +33,10 @@ export class SessionController {
   ) {
     if (req.cookies['jwt'] && !loginDto?.email) {
       const data = this.jwtService.decode(req.cookies['jwt']);
-      const findUser = await this.sessionService.silentLogin(data['id']);
+      const findUser = await this.sessionService.silentLogin(
+        data['id'],
+        loginDto.token,
+      );
       if (findUser) {
         const result = {
           accessToken: this.jwtService.sign({
@@ -111,14 +114,7 @@ export class SessionController {
   @Delete()
   @UseGuards(JWTGuard)
   async logout(
-    @Body(
-      'id',
-      new ParseIntPipe({
-        exceptionFactory: (error) => {
-          throw new HttpException('올바른 id 값을 입력해주세요', 400);
-        },
-      }),
-    )
+    @Body('id')
     id: number,
     @Res() res: Response,
   ) {

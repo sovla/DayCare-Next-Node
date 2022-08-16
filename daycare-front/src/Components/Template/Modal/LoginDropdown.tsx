@@ -2,11 +2,13 @@ import Button from '@src/Components/Atom/Button/Button';
 import useApi from '@src/CustomHook/useApi';
 import { changeUser, selectUser } from '@src/Store/userState';
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 import { sessionLoginOutType } from '@src/Type/API/session';
 import { changeError } from '@src/Store/errorState';
 import { useRouter } from 'next/router';
+import { useAppDispatch } from '@src/Store/store';
+import { initAlarm } from '@src/Store/alarmState';
 
 const slide = keyframes`
   0% {
@@ -32,7 +34,7 @@ const StyledDiv = styled.div`
 const LoginDropdown = () => {
   const router = useRouter();
   const user = useSelector(selectUser);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { api: LogoutApi } = useApi<sessionLoginOutType>({
     data: {
       id: user.auth?.id as number,
@@ -53,6 +55,7 @@ const LoginDropdown = () => {
       if (response.data?.statusCode === 200) {
         alert('로그아웃 완료');
         dispatch(changeUser(null));
+        dispatch(initAlarm(null));
         // 로그아웃 처리 및 전역 상태 변경
       }
     } catch (error) {

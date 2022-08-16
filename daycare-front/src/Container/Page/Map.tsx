@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable consistent-return */
@@ -287,23 +288,27 @@ const Map: React.FC = () => {
     // 네이버 맵 만들기
     new naver.maps.Map('map', {
       center: new naver.maps.LatLng(location.lat, location.lon),
-      zoom: naverMap?.getZoom() ?? 10,
+      zoom: 14,
     });
 
   const onClickCenter = useCallback(
     async (id: number) => {
       // 지도위에서 센터를 선택하거나 왼쪽 센터리스트에서 선택한 경우
-      try {
-        API.get(`center/${id}`, {
-          params: {
-            id: user.auth?.id,
-          },
-        }).then((res) => {
+      API.get(`center/${id}`, {
+        params: {
+          id: user.auth?.id,
+        },
+      })
+        .then((res) => {
           setSelectCenter(res.data.center);
           // selectCenter를 이용해 상세 페이지 데이터 출력
 
           router.replace(
-            `map?${objectToQueryString({ ...router.query, center: id })}`
+            `map?${objectToQueryString({
+              ...router.query,
+              center: id,
+              isReview: false,
+            })}`
           );
           // url 변경 center=해당 어린이집 id 값으로
           if (!naverMap) {
@@ -315,15 +320,15 @@ const Map: React.FC = () => {
           );
           naverMap.setZoom(naverMap.getZoom() < 15 ? naverMap.getZoom() : 15);
           // 맵 가운데로 이동 및 줌 레벨이 15 밑 일 경우 자세한 위치를 위해 15로 고정
+        })
+        .catch((error) => {
+          dispatch(
+            changeError({
+              errorStatus: error,
+              isShow: true,
+            })
+          );
         });
-      } catch (error) {
-        dispatch(
-          changeError({
-            errorStatus: error,
-            isShow: true,
-          })
-        );
-      }
     },
     [naverMap, router, user.auth]
   );
@@ -402,14 +407,14 @@ const Map: React.FC = () => {
     [naverMap, onClickCenter]
   );
 
-  const onClickSearch = useCallback(() => {
+  const onClickSearch = useCallback(async () => {
     // 지도에서 이 위치에서 검색 버튼을 눌럿을때
     if (!naverMap) {
       // 네이버 지도가 없는 상태로 전달시 return null;
       return null;
     }
     setIsGetCenterLoading(true);
-    API.get<getCentersType['response']>('center', {
+    await API.get<getCentersType['response']>('center', {
       params: {
         // 필터링 기능 및 지도 가운데 위치 파라미터
         lon: naverMap.getCenter().x,
@@ -433,6 +438,7 @@ const Map: React.FC = () => {
             ...router.query,
             lat: naverMap.getCenter().y,
             lon: naverMap.getCenter().x,
+            isReview: false,
           })}`
         );
         // 센터 리스트
@@ -555,12 +561,21 @@ const Map: React.FC = () => {
   }, [naverMap, onClickSearch]);
 
   const onClickInformationSearch = useCallback(async () => {
-    const response = await findCentersApi();
-    if (response.data.statusCode === 200) {
-      setCenterList(response.data.center);
-      createMarkers(response.data.center);
+    try {
+      const response = await findCentersApi();
+      if (response.data.statusCode === 200) {
+        setCenterList(response.data.center);
+        createMarkers(response.data.center);
+      }
+    } catch (error) {
+      dispatch(
+        changeError({
+          errorStatus: error,
+          isShow: true,
+        })
+      );
     }
-  }, [findCentersApi]);
+  }, [createMarkers, dispatch, findCentersApi]);
 
   useEffect(() => {
     if (!loading) {
@@ -568,7 +583,25 @@ const Map: React.FC = () => {
     }
   }, [loading]);
 
+  useEffect(() => {
+    if (router.query.isReview === 'true') {
+      const query = router.query as {
+        lat: string;
+        lon: string;
+        isReview: 'true' | 'false';
+        center: string;
+      };
+      if (selectCenter && selectCenter.id === +query.center) {
+        return;
+      }
+      naverMap?.setCenter(new naver.maps.LatLng(+query.lat, +query.lon));
+      onClickSearch();
+      onClickCenter(+query.center);
+    }
+  }, [router.query]);
+
   useEffectOnce(() => {
+    // 공유 목적의 UseEffect router.query
     if (naverMap) {
       const query = router.query as {
         lat?: string;
@@ -585,11 +618,10 @@ const Map: React.FC = () => {
   }, [naverMap]);
 
   useEffectOnce(() => {
-    if (centerList.length) {
-      if (router.query?.center) {
-        onClickCenter(+router.query.center);
-        return true;
-      }
+    // 공유 목적의 UseEffect
+    if (centerList.length && router.query?.center) {
+      onClickCenter(+router.query.center);
+      return true;
     }
     return false;
   }, [centerList]);

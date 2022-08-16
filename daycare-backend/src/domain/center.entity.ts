@@ -6,6 +6,7 @@ import {
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Alarm } from './alarm.entity';
 import { CenterLike } from './centerLike.entity';
 
 @Entity()
@@ -538,4 +539,9 @@ export class Center {
     eager: true,
   })
   center_likes: CenterLike[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.center, {
+    eager: false,
+  })
+  alarm: Alarm[];
 }

@@ -6,11 +6,12 @@ import BlueButton from '@src/Components/Atom/Button/BlueButton';
 import styled from 'styled-components';
 import useApi from '@src/CustomHook/useApi';
 import { sessionLoginType } from '@src/Type/API/session';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { changeUser } from '@src/Store/userState';
 import { LoginProps } from '@src/Type/Template/Modal';
 import { changeError } from '@src/Store/errorState';
 import RegExp from '@src/Util/RegExp';
+import { selectToken } from '@src/Store/tokenState';
 
 const ContainerDiv = styled.div`
   width: 400px;
@@ -59,11 +60,14 @@ const Login: React.FC<LoginProps> = ({ setIsSignUp }) => {
 
   const dispatch = useDispatch();
 
+  const token = useSelector(selectToken);
+
   const { api: loginApi } = useApi<sessionLoginType>({
     url: '/session',
     data: {
       email,
       password,
+      token: token.value,
     },
     method: 'post',
   });

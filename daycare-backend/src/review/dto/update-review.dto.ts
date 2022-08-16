@@ -15,13 +15,5 @@ export class UpdateReviewDto extends PartialType(CreateReviewDto) {
   @IsNotEmpty()
   id: number;
 
-  image1?: File;
-
-  image2?: File;
-
-  image3?: File;
-
-  image4?: File;
-
-  image5?: File;
+  files_index: number[];
 }

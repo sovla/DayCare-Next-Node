@@ -411,7 +411,7 @@ const BoardDetail: React.FC<BoardDetailProps> = ({ review: reviewProps }) => {
   const onClickReplyLike = useCallback(
     async (id: number) => {
       try {
-        if (!nullTypeGuard(user.auth)) {
+        if (!user.auth) {
           throw new Error('로그인 후 이용 가능 합니다.');
         }
 
