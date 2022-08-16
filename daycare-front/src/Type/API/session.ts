@@ -6,6 +6,7 @@ export interface sessionLoginType extends APIType {
   request: {
     email: string;
     password: string;
+    token: string | null;
   };
   response: {
     statusCode: 200 | 400 | 401 | 403;

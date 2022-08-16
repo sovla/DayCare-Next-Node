@@ -126,12 +126,6 @@ const BoardUpdate: React.FC<BoardUpdateProps> = ({ review }) => {
     },
     method: 'patch',
   });
-  console.log(
-    'files_index',
-    images
-      .map((v, i) => v.file && i)
-      .filter((v) => typeof v === 'number') as number[]
-  );
   const reviewUpdateApiHandle: React.MouseEventHandler<HTMLButtonElement> =
     async (e) => {
       // 리뷰 업데이트 함수 핸들링 함수

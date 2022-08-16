@@ -17,6 +17,7 @@ export interface userSignUpType extends APIType {
       email: string;
       name: string;
     };
+    code: string;
   };
 }
 

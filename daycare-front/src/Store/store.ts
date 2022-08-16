@@ -1,6 +1,9 @@
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
+import alarmState from './alarmState';
 import errorState from './errorState';
+import tokenState from './tokenState';
 import userState, { mockUserState } from './userState';
 
 export const makeStore = configureStore({
@@ -11,6 +14,8 @@ export const makeStore = configureStore({
     // middleware: ['array of middlewares'],
     user: userState,
     error: errorState,
+    token: tokenState,
+    alarm: alarmState,
   },
   devTools: true,
   middleware: (curryGetDefaultMiddleware) =>
@@ -63,4 +68,9 @@ export default wrapper;
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof makeStore.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+
 export type AppDispatch = typeof makeStore.dispatch;
+
+export const useAppDispatch: () => AppDispatch = useDispatch;
+
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

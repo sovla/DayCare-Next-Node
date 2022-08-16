@@ -6,7 +6,12 @@
 /* eslint-disable no-undef */
 import { DetailCenterProps } from '@src/Type/Template/Map';
 import Image from 'next/image';
-import React, { useCallback, useState, useLayoutEffect } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useLayoutEffect,
+  useEffect,
+} from 'react';
 import styled from 'styled-components';
 import Theme from '@src/assets/global/Theme';
 import DetailMenuButton from '@src/Components/Atom/Button/DetailMenuButton';
@@ -202,9 +207,9 @@ const DetailCenter: React.FC<DetailCenterProps> = (props) => {
           );
         }
       );
-  }, []);
+  }, [router]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     reviewGetApi().then((response) => {
       setReviewList(response.data.review);
       setImageList(response.data.images);
